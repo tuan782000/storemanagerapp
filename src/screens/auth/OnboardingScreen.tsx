@@ -6,6 +6,7 @@ import {appInfos} from '../../constants/appInfos';
 import {appColors} from '../../constants/colors';
 import {ArrowLeft2, ArrowRight2} from 'iconsax-react-native';
 import {fontFamilies} from '../../constants/fontFamilies';
+import {TextComponent} from '../../components';
 
 const OnboardingScreen = ({navigation}: any) => {
   const [index, setIndex] = useState(0);
@@ -67,10 +68,11 @@ const OnboardingScreen = ({navigation}: any) => {
             padding: 8,
             borderRadius: 8,
           }}>
-          <Text
-            style={{fontFamily: fontFamilies.bold, color: appColors.primary}}>
-            Bỏ qua
-          </Text>
+          <TextComponent
+            text="Bỏ qua"
+            color={appColors.primary}
+            font={fontFamilies.bold}
+          />
           <ArrowRight2 size={20} color={appColors.primary} />
         </TouchableOpacity>
       </View>
@@ -99,20 +101,25 @@ const OnboardingScreen = ({navigation}: any) => {
             size={18}
             color={`${index === 0 ? appColors.gray2 : appColors.white}`}
           />
-          <Text
-            style={[
-              styles.text,
-              {color: index === 0 ? appColors.gray2 : appColors.white},
-            ]}>
-            Quay lại
-          </Text>
+
+          <TextComponent
+            color={index === 0 ? appColors.gray2 : appColors.white}
+            size={16}
+            font={fontFamilies.medium}
+            text="Quay lại"
+          />
         </TouchableOpacity>
         <TouchableOpacity
           style={{flexDirection: 'row', alignItems: 'center'}}
           onPress={() =>
             index < 2 ? setIndex(index + 1) : navigation.navigate('LoginScreen')
           }>
-          <Text style={[styles.text]}>Tiếp theo</Text>
+          <TextComponent
+            color={index === 0 ? appColors.gray2 : appColors.white}
+            size={16}
+            font={fontFamilies.medium}
+            text="Tiếp theo"
+          />
           <ArrowRight2 size={18} color={appColors.white} />
         </TouchableOpacity>
       </View>
@@ -121,11 +128,3 @@ const OnboardingScreen = ({navigation}: any) => {
 };
 
 export default OnboardingScreen;
-
-const styles = StyleSheet.create({
-  text: {
-    color: appColors.white,
-    fontSize: 16,
-    fontFamily: fontFamilies.bold,
-  },
-});

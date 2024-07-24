@@ -1,5 +1,6 @@
 import {StyleSheet} from 'react-native';
 import {appColors} from '../constants/colors';
+import {fontFamilies} from '../constants/fontFamilies';
 
 export const globalStyles = StyleSheet.create({
   container: {
@@ -9,5 +10,10 @@ export const globalStyles = StyleSheet.create({
   center: {
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  text: {
+    fontFamily: fontFamilies.regular,
+    fontSize: 14,
+    color: appColors.text,
   },
 });

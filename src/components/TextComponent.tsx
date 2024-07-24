@@ -1,14 +1,36 @@
-import {View, Text} from 'react-native';
+import {View, Text, StyleProp} from 'react-native';
 import React from 'react';
+import {TextStyle} from 'react-native';
+import {appColors} from '../constants/colors';
+import {fontFamilies} from '../constants/fontFamilies';
+import {globalStyles} from '../styles/globalStyle';
 // thêm tilte để khác kiểu
 
-interface Props {}
+interface Props {
+  text: string;
+  color?: string;
+  size?: number;
+  flex?: number;
+  font?: string;
+  styles?: StyleProp<TextStyle>;
+  title?: boolean;
+}
 const TextComponent = (props: Props) => {
-  const {} = props;
+  const {text, color, flex, font, size, styles, title} = props;
   return (
-    <View>
-      <Text>TextComponent</Text>
-    </View>
+    <Text
+      style={[
+        globalStyles.text,
+        {
+          color: color ?? appColors.text,
+          flex: flex ?? 0,
+          fontSize: size ?? title ? 24 : 14,
+          fontFamily: font ?? title ? fontFamilies.bold : fontFamilies.regular,
+        },
+        styles,
+      ]}>
+      {text}
+    </Text>
   );
 };
 

@@ -4,6 +4,7 @@ import {globalStyles} from '../styles/globalStyle';
 import {appInfos} from '../constants/appInfos';
 import SpaceComponent from '../components/SpaceComponent';
 import {appColors} from '../constants/colors';
+import {TextComponent} from '../components';
 
 const SplashScreen = () => {
   return (
@@ -15,7 +16,7 @@ const SplashScreen = () => {
       <SpaceComponent height={20} />
       <ActivityIndicator color={appColors.gray} size={22} />
       <SpaceComponent height={20} />
-      <Text>Vui lòng đợi trong giây lát...</Text>
+      <TextComponent text="Vui lòng đợi trong giây lát..." />
     </View>
   );
 };
