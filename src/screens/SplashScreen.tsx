@@ -5,6 +5,7 @@ import {appInfos} from '../constants/appInfos';
 import SpaceComponent from '../components/SpaceComponent';
 import {appColors} from '../constants/colors';
 import {TextComponent} from '../components';
+import {fontFamilies} from '../constants/fontFamilies';
 
 const SplashScreen = () => {
   return (
@@ -14,9 +15,15 @@ const SplashScreen = () => {
         style={{width: appInfos.sizes.width * 80, resizeMode: 'contain'}}
       />
       <SpaceComponent height={20} />
+      <TextComponent
+        text="Điện lạnh Việt Nam"
+        size={28}
+        font={fontFamilies.bold}
+      />
+      <SpaceComponent height={20} />
       <ActivityIndicator color={appColors.gray} size={22} />
       <SpaceComponent height={20} />
-      <TextComponent text="Vui lòng đợi trong giây lát..." />
+      <TextComponent text="Vui lòng đợi trong giây lát" />
     </View>
   );
 };

@@ -1,4 +1,11 @@
-import {View, Text, Image, TouchableOpacity, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  Platform,
+} from 'react-native';
 import React, {useState} from 'react';
 import {globalStyles} from '../../styles/globalStyle';
 import Swiper from 'react-native-swiper';
@@ -51,7 +58,7 @@ const OnboardingScreen = ({navigation}: any) => {
         style={[
           {
             paddingHorizontal: 16,
-            paddingVertical: 40,
+            paddingVertical: Platform.OS === 'ios' ? 50 : 40,
             position: 'absolute',
             top: 0,
             right: 0,
@@ -80,7 +87,7 @@ const OnboardingScreen = ({navigation}: any) => {
         style={[
           {
             paddingHorizontal: 16,
-            paddingVertical: 22,
+            paddingVertical: Platform.OS === 'ios' ? 30 : 22,
             position: 'absolute',
             bottom: 0,
             right: 0,
@@ -101,6 +108,7 @@ const OnboardingScreen = ({navigation}: any) => {
             size={18}
             color={`${index === 0 ? appColors.gray2 : appColors.white}`}
           />
+          {/* <TextComponent text="Quay lại" font={fontFamilies.medium} size={16} /> */}
 
           <TextComponent
             color={index === 0 ? appColors.gray2 : appColors.white}
@@ -115,7 +123,7 @@ const OnboardingScreen = ({navigation}: any) => {
             index < 2 ? setIndex(index + 1) : navigation.navigate('LoginScreen')
           }>
           <TextComponent
-            color={index === 0 ? appColors.gray2 : appColors.white}
+            color={appColors.white}
             size={16}
             font={fontFamilies.medium}
             text="Tiếp theo"

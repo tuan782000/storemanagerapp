@@ -7,6 +7,15 @@ export const globalStyles = StyleSheet.create({
     flex: 1,
     backgroundColor: appColors.white,
   },
+  section: {
+    paddingHorizontal: 16,
+    paddingBottom: 20,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+  },
   center: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -44,5 +53,15 @@ export const globalStyles = StyleSheet.create({
     margin: 0,
     flex: 1,
     paddingHorizontal: 14,
+  },
+  shadow: {
+    shadowColor: 'rgba(0,0,0,0.5)',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 6,
   },
 });
