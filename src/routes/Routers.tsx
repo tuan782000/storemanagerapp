@@ -15,7 +15,7 @@ const Routers = () => {
   useEffect(() => {
     const timeout = setTimeout(() => {
       setIsShowSplash(false);
-    }, 1500);
+    }, 3000);
 
     return () => clearTimeout(timeout);
   }, []);

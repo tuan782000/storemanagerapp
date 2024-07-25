@@ -16,6 +16,7 @@ interface Props {
   textStyle?: StyleProp<TextStyle>;
   onPress?: () => void;
   iconPostion?: 'right' | 'left';
+  textFont?: string;
 }
 
 // mặc định icon nằm bên trái
@@ -31,36 +32,40 @@ const ButtonComponent = (props: Props) => {
     textStyle,
     type,
     iconPostion,
+    textFont,
   } = props;
   return type === 'primary' ? (
     <TouchableOpacity
       onPress={onPress}
       style={[
         globalStyles.button,
+        globalStyles.shadow,
         {
           backgroundColor: color ?? appColors.primary,
         },
         styles,
       ]}>
-      {icon && icon}
+      {icon && iconPostion === 'left' && icon}
       <TextComponent
         text={text}
         color={textColor ?? appColors.white}
-        font={fontFamilies.medium}
+        font={textFont ?? fontFamilies.medium}
         styles={[
           textStyle,
           {
             marginLeft: icon ? 12 : 0,
+            fontSize: 16,
+            textAlign: 'center',
           },
         ]}
-        flex={icon && iconPostion === 'right' ? 1 : 0}
+        flex={icon ? 1 : 0}
       />
       {icon && iconPostion === 'right' && icon}
     </TouchableOpacity>
   ) : (
     <TouchableOpacity onPress={onPress}>
       <TextComponent
-        text="Ok"
+        text={text}
         color={type === 'link' ? appColors.link : appColors.text}
       />
     </TouchableOpacity>
