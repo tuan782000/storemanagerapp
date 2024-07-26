@@ -8,4 +8,5 @@ export const appColors = {
   gray4: '#9D9898',
   link: '#5669ff',
   red: '#fe5f57',
+  edit: '#f6951c',
 };

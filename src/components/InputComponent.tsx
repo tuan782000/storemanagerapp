@@ -4,6 +4,8 @@ import {
   TouchableOpacity,
   TextInput,
   KeyboardType,
+  StyleProp,
+  ViewStyle,
 } from 'react-native';
 import React, {ReactNode, useState} from 'react';
 import {EyeSlash} from 'iconsax-react-native';
@@ -21,15 +23,29 @@ interface Props {
   isPassword?: boolean;
   allowClear?: boolean;
   type?: KeyboardType;
+  disabled?: boolean;
+  styleDisabled?: StyleProp<ViewStyle>;
 }
 
 const InputComponent = (props: Props) => {
-  const {onChange, value, affix, isPassword, placeholder, suffix, type} = props;
+  const {
+    onChange,
+    value,
+    affix,
+    isPassword,
+    placeholder,
+    suffix,
+    type,
+    disabled,
+    styleDisabled,
+    allowClear,
+  } = props;
   const [isShowPass, setIsShowPass] = useState(isPassword ?? false);
   return (
-    <View style={[globalStyles.inputContainer]}>
+    <View style={[globalStyles.inputContainer, {}, styleDisabled]}>
       {affix ?? affix}
       <TextInput
+        editable={disabled}
         style={[globalStyles.input, globalStyles.text]}
         value={value}
         placeholder={placeholder ?? ''}
@@ -51,7 +67,8 @@ const InputComponent = (props: Props) => {
             color={appColors.gray}
           />
         ) : (
-          value.length > 0 && (
+          value.length > 0 &&
+          allowClear && (
             <AntDesign name="close" size={22} color={appColors.text} />
           )
         )}

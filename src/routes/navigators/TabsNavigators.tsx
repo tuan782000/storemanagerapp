@@ -23,8 +23,11 @@ const TabsNavigators = () => {
 
   useEffect(() => {
     fetchUserData();
-    handleCheckUserAdmin();
   }, []);
+
+  useEffect(() => {
+    handleCheckUserAdmin();
+  }, [userData]);
 
   const fetchUserData = async () => {
     const user = auth().currentUser;
@@ -37,17 +40,19 @@ const TabsNavigators = () => {
         if (userDoc.exists) {
           setUserData(userDoc.data());
         }
+
+        // handleCheckUserAdmin();
       } catch (error) {
         console.error('Error fetching user data: ', error);
       }
     }
   };
 
+  // 1 bugs nhỏ khi login vào staff - quay lại login bằng admin thì vẵn ăn isAdmin là false
+  // đã khắc phục được
   const handleCheckUserAdmin = () => {
     if (userData) {
-      const admin = userData.role;
-      // console.log(typeof admin);
-      setIsAdmin(admin === 'admin' ? true : false);
+      setIsAdmin(userData.role === 'admin');
     }
   };
 

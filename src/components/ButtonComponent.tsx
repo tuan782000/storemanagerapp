@@ -25,6 +25,8 @@ interface Props {
   iconPostion?: 'right' | 'left';
   textFont?: string;
   isLoading?: boolean;
+  activeOpacity?: number;
+  textAndLinkStyle?: StyleProp<TextStyle>;
 }
 
 // mặc định icon nằm bên trái
@@ -42,9 +44,12 @@ const ButtonComponent = (props: Props) => {
     iconPostion,
     textFont,
     isLoading,
+    activeOpacity,
+    textAndLinkStyle,
   } = props;
   return type === 'primary' ? (
     <TouchableOpacity
+      activeOpacity={activeOpacity}
       disabled={isLoading}
       onPress={onPress}
       style={[
@@ -81,6 +86,7 @@ const ButtonComponent = (props: Props) => {
   ) : (
     <TouchableOpacity onPress={onPress}>
       <TextComponent
+        styles={textAndLinkStyle}
         text={text}
         color={type === 'link' ? appColors.link : appColors.text}
       />
