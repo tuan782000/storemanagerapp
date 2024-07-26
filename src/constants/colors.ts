@@ -9,4 +9,8 @@ export const appColors = {
   link: '#5669ff',
   red: '#fe5f57',
   edit: '#f6951c',
+  disabled: '#f0f0f0',
+  success: '#28a745',
+  warning: '#ffc008',
+  danager: '#dc3545',
 };

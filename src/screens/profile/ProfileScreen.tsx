@@ -16,9 +16,11 @@ import {fontFamilies} from '../../constants/fontFamilies';
 import {UserModel} from '../../models/UserModel';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import EditAccountModal from '../../modals/EditAccountModal';
 
 const ProfileScreen = () => {
   const [userData, setUserData] = useState<UserModel | null>(null);
+  const [isVisibleEditModal, setIsVisibleEditModal] = useState(false);
   const user = auth().currentUser;
   useEffect(() => {
     fetchUserData();
@@ -55,7 +57,7 @@ const ProfileScreen = () => {
           <ButtonComponent
             text="Cập nhật"
             color={appColors.edit}
-            onPress={() => console.log('Cập nhật')}
+            onPress={() => setIsVisibleEditModal(true)}
             type="primary"
             activeOpacity={0.9}
             styles={{
@@ -122,7 +124,7 @@ const ProfileScreen = () => {
               value={userData ? userData.name : ''}
               onChange={() => {}}
               disabled={false}
-              styleDisabled={{backgroundColor: '#f0f0f0'}}
+              styleDisabled={{backgroundColor: appColors.disabled}}
             />
             <TextComponent text="Số điện thoại" />
             <SpaceComponent height={10} />
@@ -130,7 +132,7 @@ const ProfileScreen = () => {
               value={userData ? userData.phone : ''}
               onChange={() => {}}
               disabled={false}
-              styleDisabled={{backgroundColor: '#f0f0f0'}}
+              styleDisabled={{backgroundColor: appColors.disabled}}
             />
             <TextComponent text="Email" />
             <SpaceComponent height={10} />
@@ -138,7 +140,7 @@ const ProfileScreen = () => {
               value={userData ? userData.email : ''}
               onChange={() => {}}
               disabled={false}
-              styleDisabled={{backgroundColor: '#f0f0f0'}}
+              styleDisabled={{backgroundColor: appColors.disabled}}
             />
           </View>
         </RowComponent>
@@ -191,6 +193,14 @@ const ProfileScreen = () => {
           icon={<Logout size={22} color={appColors.white} />}
         />
       </SectionComponent>
+      <EditAccountModal
+        title="Chỉnh sửa thông tin"
+        visible={isVisibleEditModal}
+        onClose={() => setIsVisibleEditModal(!isVisibleEditModal)}
+        name={userData && userData.name}
+        phone={userData && userData.phone}
+        onUpdate={fetchUserData}
+      />
     </ContainerComponent>
   );
 };
