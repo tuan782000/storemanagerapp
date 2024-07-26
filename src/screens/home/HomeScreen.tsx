@@ -12,25 +12,25 @@ const HomeScreen = ({navigation}: any) => {
   const [userData, setUserData] = useState<UserModel | null>(null);
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      const user = auth().currentUser;
-      if (user) {
-        try {
-          const userDoc: any = await firestore()
-            .collection('users')
-            .doc(user.uid)
-            .get();
-          if (userDoc.exists) {
-            setUserData(userDoc.data());
-          }
-        } catch (error) {
-          console.error('Error fetching user data: ', error);
-        }
-      }
-    };
-
     fetchUserData();
   }, []);
+
+  const fetchUserData = async () => {
+    const user = auth().currentUser;
+    if (user) {
+      try {
+        const userDoc: any = await firestore()
+          .collection('users')
+          .doc(user.uid)
+          .get();
+        if (userDoc.exists) {
+          setUserData(userDoc.data());
+        }
+      } catch (error) {
+        console.error('Error fetching user data: ', error);
+      }
+    }
+  };
 
   const handleSignOut = async () => {
     await auth().signOut();
