@@ -1,4 +1,11 @@
-import {View, Text, ViewStyle, StyleProp, TouchableOpacity} from 'react-native';
+import {
+  View,
+  Text,
+  ViewStyle,
+  StyleProp,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import React, {ReactNode} from 'react';
 import {TextStyle} from 'react-native';
 import TextComponent from './TextComponent';
@@ -17,6 +24,7 @@ interface Props {
   onPress?: () => void;
   iconPostion?: 'right' | 'left';
   textFont?: string;
+  isLoading?: boolean;
 }
 
 // mặc định icon nằm bên trái
@@ -33,9 +41,11 @@ const ButtonComponent = (props: Props) => {
     type,
     iconPostion,
     textFont,
+    isLoading,
   } = props;
   return type === 'primary' ? (
     <TouchableOpacity
+      disabled={isLoading}
       onPress={onPress}
       style={[
         globalStyles.button,
@@ -45,22 +55,28 @@ const ButtonComponent = (props: Props) => {
         },
         styles,
       ]}>
-      {icon && iconPostion === 'left' && icon}
-      <TextComponent
-        text={text}
-        color={textColor ?? appColors.white}
-        font={textFont ?? fontFamilies.medium}
-        styles={[
-          textStyle,
-          {
-            marginLeft: icon ? 12 : 0,
-            fontSize: 16,
-            textAlign: 'center',
-          },
-        ]}
-        flex={icon ? 1 : 0}
-      />
-      {icon && iconPostion === 'right' && icon}
+      {isLoading ? (
+        <ActivityIndicator color={appColors.white} />
+      ) : (
+        <>
+          {icon && iconPostion === 'left' && icon}
+          <TextComponent
+            text={text}
+            color={textColor ?? appColors.white}
+            font={textFont ?? fontFamilies.medium}
+            styles={[
+              textStyle,
+              {
+                marginLeft: icon ? 12 : 0,
+                fontSize: 16,
+                textAlign: 'center',
+              },
+            ]}
+            flex={icon ? 1 : 0}
+          />
+          {icon && iconPostion === 'right' && icon}
+        </>
+      )}
     </TouchableOpacity>
   ) : (
     <TouchableOpacity onPress={onPress}>

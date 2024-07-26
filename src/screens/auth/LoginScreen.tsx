@@ -1,5 +1,5 @@
 import {View, Text, Button, Image, Switch} from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import ButtonComponent from '../../components/ButtonComponent';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {globalStyles} from '../../styles/globalStyle';
@@ -14,10 +14,20 @@ import {
 } from '../../components';
 import {ArrowRight2, Lock, Sms} from 'iconsax-react-native';
 import {fontFamilies} from '../../constants/fontFamilies';
+import {UserModel, UserRole} from '../../models/UserModel';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+import {extractUsernameFromEmail} from '../../utils/extractUsernameFromEmail';
 
 const initialValue = {
   email: '',
   password: '',
+  username: '',
+  role: UserRole.Employee,
+  name: '',
+  phone: '',
+  created_at: Date.now(),
+  updated_at: Date.now(),
 };
 
 const initialErrors = {
@@ -30,9 +40,15 @@ const LoginScreen = ({navigation}: any) => {
   // const [email, setEmail] = useState('');
   // const [password, setPassword] = useState('');
 
-  const [values, setValues] = useState(initialValue);
+  const [values, setValues] = useState<UserModel>(initialValue);
   const [errors, setErrors] = useState(initialErrors);
+  const [errorFromFirebase, setErrorFromFirebase] = useState('');
   const [isRemember, setIsRemember] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // useEffect(() => {
+  //   setErrors(initialErrors);
+  // }, [values.email, values.password]);
 
   const handleChangeValue = (key: string, value: string) => {
     const data: any = {...values}; // copy toàn bộ value
@@ -41,6 +57,7 @@ const LoginScreen = ({navigation}: any) => {
     // lúc này data đã được chỉnh sửa
 
     setValues(data);
+    setErrorFromFirebase('');
     validateInput(key, value);
   };
 
@@ -65,14 +82,111 @@ const LoginScreen = ({navigation}: any) => {
     setErrors(newErrors);
   };
 
-  const handleLogin = async () => {
+  const handleLoginWithEmail = async () => {
+    if (values.email === '' || values.password === '') {
+      // let newErrors = {...errors};
+      // newErrors.email = 'Vui lòng kiểm tra lại email hoặc mật khẩu không đúng';
+      // setErrors(newErrors);
+      setErrorFromFirebase(
+        'Vui lòng kiểm tra lại email hoặc mật khẩu không đúng',
+      );
+      return;
+    }
     // Check for errors before submitting
     if (Object.values(errors).some(error => error !== '')) {
       console.log('There are errors in the form'); // thay chỗ này bằng toast
       return;
     }
 
-    console.log(values);
+    setIsLoading(true);
+
+    if (values.email !== '' && values.password !== '') {
+      setErrors(initialErrors);
+      console.log(values);
+
+      try {
+        const userCredential = await auth().signInWithEmailAndPassword(
+          values.email,
+          values.password,
+        );
+        const user = userCredential.user;
+
+        console.log(user);
+      } catch (error: any) {
+        console.log(error.message);
+        setErrorFromFirebase(error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
+
+  // Để tạm thời sau này sẽ làm đăng ký riêng cho admin
+  const handleRegister = async () => {
+    if (values.email === '' || values.password === '') {
+      // let newErrors = {...errors};
+      // newErrors.email = 'Vui lòng kiểm tra lại email hoặc mật khẩu không đúng';
+      // setErrors(newErrors);
+      setErrorFromFirebase(
+        'Vui lòng kiểm tra lại email hoặc mật khẩu không đúng',
+      );
+      return;
+    }
+
+    // Check for errors before submitting
+    if (Object.values(errors).some(error => error !== '')) {
+      console.log('There are errors in the form'); // thay chỗ này bằng toast
+      return;
+    }
+
+    setIsLoading(true);
+
+    if (values.email !== '' && values.password !== '') {
+      setErrors(initialErrors);
+
+      console.log(values);
+      // await auth()
+      //   .createUserWithEmailAndPassword(values.email, values.password)
+      //   .then(userCredential => {
+      //     const user = userCredential.user;
+
+      //     // save user to firestore
+
+      //     setIsLoading(false);
+      //   })
+      //   .catch((error: any) => {
+      //     setIsLoading(false);
+      //     console.log(error.message);
+      //   });
+      try {
+        const userCredential = await auth().createUserWithEmailAndPassword(
+          values.email,
+          values.password,
+        );
+        const user = userCredential.user;
+
+        // Save user data to Firestore
+        await firestore()
+          .collection('users')
+          .doc(user.uid)
+          .set({
+            email: values.email,
+            username: extractUsernameFromEmail(values.email),
+            role: values.role,
+            name: values.name,
+            phone: values.phone,
+            created_at: values.created_at,
+            updated_at: values.updated_at,
+          });
+
+        console.log('User registered successfully:', values);
+        console.log('User registered successfully - 01:', user);
+      } catch (error: any) {
+        console.log(error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    }
   };
 
   return (
@@ -94,6 +208,12 @@ const LoginScreen = ({navigation}: any) => {
       <SectionComponent>
         <TextComponent text="Đăng nhập" size={20} title />
         <SpaceComponent height={20} />
+        {errorFromFirebase ? (
+          <>
+            <TextComponent text={errorFromFirebase} color={appColors.red} />
+            <SpaceComponent height={5} />
+          </>
+        ) : null}
         {errors['email'] ? (
           <>
             <TextComponent text={errors['email']} color={appColors.red} />
@@ -144,9 +264,11 @@ const LoginScreen = ({navigation}: any) => {
       <SpaceComponent height={16} />
       <SectionComponent>
         <ButtonComponent
+          isLoading={isLoading}
           text="ĐĂNG NHẬP"
           type="primary"
-          onPress={handleLogin}
+          onPress={handleLoginWithEmail}
+          // onPress={handleRegister}
           icon={<ArrowRight2 size={20} color={appColors.white} />}
           iconPostion="right"
         />

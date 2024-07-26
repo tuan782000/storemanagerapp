@@ -3,13 +3,12 @@ export enum UserRole {
   Employee = 'employee',
 }
 export interface UserModel {
-  id: string;
   username: string;
   password: string;
   role: UserRole;
   name: string;
   email: string;
   phone: string;
-  created_at: Date;
-  updated_at: Date;
+  created_at: number;
+  updated_at: number;
 }

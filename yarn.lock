@@ -3005,6 +3005,39 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-native-firebase/auth@npm:^20.3.0":
+  version: 20.3.0
+  resolution: "@react-native-firebase/auth@npm:20.3.0"
+  dependencies:
+    plist: ^3.1.0
+  peerDependencies:
+    "@react-native-firebase/app": 20.3.0
+    expo: ">=47.0.0"
+  peerDependenciesMeta:
+    expo:
+      optional: true
+  checksum: f13bba65c096fc89a5b54b59d32ddc6bd8ac70da12609f5d11d86b0cf0111258827eab25777d95ff827c03e2466cd645d2cd28dc13784163e31e0459cef74a7d
+  languageName: node
+  linkType: hard
+
+"@react-native-firebase/firestore@npm:^20.3.0":
+  version: 20.3.0
+  resolution: "@react-native-firebase/firestore@npm:20.3.0"
+  peerDependencies:
+    "@react-native-firebase/app": 20.3.0
+  checksum: a6b92203e9cc2ef4f0513689595c2c2d810de7333c34c5c7d16a5b7a4b7dee978c78f791360e20854dee6cf94b66504fd72f7cba14669715f05fcd6a96b04920
+  languageName: node
+  linkType: hard
+
+"@react-native-firebase/storage@npm:^20.3.0":
+  version: 20.3.0
+  resolution: "@react-native-firebase/storage@npm:20.3.0"
+  peerDependencies:
+    "@react-native-firebase/app": 20.3.0
+  checksum: b7b8f7a9c562c5677e265e7c4c383198d4a7aa796dc28a95115e812f6e6cf67eacbdd6ad780c7687056519c6103d81ae797b9b435e184c86180279350009bd48
+  languageName: node
+  linkType: hard
+
 "@react-native/assets-registry@npm:0.74.85":
   version: 0.74.85
   resolution: "@react-native/assets-registry@npm:0.74.85"
@@ -3819,6 +3852,13 @@ __metadata:
   version: 1.2.0
   resolution: "@ungap/structured-clone@npm:1.2.0"
   checksum: 4f656b7b4672f2ce6e272f2427d8b0824ed11546a601d8d5412b9d7704e83db38a8d9f402ecdf2b9063fc164af842ad0ec4a55819f621ed7e7ea4d1efcc74524
+  languageName: node
+  linkType: hard
+
+"@xmldom/xmldom@npm:^0.8.8":
+  version: 0.8.10
+  resolution: "@xmldom/xmldom@npm:0.8.10"
+  checksum: 4c136aec31fb3b49aaa53b6fcbfe524d02a1dc0d8e17ee35bd3bf35e9ce1344560481cd1efd086ad1a4821541482528672306d5e37cdbd187f33d7fadd3e2cf0
   languageName: node
   linkType: hard
 
@@ -8882,6 +8922,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"plist@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "plist@npm:3.1.0"
+  dependencies:
+    "@xmldom/xmldom": ^0.8.8
+    base64-js: ^1.5.1
+    xmlbuilder: ^15.1.1
+  checksum: c8ea013da8646d4c50dff82f9be39488054621cc229957621bb00add42b5d4ce3657cf58d4b10c50f7dea1a81118f825838f838baeb4e6f17fab453ecf91d424
+  languageName: node
+  linkType: hard
+
 "possible-typed-array-names@npm:^1.0.0":
   version: 1.0.0
   resolution: "possible-typed-array-names@npm:1.0.0"
@@ -10125,6 +10176,9 @@ __metadata:
     "@babel/runtime": ^7.20.0
     "@react-native-async-storage/async-storage": ^1.24.0
     "@react-native-firebase/app": ^20.3.0
+    "@react-native-firebase/auth": ^20.3.0
+    "@react-native-firebase/firestore": ^20.3.0
+    "@react-native-firebase/storage": ^20.3.0
     "@react-native/babel-preset": 0.74.85
     "@react-native/eslint-config": 0.74.85
     "@react-native/metro-config": 0.74.85
@@ -11072,6 +11126,13 @@ __metadata:
     utf-8-validate:
       optional: true
   checksum: f9bb062abf54cc8f02d94ca86dcd349c3945d63851f5d07a3a61c2fcb755b15a88e943a63cf580cbdb5b74436d67ef6b67f745b8f7c0814e411379138e1863cb
+  languageName: node
+  linkType: hard
+
+"xmlbuilder@npm:^15.1.1":
+  version: 15.1.1
+  resolution: "xmlbuilder@npm:15.1.1"
+  checksum: 14f7302402e28d1f32823583d121594a9dca36408d40320b33f598bd589ca5163a352d076489c9c64d2dc1da19a790926a07bf4191275330d4de2b0d85bb1843
   languageName: node
   linkType: hard
 
