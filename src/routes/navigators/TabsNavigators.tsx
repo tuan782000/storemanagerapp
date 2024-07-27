@@ -66,7 +66,7 @@ const TabsNavigators = () => {
     </>
   ) : (
     <>
-      <Tabs.Screen name="HomeTab" component={HomeNavigator}></Tabs.Screen>
+      {/* <Tabs.Screen name="HomeTab" component={HomeNavigator}></Tabs.Screen> */}
       <Tabs.Screen name="WorkTab" component={WorkScreen}></Tabs.Screen>
       <Tabs.Screen name="ProfileTab" component={ProfileScreen}></Tabs.Screen>
     </>

@@ -6157,6 +6157,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"gifted-charts-core@npm:^0.1.19":
+  version: 0.1.19
+  resolution: "gifted-charts-core@npm:0.1.19"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 19dd955691b8bd8cb68ff79755dab5f32d94961d4b178b7e65423f11b7af09c60495637154a49d6f27b207c37264553b4ded4962aeb94d38cc08b44ab9fe2357
+  languageName: node
+  linkType: hard
+
 "glob-parent@npm:^5.1.2":
   version: 5.1.2
   resolution: "glob-parent@npm:5.1.2"
@@ -9173,6 +9183,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-gifted-charts@npm:^1.4.20":
+  version: 1.4.20
+  resolution: "react-native-gifted-charts@npm:1.4.20"
+  dependencies:
+    gifted-charts-core: ^0.1.19
+  peerDependencies:
+    expo-linear-gradient: "*"
+    react: "*"
+    react-native: "*"
+    react-native-linear-gradient: "*"
+    react-native-svg: "*"
+  peerDependenciesMeta:
+    expo-linear-gradient:
+      optional: true
+    react-native-linear-gradient:
+      optional: true
+  checksum: 4c2d8558b76bcf5ced3fd8e319fb3cbb29103c8ef02c045ddee7ef85db00ab5b31bf429f56f535b7205357d366a71f36e25d1ec9293648adc21feb047479db56
+  languageName: node
+  linkType: hard
+
 "react-native-linear-gradient@npm:^2.8.3":
   version: 2.8.3
   resolution: "react-native-linear-gradient@npm:2.8.3"
@@ -10200,6 +10230,7 @@ __metadata:
     react: 18.2.0
     react-native: 0.74.3
     react-native-gesture-handler: ^2.17.1
+    react-native-gifted-charts: ^1.4.20
     react-native-linear-gradient: ^2.8.3
     react-native-modalize: ^2.1.1
     react-native-portalize: ^1.0.7
