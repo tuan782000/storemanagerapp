@@ -1,7 +1,20 @@
-import {View, Text, Button, Touchable, TouchableOpacity} from 'react-native';
+import {
+  View,
+  Text,
+  Button,
+  Touchable,
+  TouchableOpacity,
+  Image,
+} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {globalStyles} from '../../styles/globalStyle';
-import {ContainerComponent, TextComponent} from '../../components';
+import {
+  ContainerComponent,
+  RowComponent,
+  SectionComponent,
+  SpaceComponent,
+  TextComponent,
+} from '../../components';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
@@ -9,6 +22,8 @@ import {UserModel} from '../../models/UserModel';
 import {Logout} from 'iconsax-react-native';
 import {BarChart, LineChart, PieChart} from 'react-native-gifted-charts';
 import LinearGradient from 'react-native-linear-gradient';
+import {fontFamilies} from '../../constants/fontFamilies';
+import {appColors} from '../../constants/colors';
 
 const barChartData: any = [
   {
@@ -96,30 +111,41 @@ const HomeScreen = ({navigation}: any) => {
     }
   };
 
-  const handleSignOut = async () => {
-    await auth().signOut();
+  // const handleSignOut = async () => {
+  //   await auth().signOut();
 
-    // navigation.navigate('LoginScreen');
-  };
+  //   // navigation.navigate('LoginScreen');
+  // };
 
   const user = auth().currentUser;
   return (
     <ContainerComponent isScroll>
-      <View style={[globalStyles.container, globalStyles.center]}>
-        <TextComponent text={`${user?.email}`} />
-        {userData ? (
-          <>
-            <TextComponent text={`Username: ${userData.username}`} />
-          </>
-        ) : (
-          <></>
-        )}
-        <TouchableOpacity onPress={handleSignOut}>
+      <SectionComponent styles={{marginTop: 10}}>
+        <RowComponent justify="space-between">
+          <View
+            style={{
+              borderRadius: 999,
+              borderWidth: 1,
+              borderColor: appColors.primary,
+            }}>
+            <Image
+              source={require('../../assets/images/icon-logo.png')}
+              style={{width: 60, height: 60}}
+            />
+          </View>
+          {userData ? (
+            <>
+              <TextComponent text={`Xin chào, ${userData.username}`} />
+            </>
+          ) : (
+            <></>
+          )}
+          {/* <TouchableOpacity onPress={handleSignOut}>
           <Logout size={22} color="coral" />
-        </TouchableOpacity>
-      </View>
-
-      <View style={[globalStyles.container, globalStyles.center]}>
+        </TouchableOpacity> */}
+        </RowComponent>
+      </SectionComponent>
+      <View style={[globalStyles.container]}>
         {/* <BarChart
           data={barChartData}
           barWidth={30}
@@ -131,6 +157,13 @@ const HomeScreen = ({navigation}: any) => {
           animationDuration={1000}
           // animationType="SlideFromBottom"
         /> */}
+        <SectionComponent>
+          <TextComponent
+            text="I. Thống kê doanh số thu - chi của 6 tháng gần nhất"
+            size={18}
+            font={fontFamilies.bold}
+          />
+        </SectionComponent>
         <View
           style={{
             margin: 10,
@@ -192,6 +225,13 @@ const HomeScreen = ({navigation}: any) => {
       </View> */}
 
       <View style={[globalStyles.container, globalStyles.center]}>
+        <SectionComponent>
+          <TextComponent
+            text="II. Tổng biên độ thu - chi của 6 tháng gần nhất"
+            size={18}
+            font={fontFamilies.bold}
+          />
+        </SectionComponent>
         <PieChart
           data={pieData}
           showText
