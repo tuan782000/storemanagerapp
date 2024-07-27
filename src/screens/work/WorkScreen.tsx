@@ -1,11 +1,14 @@
 import {View, Text} from 'react-native';
 import React from 'react';
+import {ContainerComponent, SectionComponent} from '../../components';
 
 const WorkScreen = () => {
   return (
-    <View>
-      <Text>WorkScreen</Text>
-    </View>
+    <ContainerComponent isScroll>
+      <SectionComponent>
+        <Text>StaffScreen</Text>
+      </SectionComponent>
+    </ContainerComponent>
   );
 };
 
