@@ -32,6 +32,11 @@ const EditAccountModal = (props: Props) => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    setEditName(name);
+    setEditPhone(phone);
+  }, [name, phone]);
+
+  useEffect(() => {
     if (editName && editName.length < 3) {
       setErrorName('Số ký tự phải lớn hơn 3');
     } else {
