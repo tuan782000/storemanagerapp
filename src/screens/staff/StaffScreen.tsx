@@ -1,12 +1,24 @@
 import {View, Text} from 'react-native';
 import React from 'react';
-import {ContainerComponent, SectionComponent} from '../../components';
+import {
+  ContainerComponent,
+  RowComponent,
+  SectionComponent,
+  TextComponent,
+} from '../../components';
+import {fontFamilies} from '../../constants/fontFamilies';
 
 const StaffScreen = () => {
   return (
     <ContainerComponent isScroll>
       <SectionComponent>
-        <Text>StaffScreen</Text>
+        <RowComponent justify="space-between">
+          <TextComponent
+            text="Quản lý nhân viên"
+            title
+            font={fontFamilies.bold}
+          />
+        </RowComponent>
       </SectionComponent>
     </ContainerComponent>
   );

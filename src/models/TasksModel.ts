@@ -1,6 +1,7 @@
 export enum TaskStatus {
-  Completed = 'completed',
-  Pending = 'pending',
+  Pending,
+  Completed,
+  Canceled,
 }
 
 export interface TasksModel {

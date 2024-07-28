@@ -6,6 +6,7 @@ export const appColors = {
   gray2: '#DADADA',
   gray3: '#E4DFDF',
   gray4: '#9D9898',
+  gray5: '#f7f7f7',
   link: '#5669ff',
   red: '#fe5f57',
   edit: '#f6951c',
@@ -13,4 +14,5 @@ export const appColors = {
   success: '#28a745',
   warning: '#ffc008',
   danager: '#dc3545',
+  tabText: '#878787',
 };

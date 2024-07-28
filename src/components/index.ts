@@ -6,9 +6,11 @@ import LoadingComponent from './LoadingComponent';
 import RowComponent from './RowComponent';
 import SectionComponent from './SectionComponent';
 import SpaceComponent from './SpaceComponent';
+import TabComponent from './TabComponent';
 import TaskComoponent from './TaskComoponent';
 import TextComponent from './TextComponent';
 import UserAvatarComponent from './UserAvatarComponent';
+
 export {
   UserAvatarComponent,
   TaskComoponent,
@@ -21,4 +23,5 @@ export {
   ContainerComponent,
   TextComponent,
   SpaceComponent,
+  TabComponent,
 };
