@@ -121,73 +121,73 @@ const LoginScreen = ({navigation}: any) => {
     }
   };
 
-  // Để tạm thời sau này sẽ làm đăng ký riêng cho admin
-  const handleRegister = async () => {
-    if (values.email === '' || values.password === '') {
-      // let newErrors = {...errors};
-      // newErrors.email = 'Vui lòng kiểm tra lại email hoặc mật khẩu không đúng';
-      // setErrors(newErrors);
-      setErrorFromFirebase(
-        'Vui lòng kiểm tra lại email hoặc mật khẩu không đúng',
-      );
-      return;
-    }
+  // // Để tạm thời sau này sẽ làm đăng ký riêng cho admin
+  // const handleRegister = async () => {
+  //   if (values.email === '' || values.password === '') {
+  //     // let newErrors = {...errors};
+  //     // newErrors.email = 'Vui lòng kiểm tra lại email hoặc mật khẩu không đúng';
+  //     // setErrors(newErrors);
+  //     setErrorFromFirebase(
+  //       'Vui lòng kiểm tra lại email hoặc mật khẩu không đúng',
+  //     );
+  //     return;
+  //   }
 
-    // Check for errors before submitting
-    if (Object.values(errors).some(error => error !== '')) {
-      console.log('There are errors in the form'); // thay chỗ này bằng toast
-      return;
-    }
+  //   // Check for errors before submitting
+  //   if (Object.values(errors).some(error => error !== '')) {
+  //     console.log('There are errors in the form'); // thay chỗ này bằng toast
+  //     return;
+  //   }
 
-    setIsLoading(true);
+  //   setIsLoading(true);
 
-    if (values.email !== '' && values.password !== '') {
-      setErrors(initialErrors);
+  //   if (values.email !== '' && values.password !== '') {
+  //     setErrors(initialErrors);
 
-      console.log(values);
-      // await auth()
-      //   .createUserWithEmailAndPassword(values.email, values.password)
-      //   .then(userCredential => {
-      //     const user = userCredential.user;
+  //     console.log(values);
+  //     // await auth()
+  //     //   .createUserWithEmailAndPassword(values.email, values.password)
+  //     //   .then(userCredential => {
+  //     //     const user = userCredential.user;
 
-      //     // save user to firestore
+  //     //     // save user to firestore
 
-      //     setIsLoading(false);
-      //   })
-      //   .catch((error: any) => {
-      //     setIsLoading(false);
-      //     console.log(error.message);
-      //   });
-      try {
-        const userCredential = await auth().createUserWithEmailAndPassword(
-          values.email,
-          values.password,
-        );
-        const user = userCredential.user;
+  //     //     setIsLoading(false);
+  //     //   })
+  //     //   .catch((error: any) => {
+  //     //     setIsLoading(false);
+  //     //     console.log(error.message);
+  //     //   });
+  //     try {
+  //       const userCredential = await auth().createUserWithEmailAndPassword(
+  //         values.email,
+  //         values.password,
+  //       );
+  //       const user = userCredential.user;
 
-        // Save user data to Firestore
-        await firestore()
-          .collection('users')
-          .doc(user.uid)
-          .set({
-            email: values.email,
-            username: extractUsernameFromEmail(values.email),
-            role: values.role,
-            name: values.name,
-            phone: values.phone,
-            created_at: values.created_at,
-            updated_at: values.updated_at,
-          });
+  //       // Save user data to Firestore
+  //       await firestore()
+  //         .collection('users')
+  //         .doc(user.uid)
+  //         .set({
+  //           email: values.email,
+  //           username: extractUsernameFromEmail(values.email),
+  //           role: values.role,
+  //           name: values.name,
+  //           phone: values.phone,
+  //           created_at: values.created_at,
+  //           updated_at: values.updated_at,
+  //         });
 
-        console.log('User registered successfully:', values);
-        console.log('User registered successfully - 01:', user);
-      } catch (error: any) {
-        console.log(error.message);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-  };
+  //       console.log('User registered successfully:', values);
+  //       console.log('User registered successfully - 01:', user);
+  //     } catch (error: any) {
+  //       console.log(error.message);
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   }
+  // };
 
   return (
     <ContainerComponent isScroll>

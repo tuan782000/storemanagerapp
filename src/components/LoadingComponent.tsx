@@ -1,13 +1,33 @@
-import {View, Text} from 'react-native';
+import {View, Text, Modal, ActivityIndicator} from 'react-native';
 import React from 'react';
-interface Props {}
+import {globalStyles} from '../styles/globalStyle';
+import {appColors} from '../constants/colors';
+import TextComponent from './TextComponent';
+interface Props {
+  message?: string;
+  visible: boolean;
+}
 
 const LoadingComponent = (props: Props) => {
-  const {} = props;
+  const {visible, message} = props;
   return (
-    <View>
-      <Text>LoadingComponent</Text>
-    </View>
+    <Modal
+      animationType="slide"
+      visible={visible}
+      style={[globalStyles.center, {flex: 1}]}
+      transparent
+      statusBarTranslucent>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <ActivityIndicator color={appColors.white} />
+        {message && <TextComponent text={message} />}
+      </View>
+    </Modal>
   );
 };
 

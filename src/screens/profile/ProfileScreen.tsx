@@ -51,7 +51,7 @@ const ProfileScreen = () => {
 
   return (
     <ContainerComponent isScroll>
-      <SectionComponent>
+      <SectionComponent styles={{marginTop: 10}}>
         <RowComponent justify="space-between" styles={{alignItems: 'center'}}>
           <TextComponent text="Tài khoản" title font={fontFamilies.bold} />
           <ButtonComponent

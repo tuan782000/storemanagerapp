@@ -4,6 +4,7 @@ import SplashScreen from './SplashScreen';
 import ScheduleScreen from './schedule/ScheduleScreen';
 import StaffScreen from './staff/StaffScreen';
 import WorkScreen from './work/WorkScreen';
+import AddNewUserScreen from './AddNewUserScreen';
 
 export {
   HomeScreen,
@@ -12,4 +13,5 @@ export {
   WorkScreen,
   StaffScreen,
   ScheduleScreen,
+  AddNewUserScreen,
 };

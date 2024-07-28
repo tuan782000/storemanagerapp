@@ -2,6 +2,7 @@ import {View, Text} from 'react-native';
 import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import TabsNavigators from './TabsNavigators';
+import {AddNewUserScreen} from '../../screens';
 
 const MainNavigator = () => {
   // Auth thì nằm riêng
@@ -16,6 +17,7 @@ const MainNavigator = () => {
         headerShown: false,
       }}>
       <Stack.Screen name="Main" component={TabsNavigators} />
+      <Stack.Screen name="AddNewUserScreen" component={AddNewUserScreen} />
     </Stack.Navigator>
   );
 };
