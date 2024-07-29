@@ -1,5 +1,9 @@
-import {View, Text, TouchableOpacity, Image} from 'react-native';
+import firestore from '@react-native-firebase/firestore';
+import {Add, Call, SearchNormal1} from 'iconsax-react-native';
 import React, {useEffect, useState} from 'react';
+import {Image, TouchableOpacity, View} from 'react-native';
+import Octicons from 'react-native-vector-icons/Octicons';
+import SwipeableFlatList from 'rn-gesture-swipeable-flatlist';
 import {
   CardComponent,
   ContainerComponent,
@@ -9,82 +13,77 @@ import {
   SpaceComponent,
   TextComponent,
 } from '../../components';
-import {fontFamilies} from '../../constants/fontFamilies';
-import ButtonComponent from '../../components/ButtonComponent';
-import {appColors} from '../../constants/colors';
 import DividerComponent from '../../components/DividerComponent';
-import {Add, Call, SearchNormal1} from 'iconsax-react-native';
+import {appColors} from '../../constants/colors';
+import {fontFamilies} from '../../constants/fontFamilies';
+import {UserModel} from '../../models/UserModel';
 import {globalStyles} from '../../styles/globalStyle';
-import SwipeableFlatList from 'rn-gesture-swipeable-flatlist';
-import Octicons from 'react-native-vector-icons/Octicons';
+import {DateTime} from '../../utils/DateTime';
+import {getLastSevenCharacters} from '../../utils/getLastSevenCharacters';
+
+type EmployeeData = Pick<
+  UserModel,
+  `email` | `name` | `phone` | `created_at`
+> & {
+  id: string;
+};
 
 const StaffScreen = ({navigation}: any) => {
-  const data = [
-    {
-      id: '1',
-      employeeId: '1234567890',
-      name: 'Nguyễn Văn A',
-      phone: '0778748993',
-      email: 'tho01@gmail.com',
-      startDate: '12-12-2022',
-    },
-    {
-      id: '2',
-      employeeId: '1234512345',
-      name: 'Nguyễn Văn B',
-      phone: '0778707787',
-      email: 'tho02@gmail.com',
-      startDate: '21-12-2022',
-    },
-    {
-      id: '3',
-      employeeId: '6789067890',
-      name: 'Nguyễn Văn C',
-      phone: '0899748993',
-      email: 'tho03@gmail.com',
-      startDate: '24-12-2022',
-    },
-    {
-      id: '4',
-      employeeId: '4567867890',
-      name: 'Nguyễn Văn D',
-      phone: '07745678993',
-      email: 'tho04@gmail.com',
-      startDate: '12-01-2022',
-    },
-    {
-      id: '5',
-      employeeId: '1234567890',
-      name: 'Nguyễn Văn E',
-      phone: '0776748993',
-      email: 'tho05@gmail.com',
-      startDate: '22-02-2022',
-    },
-    // Thêm các mục dữ liệu khác
-  ];
-
+  // lưu trữ danh sách đã call api lấy về
+  const [data, setData] = useState<EmployeeData[]>([]);
   // state này để lưu từ khoá người dùng nhập
   const [searchQuery, setSearchQuery] = useState('');
-  // state này dùng để lưu trũ data
-  const [filteredData, setFilteredData] = useState(data);
+  // state này dùng để lưu trũ data sau khi search và hiển thị
+  const [filteredData, setFilteredData] = useState<EmployeeData[]>([]);
+
+  useEffect(() => {
+    getListEmployees();
+  }, []);
 
   // useEffect này dùng để theo dõi state từ khoá - mỗi lần thay đổi nó sẽ tìm kiếm dựa trên data
   useEffect(() => {
     const filtered = data.filter(
       item =>
         item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.employeeId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.phone.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.email.toLowerCase().includes(searchQuery.toLowerCase()),
     );
     setFilteredData(filtered);
-  }, [searchQuery]);
+  }, [searchQuery, data]);
 
-  const renderItem = ({item}: {item: (typeof data)[0]}) => (
+  const getListEmployees = async () => {
+    try {
+      const snapshot = await firestore()
+        .collection('users')
+        .where('role', '==', 'employee')
+        .get();
+
+      const users: EmployeeData[] = snapshot.docs.map(doc => {
+        const data = doc.data() as UserModel;
+        return {
+          id: doc.id,
+          name: data.name,
+          phone: data.phone,
+          email: data.email,
+          created_at: data.created_at,
+        };
+      });
+
+      setData(users);
+      setFilteredData(users);
+    } catch (error) {
+      console.error('Error fetching data: ', error);
+    }
+  };
+
+  console.log(filteredData);
+
+  const renderItem = ({item}: {item: EmployeeData}) => (
     <CardComponent>
       <RowComponent>
         <TextComponent text="Mã số nhân viên: " />
-        <TextComponent text={item.employeeId} />
+        <TextComponent text={getLastSevenCharacters(item.id)} />
       </RowComponent>
       <SpaceComponent height={10} />
       <DividerComponent />
@@ -113,7 +112,9 @@ const StaffScreen = ({navigation}: any) => {
           <SpaceComponent height={5} />
           <RowComponent>
             <TextComponent text="Ngày vào làm: " />
-            <TextComponent text={item.startDate} />
+            <TextComponent
+              text={DateTime.timestampToVietnamDate(item.created_at)}
+            />
           </RowComponent>
         </RowComponent>
         <View

@@ -36,4 +36,19 @@ export class DateTime {
       date.getMinutes(),
     )} ${this.dateToDateString(date)}`;
   };
+
+  static timestampToVietnamDate = (timestamp: number): string => {
+    // Tạo đối tượng Date
+    const date = new Date(timestamp);
+
+    // Điều chỉnh múi giờ thành UTC+7 (Việt Nam)
+    date.setHours(date.getHours() + 7);
+
+    // Định dạng ngày tháng năm
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${day}/${month}/${year}`;
+  };
 }
