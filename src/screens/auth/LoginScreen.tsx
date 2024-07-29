@@ -18,6 +18,7 @@ import {UserModel, UserRole} from '../../models/UserModel';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {extractUsernameFromEmail} from '../../utils/extractUsernameFromEmail';
+import {ResetPasswordModal} from '../../modals';
 
 const initialValue = {
   email: '',
@@ -45,6 +46,8 @@ const LoginScreen = ({navigation}: any) => {
   const [errorFromFirebase, setErrorFromFirebase] = useState('');
   const [isRemember, setIsRemember] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+
+  const [isVisibledResetPassword, setIsVisibledResetPassword] = useState(false);
 
   // useEffect(() => {
   //   setErrors(initialErrors);
@@ -255,9 +258,7 @@ const LoginScreen = ({navigation}: any) => {
           <ButtonComponent
             text="Quên mật khẩu"
             type="text"
-            onPress={() =>
-              console.log('Liên hệ với Admin để cấp lại mật khẩu mới')
-            }
+            onPress={() => setIsVisibledResetPassword(true)}
           />
         </RowComponent>
       </SectionComponent>
@@ -280,6 +281,11 @@ const LoginScreen = ({navigation}: any) => {
           styles={{textAlign: 'center'}}
         />
       </SectionComponent>
+
+      <ResetPasswordModal
+        onClose={() => setIsVisibledResetPassword(!isVisibledResetPassword)}
+        visible={isVisibledResetPassword}
+      />
     </ContainerComponent>
   );
 };

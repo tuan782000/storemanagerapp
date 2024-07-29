@@ -16,11 +16,12 @@ import {fontFamilies} from '../../constants/fontFamilies';
 import {UserModel} from '../../models/UserModel';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import EditAccountModal from '../../modals/EditAccountModal';
+import {EditAccountModal, ResetPasswordModal} from '../../modals';
 
 const ProfileScreen = () => {
   const [userData, setUserData] = useState<UserModel | null>(null);
   const [isVisibleEditModal, setIsVisibleEditModal] = useState(false);
+  const [isVisibledResetPassword, setIsVisibledResetPassword] = useState(false);
   const user = auth().currentUser;
   useEffect(() => {
     fetchUserData();
@@ -163,7 +164,11 @@ const ProfileScreen = () => {
 
             <SpaceComponent height={20} />
 
-            <ButtonComponent text="Đi đến nơi thay đổi mật khẩu" type="link" />
+            <ButtonComponent
+              text="Đổi mật khẩu"
+              type="link"
+              onPress={() => setIsVisibledResetPassword(true)}
+            />
           </View>
         </RowComponent>
       </SectionComponent>
@@ -200,6 +205,10 @@ const ProfileScreen = () => {
         name={userData && userData.name}
         phone={userData && userData.phone}
         onUpdate={fetchUserData}
+      />
+      <ResetPasswordModal
+        visible={isVisibledResetPassword}
+        onClose={() => setIsVisibledResetPassword(!isVisibledResetPassword)}
       />
     </ContainerComponent>
   );

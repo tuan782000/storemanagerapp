@@ -80,7 +80,12 @@ const StaffScreen = ({navigation}: any) => {
   console.log(filteredData);
 
   const renderItem = ({item}: {item: EmployeeData}) => (
-    <CardComponent>
+    <CardComponent
+      onPress={() =>
+        navigation.navigate('StaffDetailScreen', {
+          id: item.id,
+        })
+      }>
       <RowComponent>
         <TextComponent text="Mã số nhân viên: " />
         <TextComponent text={getLastSevenCharacters(item.id)} />

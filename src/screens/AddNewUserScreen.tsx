@@ -21,12 +21,8 @@ import bcrypt from 'bcryptjs';
 const initialUser = {
   email: '',
   password: '',
-  //   username: '',
-  //   role: UserRole.Employee,
   name: '',
   phone: '',
-  //   created_at: Date.now(),
-  //   updated_at: Date.now(),
 };
 
 const initialErrors = {
@@ -47,7 +43,7 @@ const AddNewUserScreen = ({navigation}: any) => {
   const [userForm, setUserForm] = useState<any>(initialUser);
   const [errors, setErrors] = useState<any>(initialErrors);
   const icons: any = initialIcons;
-  const [isFormValid, setIsFormValid] = useState(false);
+  //   const [isFormValid, setIsFormValid] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChangeValue = (key: string, value: string) => {
@@ -107,39 +103,6 @@ const AddNewUserScreen = ({navigation}: any) => {
     ) {
       setErrors(initialErrors);
       try {
-        // Kiểm tra xem email đã được sử dụng chưa
-        // const signInMethods = await auth().fetchSignInMethodsForEmail(
-        //   userForm.email,
-        // );
-        // if (signInMethods.length > 0) {
-        //   let newErrors: any = {...errors};
-        //   (newErrors.email =
-        //     'Email đã được sử dụng. Vui lòng chọn email khác.'),
-        //     setErrors(newErrors);
-        //   setIsLoading(false);
-        //   return;
-        // }
-        // const userCredential = await auth().createUserWithEmailAndPassword(
-        //   userForm.email,
-        //   userForm.password,
-        // );
-
-        // const user = userCredential.user;
-
-        // await firestore()
-        //   .collection('users')
-        //   .doc(user.uid)
-        //   .set({
-        //     email: userForm.email,
-        //     username: extractUsernameFromEmail(userForm.email),
-        //     role: UserRole.Employee,
-        //     name: userForm.name,
-        //     phone: userForm.phone,
-        //     created_at: Date.now(),
-        //     updated_at: Date.now(),
-        //   });
-
-        // Kiểm tra xem email đã được sử dụng chưa
         const userSnapshot = await firestore()
           .collection('users')
           .where('email', '==', userForm.email)
