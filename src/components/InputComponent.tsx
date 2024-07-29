@@ -55,7 +55,6 @@ const InputComponent = (props: Props) => {
         keyboardType={type ?? 'default'}
         autoCapitalize="none"
       />
-      {suffix ?? suffix}
       <TouchableOpacity
         onPress={
           isPassword ? () => setIsShowPass(!isShowPass) : () => onChange('')
@@ -73,6 +72,7 @@ const InputComponent = (props: Props) => {
           )
         )}
       </TouchableOpacity>
+      {suffix ?? suffix}
     </View>
   );
 };

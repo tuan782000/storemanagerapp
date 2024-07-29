@@ -1,3 +1,4 @@
+import CardComponent from './CardComponent';
 import ContainerComponent from './ContainerComponent';
 import DatepickerComponent from './DatepickerComponent';
 import DropDownPickerComponent from './DropDownPickerComponent';
@@ -12,6 +13,7 @@ import TextComponent from './TextComponent';
 import UserAvatarComponent from './UserAvatarComponent';
 
 export {
+  CardComponent,
   UserAvatarComponent,
   TaskComoponent,
   SectionComponent,

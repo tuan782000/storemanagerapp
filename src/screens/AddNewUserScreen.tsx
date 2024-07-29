@@ -10,12 +10,13 @@ import {
 import DividerComponent from '../components/DividerComponent';
 import {Call, CallAdd, Lock1, Sms, User} from 'iconsax-react-native';
 import {appColors} from '../constants/colors';
-import auth from '@react-native-firebase/auth';
+// import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {extractUsernameFromEmail} from '../utils/extractUsernameFromEmail';
 import {UserRole} from '../models/UserModel';
 import {View} from 'react-native';
 import ButtonComponent from '../components/ButtonComponent';
+import bcrypt from 'bcryptjs';
 
 const initialUser = {
   email: '',
@@ -107,29 +108,60 @@ const AddNewUserScreen = ({navigation}: any) => {
       setErrors(initialErrors);
       try {
         // Kiểm tra xem email đã được sử dụng chưa
-        const signInMethods = await auth().fetchSignInMethodsForEmail(
-          userForm.email,
-        );
-        if (signInMethods.length > 0) {
+        // const signInMethods = await auth().fetchSignInMethodsForEmail(
+        //   userForm.email,
+        // );
+        // if (signInMethods.length > 0) {
+        //   let newErrors: any = {...errors};
+        //   (newErrors.email =
+        //     'Email đã được sử dụng. Vui lòng chọn email khác.'),
+        //     setErrors(newErrors);
+        //   setIsLoading(false);
+        //   return;
+        // }
+        // const userCredential = await auth().createUserWithEmailAndPassword(
+        //   userForm.email,
+        //   userForm.password,
+        // );
+
+        // const user = userCredential.user;
+
+        // await firestore()
+        //   .collection('users')
+        //   .doc(user.uid)
+        //   .set({
+        //     email: userForm.email,
+        //     username: extractUsernameFromEmail(userForm.email),
+        //     role: UserRole.Employee,
+        //     name: userForm.name,
+        //     phone: userForm.phone,
+        //     created_at: Date.now(),
+        //     updated_at: Date.now(),
+        //   });
+
+        // Kiểm tra xem email đã được sử dụng chưa
+        const userSnapshot = await firestore()
+          .collection('users')
+          .where('email', '==', userForm.email)
+          .get();
+
+        if (!userSnapshot.empty) {
           let newErrors: any = {...errors};
-          (newErrors.email =
-            'Email đã được sử dụng. Vui lòng chọn email khác.'),
-            setErrors(newErrors);
+          newErrors.email = 'Email đã được sử dụng. Vui lòng chọn email khác.';
+          setErrors(newErrors);
           setIsLoading(false);
           return;
         }
-        const userCredential = await auth().createUserWithEmailAndPassword(
-          userForm.email,
-          userForm.password,
-        );
 
-        const user = userCredential.user;
+        // Băm mật khẩu
+        const hashedPassword = await bcrypt.hash(userForm.password, 10);
 
+        // Tạo người dùng mới trong Firestore
         await firestore()
           .collection('users')
-          .doc(user.uid)
-          .set({
+          .add({
             email: userForm.email,
+            password: hashedPassword,
             username: extractUsernameFromEmail(userForm.email),
             role: UserRole.Employee,
             name: userForm.name,
