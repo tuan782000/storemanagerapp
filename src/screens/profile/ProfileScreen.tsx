@@ -17,6 +17,7 @@ import {UserModel} from '../../models/UserModel';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {EditAccountModal, ResetPasswordModal} from '../../modals';
+import Toast from 'react-native-toast-message';
 
 const ProfileScreen = () => {
   const [userData, setUserData] = useState<UserModel | null>(null);
@@ -46,7 +47,12 @@ const ProfileScreen = () => {
 
   const handleSignOut = async () => {
     await auth().signOut();
-
+    Toast.show({
+      type: 'error',
+      text1: 'Đăng xuất',
+      text2: 'Đăng xuất thành công',
+      visibilityTime: 1000,
+    });
     // navigation.navigate('LoginScreen');
   };
 

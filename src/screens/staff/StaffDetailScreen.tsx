@@ -16,6 +16,7 @@ import Octicons from 'react-native-vector-icons/Octicons';
 import {fontFamilies} from '../../constants/fontFamilies';
 import {DateTime} from '../../utils/DateTime';
 import ButtonComponent from '../../components/ButtonComponent';
+import {DeleteUserConfirmModal} from '../../modals';
 
 const StaffDetailScreen = ({navigation, route}: any) => {
   const {id} = route.params;
@@ -23,6 +24,7 @@ const StaffDetailScreen = ({navigation, route}: any) => {
 
   const [infoUser, setInfoUser] = useState<UserModel | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isVisibleDeleteStaff, setIsVisibleDeleteStaff] = useState(false);
 
   useEffect(() => {
     handleGetUserWithId(id);
@@ -87,6 +89,12 @@ const StaffDetailScreen = ({navigation, route}: any) => {
                 style={{width: 150, height: 150}}
                 resizeMode="contain"
               />
+              <SpaceComponent height={20} />
+              <ButtonComponent
+                text="Đổi ảnh đại diện"
+                type="link"
+                onPress={() => console.log('Đổi ảnh đại diện')}
+              />
             </View>
             <SpaceComponent height={20} />
             {Object.entries(infoUser).map(([key, value]) => (
@@ -125,7 +133,7 @@ const StaffDetailScreen = ({navigation, route}: any) => {
             <SpaceComponent height={10} />
             <ButtonComponent
               text="Xoá nhân viên"
-              onPress={() => {}}
+              onPress={() => setIsVisibleDeleteStaff(true)}
               type="primary"
               color={appColors.red}
             />
@@ -137,6 +145,11 @@ const StaffDetailScreen = ({navigation, route}: any) => {
           </SectionComponent>
         )}
       </SectionComponent>
+      <DeleteUserConfirmModal
+        onClose={() => setIsVisibleDeleteStaff(!isVisibleDeleteStaff)}
+        visible={isVisibleDeleteStaff}
+        userId={id}
+      />
     </ContainerComponent>
   );
 };

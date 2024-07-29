@@ -17,6 +17,7 @@ import {UserRole} from '../models/UserModel';
 import {View} from 'react-native';
 import ButtonComponent from '../components/ButtonComponent';
 import bcrypt from 'bcryptjs';
+import Toast from 'react-native-toast-message';
 
 const initialUser = {
   email: '',
@@ -134,7 +135,20 @@ const AddNewUserScreen = ({navigation}: any) => {
           });
 
         setUserForm(initialUser);
+        Toast.show({
+          type: 'success',
+          text1: 'Thành công',
+          text2: 'Đăng ký nhân viên thành công!!!',
+          visibilityTime: 10000,
+        });
+        navigation.goBack();
       } catch (error: any) {
+        Toast.show({
+          type: 'error',
+          text1: 'Thất bại',
+          text2: error.message,
+          visibilityTime: 10000,
+        });
         console.log(error.message);
         // console.log(errors);
         // setErrors((prevErrors: any) => ({

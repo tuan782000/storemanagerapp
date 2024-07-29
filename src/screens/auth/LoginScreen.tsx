@@ -19,6 +19,7 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {extractUsernameFromEmail} from '../../utils/extractUsernameFromEmail';
 import {ResetPasswordModal} from '../../modals';
+import Toast from 'react-native-toast-message';
 
 const initialValue = {
   email: '',
@@ -113,10 +114,20 @@ const LoginScreen = ({navigation}: any) => {
           values.password,
         );
         const user = userCredential.user;
-
+        Toast.show({
+          type: 'success',
+          text1: 'Thành công',
+          text2: 'Đăng nhập thành công!!!',
+          visibilityTime: 1000,
+        });
         console.log(user);
       } catch (error: any) {
-        console.log(error.message);
+        Toast.show({
+          type: 'error',
+          text1: 'Thất bại',
+          text2: error.message,
+          visibilityTime: 1000,
+        });
         setErrorFromFirebase(error.message);
       } finally {
         setIsLoading(false);

@@ -13,6 +13,7 @@ import ButtonComponent from '../components/ButtonComponent';
 import {fontFamilies} from '../constants/fontFamilies';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import Toast from 'react-native-toast-message';
 
 interface Props {
   visible: boolean;
@@ -78,9 +79,21 @@ const EditAccountModal = (props: Props) => {
 
         // Close modal after updating
         onClose();
+        Toast.show({
+          type: 'success',
+          text1: 'Thành công',
+          text2: 'Cập nhật thành công!!!',
+          visibilityTime: 1000,
+        });
       }
     } catch (error: any) {
       console.error('Error updating user data: ', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Thất bại',
+        text2: error.message,
+        visibilityTime: 1000,
+      });
     } finally {
       setIsLoading(false);
     }

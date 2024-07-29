@@ -19,7 +19,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {UserModel} from '../../models/UserModel';
-import {Logout} from 'iconsax-react-native';
+import {Logout, Notification} from 'iconsax-react-native';
 import {BarChart, LineChart, PieChart} from 'react-native-gifted-charts';
 import LinearGradient from 'react-native-linear-gradient';
 import {fontFamilies} from '../../constants/fontFamilies';
@@ -134,9 +134,13 @@ const HomeScreen = ({navigation}: any) => {
             />
           </View>
           {userData ? (
-            <>
+            <RowComponent
+              justify="flex-start"
+              styles={{flexDirection: 'column', alignItems: 'flex-end'}}>
               <TextComponent text={`Xin chào, ${userData.username}`} />
-            </>
+              <SpaceComponent height={20} />
+              <Notification size={22} color={appColors.text} />
+            </RowComponent>
           ) : (
             <></>
           )}

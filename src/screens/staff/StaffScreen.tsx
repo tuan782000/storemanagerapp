@@ -20,6 +20,7 @@ import {UserModel} from '../../models/UserModel';
 import {globalStyles} from '../../styles/globalStyle';
 import {DateTime} from '../../utils/DateTime';
 import {getLastSevenCharacters} from '../../utils/getLastSevenCharacters';
+import Toast from 'react-native-toast-message';
 
 type EmployeeData = Pick<
   UserModel,
@@ -35,6 +36,16 @@ const StaffScreen = ({navigation}: any) => {
   const [searchQuery, setSearchQuery] = useState('');
   // state này dùng để lưu trũ data sau khi search và hiển thị
   const [filteredData, setFilteredData] = useState<EmployeeData[]>([]);
+
+  useEffect(() => {
+    // Lắng nghe sự kiện khi màn hình được focus
+    const unsubscribe = navigation.addListener('focus', () => {
+      getListEmployees();
+    });
+
+    // Dọn dẹp listener khi component bị unmount
+    return unsubscribe;
+  }, [navigation]);
 
   useEffect(() => {
     getListEmployees();
@@ -72,8 +83,14 @@ const StaffScreen = ({navigation}: any) => {
 
       setData(users);
       setFilteredData(users);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching data: ', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Thất bại',
+        text2: error.message,
+        visibilityTime: 10000,
+      });
     }
   };
 
