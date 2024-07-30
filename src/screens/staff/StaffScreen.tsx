@@ -1,7 +1,7 @@
 import firestore from '@react-native-firebase/firestore';
 import {Add, Call, SearchNormal1} from 'iconsax-react-native';
 import React, {useEffect, useState} from 'react';
-import {Image, TouchableOpacity, View} from 'react-native';
+import {Image, TouchableOpacity, View, Linking} from 'react-native';
 import Octicons from 'react-native-vector-icons/Octicons';
 import SwipeableFlatList from 'rn-gesture-swipeable-flatlist';
 import {
@@ -94,7 +94,21 @@ const StaffScreen = ({navigation}: any) => {
     }
   };
 
-  console.log(filteredData);
+  // Hàm này hỗ trợ gọi điện
+  const makeCall = (phoneNumber: string) => {
+    if (!phoneNumber) {
+      Toast.show({
+        type: 'error',
+        text1: 'Thất bại',
+        text2: 'Người dùng chưa có số điện thoại',
+        visibilityTime: 10000,
+      });
+      return;
+    }
+    const url = `tel:${phoneNumber}`;
+
+    Linking.openURL(url);
+  };
 
   const renderItem = ({item}: {item: EmployeeData}) => (
     <CardComponent
@@ -154,25 +168,29 @@ const StaffScreen = ({navigation}: any) => {
     </CardComponent>
   );
 
-  const renderRightActions = () => (
-    <View
-      style={{
-        paddingHorizontal: 20,
-        backgroundColor: appColors.primary,
-        borderRadius: 8,
-        marginBottom: 20,
-        marginLeft: -32,
-        marginRight: 16,
-        justifyContent: 'center',
-        alignContent: 'center',
-        paddingLeft: 32,
-      }}>
-      <TouchableOpacity
-        style={{justifyContent: 'center', alignItems: 'center'}}>
-        <Call size={22} color={appColors.white} />
-      </TouchableOpacity>
-    </View>
-  );
+  const renderRightActions = (item: EmployeeData) => {
+    // console.log(item.phone, item.id);
+    return (
+      <View
+        style={{
+          paddingHorizontal: 20,
+          backgroundColor: appColors.primary,
+          borderRadius: 8,
+          marginBottom: 20,
+          marginLeft: -32,
+          marginRight: 16,
+          justifyContent: 'center',
+          alignContent: 'center',
+          paddingLeft: 32,
+        }}>
+        <TouchableOpacity
+          onPress={() => makeCall(item.phone)}
+          style={{justifyContent: 'center', alignItems: 'center'}}>
+          <Call size={22} color={appColors.white} />
+        </TouchableOpacity>
+      </View>
+    );
+  };
 
   return (
     <>
