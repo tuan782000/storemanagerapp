@@ -2,7 +2,11 @@ import {View, Text} from 'react-native';
 import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import TabsNavigators from './TabsNavigators';
-import {AddNewUserScreen, StaffDetailScreen} from '../../screens';
+import {
+  AddNewUserScreen,
+  AddNewWorkScreen,
+  StaffDetailScreen,
+} from '../../screens';
 
 const MainNavigator = () => {
   // Auth thì nằm riêng
@@ -18,6 +22,7 @@ const MainNavigator = () => {
       }}>
       <Stack.Screen name="Main" component={TabsNavigators} />
       <Stack.Screen name="AddNewUserScreen" component={AddNewUserScreen} />
+      <Stack.Screen name="AddNewWorkScreen" component={AddNewWorkScreen} />
       <Stack.Screen name="StaffDetailScreen" component={StaffDetailScreen} />
     </Stack.Navigator>
   );

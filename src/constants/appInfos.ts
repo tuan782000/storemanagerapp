@@ -5,4 +5,18 @@ export const appInfos = {
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').height,
   },
+  monthNames: [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ],
 };

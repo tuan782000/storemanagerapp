@@ -24,7 +24,9 @@ interface Props {
   allowClear?: boolean;
   type?: KeyboardType;
   disabled?: boolean;
-  styleDisabled?: StyleProp<ViewStyle>;
+  styleInput?: StyleProp<ViewStyle>;
+  multible?: boolean;
+  numberOfLines?: number;
 }
 
 const InputComponent = (props: Props) => {
@@ -37,12 +39,22 @@ const InputComponent = (props: Props) => {
     suffix,
     type,
     disabled,
-    styleDisabled,
+    styleInput,
     allowClear,
+    multible,
+    numberOfLines,
   } = props;
   const [isShowPass, setIsShowPass] = useState(isPassword ?? false);
   return (
-    <View style={[globalStyles.inputContainer, {}, styleDisabled]}>
+    <View
+      style={[
+        globalStyles.inputContainer,
+        {
+          minHeight: numberOfLines && multible ? numberOfLines * 56 : 56,
+          alignItems: numberOfLines && multible ? 'flex-start' : 'center',
+        },
+        styleInput,
+      ]}>
       {affix ?? affix}
       <TextInput
         editable={disabled}
@@ -54,6 +66,8 @@ const InputComponent = (props: Props) => {
         placeholderTextColor={'#747688'}
         keyboardType={type ?? 'default'}
         autoCapitalize="none"
+        multiline={multible}
+        numberOfLines={numberOfLines}
       />
       <TouchableOpacity
         onPress={
@@ -68,7 +82,12 @@ const InputComponent = (props: Props) => {
         ) : (
           value.length > 0 &&
           allowClear && (
-            <AntDesign name="close" size={22} color={appColors.text} />
+            <AntDesign
+              name="close"
+              size={22}
+              color={appColors.text}
+              style={{padding: multible ? 20 : 0}}
+            />
           )
         )}
       </TouchableOpacity>

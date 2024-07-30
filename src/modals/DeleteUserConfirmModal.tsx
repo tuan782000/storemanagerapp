@@ -89,7 +89,7 @@ const DeleteUserConfirmModal = (props: Props) => {
             value={`${userId}`}
             onChange={() => {}}
             disabled={false}
-            styleDisabled={{backgroundColor: appColors.disabled}}
+            styleInput={{backgroundColor: appColors.disabled}}
           />
           {/* <SpaceComponent height={20} /> */}
           <RowComponent justify="flex-end">

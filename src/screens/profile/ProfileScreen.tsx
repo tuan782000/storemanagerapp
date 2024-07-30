@@ -131,7 +131,7 @@ const ProfileScreen = () => {
               value={userData ? userData.name : ''}
               onChange={() => {}}
               disabled={false}
-              styleDisabled={{backgroundColor: appColors.disabled}}
+              styleInput={{backgroundColor: appColors.disabled}}
             />
             <TextComponent text="Số điện thoại" />
             <SpaceComponent height={10} />
@@ -139,7 +139,7 @@ const ProfileScreen = () => {
               value={userData ? userData.phone : ''}
               onChange={() => {}}
               disabled={false}
-              styleDisabled={{backgroundColor: appColors.disabled}}
+              styleInput={{backgroundColor: appColors.disabled}}
             />
             <TextComponent text="Email" />
             <SpaceComponent height={10} />
@@ -147,7 +147,7 @@ const ProfileScreen = () => {
               value={userData ? userData.email : ''}
               onChange={() => {}}
               disabled={false}
-              styleDisabled={{backgroundColor: appColors.disabled}}
+              styleInput={{backgroundColor: appColors.disabled}}
             />
           </View>
         </RowComponent>

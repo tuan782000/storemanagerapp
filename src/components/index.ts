@@ -1,6 +1,6 @@
 import CardComponent from './CardComponent';
 import ContainerComponent from './ContainerComponent';
-import DatepickerComponent from './DatepickerComponent';
+import DateTimePickerComponent from './DateTimePickerComponent';
 import DropDownPickerComponent from './DropDownPickerComponent';
 import InputComponent from './InputComponent';
 import LoadingComponent from './LoadingComponent';
@@ -21,7 +21,7 @@ export {
   RowComponent,
   InputComponent,
   DropDownPickerComponent,
-  DatepickerComponent,
+  DateTimePickerComponent,
   ContainerComponent,
   TextComponent,
   SpaceComponent,

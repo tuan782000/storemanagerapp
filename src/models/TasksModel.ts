@@ -5,13 +5,12 @@ export enum TaskStatus {
 }
 
 export interface TasksModel {
-  id: string;
   employee_id: string;
   customer_id: string;
   description: string;
-  assigned_at: Date;
-  completed_at: Date;
+  assigned_at: number | null;
+  completed_at: number | null;
   status: TaskStatus;
-  created_at: Date;
-  updated_at: Date;
+  created_at: number;
+  updated_at: number;
 }

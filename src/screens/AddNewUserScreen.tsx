@@ -44,7 +44,6 @@ const AddNewUserScreen = ({navigation}: any) => {
   const [userForm, setUserForm] = useState<any>(initialUser);
   const [errors, setErrors] = useState<any>(initialErrors);
   const icons: any = initialIcons;
-  //   const [isFormValid, setIsFormValid] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChangeValue = (key: string, value: string) => {

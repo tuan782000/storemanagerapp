@@ -4,7 +4,6 @@ export interface MaintenanceSchedule {
 }
 
 export interface WorkSessionModel {
-  id: string;
   employee_id: string;
   customer_id: string;
   start_time: Date;

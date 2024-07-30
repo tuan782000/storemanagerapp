@@ -1,6 +1,13 @@
 import {add0ToNumber} from './add0ToNumber';
 
 export class DateTime {
+  static getTime = (num: Date) => {
+    const date = new Date(num);
+
+    return `${add0ToNumber(date.getHours())}:${add0ToNumber(
+      date.getMinutes(),
+    )}`;
+  };
   static dateToDateString = (val: Date) => {
     if (val) {
       const d = new Date(val);

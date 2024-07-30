@@ -121,7 +121,7 @@ const StaffDetailScreen = ({navigation, route}: any) => {
                   }
                   onChange={() => {}}
                   disabled={false}
-                  styleDisabled={{backgroundColor: appColors.disabled}}
+                  styleInput={{backgroundColor: appColors.disabled}}
                 />
               </RowComponent>
             ))}
