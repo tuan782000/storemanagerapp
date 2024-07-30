@@ -16,7 +16,7 @@ import Octicons from 'react-native-vector-icons/Octicons';
 import {fontFamilies} from '../../constants/fontFamilies';
 import {DateTime} from '../../utils/DateTime';
 import ButtonComponent from '../../components/ButtonComponent';
-import {DeleteUserConfirmModal} from '../../modals';
+import {DeleteUserConfirmModal, EditAccountModal} from '../../modals';
 
 const StaffDetailScreen = ({navigation, route}: any) => {
   const {id} = route.params;
@@ -25,6 +25,7 @@ const StaffDetailScreen = ({navigation, route}: any) => {
   const [infoUser, setInfoUser] = useState<UserModel | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isVisibleDeleteStaff, setIsVisibleDeleteStaff] = useState(false);
+  const [isVisibleUpdateStaff, setIsVisibleUpdateStaff] = useState(false);
 
   useEffect(() => {
     handleGetUserWithId(id);
@@ -126,7 +127,7 @@ const StaffDetailScreen = ({navigation, route}: any) => {
             ))}
             <ButtonComponent
               text="Cập nhật thông tin nhân viên"
-              onPress={() => {}}
+              onPress={() => setIsVisibleUpdateStaff(true)}
               type="primary"
               color={appColors.edit}
             />
@@ -149,6 +150,13 @@ const StaffDetailScreen = ({navigation, route}: any) => {
         onClose={() => setIsVisibleDeleteStaff(!isVisibleDeleteStaff)}
         visible={isVisibleDeleteStaff}
         userId={id}
+      />
+      <EditAccountModal
+        onClose={() => setIsVisibleUpdateStaff(!isVisibleUpdateStaff)}
+        visible={isVisibleUpdateStaff}
+        onUpdate={() => handleGetUserWithId(id)}
+        name={infoUser?.name}
+        phone={infoUser?.phone}
       />
     </ContainerComponent>
   );
