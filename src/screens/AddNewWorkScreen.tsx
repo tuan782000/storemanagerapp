@@ -59,6 +59,8 @@ const AddNewWorkScreen = () => {
   const icons: any = initialIcons;
   const [isLoading, setIsLoading] = useState(false);
 
+  // tránh bị vòng lặp vô tận việc gọi hàm handleGetAllStaffs
+  // khi đi từ bất cứ đâu vào đảm bảo cái hàm này sẽ chạy được lần đầu tiên
   useEffect(() => {
     handleGetAllStaffs();
   }, []);
@@ -211,7 +213,7 @@ const AddNewWorkScreen = () => {
       <DividerComponent />
       <SpaceComponent height={10} />
       <SectionComponent>
-        <RowComponent
+        {/* <RowComponent
           styles={{
             marginBottom: 8,
             flexDirection: 'column',
@@ -224,7 +226,6 @@ const AddNewWorkScreen = () => {
           />
           <SpaceComponent height={10} />
 
-          {/* <InputComponent value="" onChange={() => {}} /> */}
           <DropDownPickerComponent
             values={staffsSelect}
             onSelect={(val: string | string[]) =>
@@ -233,7 +234,15 @@ const AddNewWorkScreen = () => {
             selected={workForm.employee_id}
             // multiple
           />
-        </RowComponent>
+        </RowComponent> */}
+        <DropDownPickerComponent
+          title={'Chọn nhân viên'}
+          values={staffsSelect}
+          selected={workForm.employee_id}
+          onSelect={val => handleChangeValue('employee_id', val)}
+          // multiple
+          // có thể truyền multiple hoặc không
+        />
         <RowComponent
           styles={{
             marginBottom: 8,
