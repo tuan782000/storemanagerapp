@@ -7,6 +7,7 @@ import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import Toast, {BaseToast, ErrorToast} from 'react-native-toast-message';
 import {appColors} from './src/constants/colors';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {Host} from 'react-native-portalize';
 
 const toastConfig = {
   success: (props: any) => (
@@ -64,17 +65,19 @@ const toastConfig = {
 
 const App = () => {
   return (
-    <GestureHandlerRootView style={{flex: 1}}>
-      <>
-        <StatusBar
-          backgroundColor="transparent"
-          barStyle="dark-content"
-          translucent
-        />
-        <Routers />
-        <Toast config={toastConfig} />
-      </>
-    </GestureHandlerRootView>
+    <>
+      <GestureHandlerRootView style={{flex: 1}}>
+        <Host>
+          <StatusBar
+            backgroundColor="transparent"
+            barStyle="dark-content"
+            translucent
+          />
+          <Routers />
+          <Toast config={toastConfig} />
+        </Host>
+      </GestureHandlerRootView>
+    </>
   );
 };
 

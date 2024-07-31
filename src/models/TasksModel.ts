@@ -5,8 +5,8 @@ export enum TaskStatus {
 }
 
 export interface TasksModel {
-  employee_id: string;
-  customer_id: string;
+  employee_id: string[];
+  customer_id: string[];
   description: string;
   assigned_at: number | null;
   completed_at: number | null;

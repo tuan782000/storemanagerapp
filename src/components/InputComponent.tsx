@@ -25,7 +25,7 @@ interface Props {
   type?: KeyboardType;
   disabled?: boolean;
   styleInput?: StyleProp<ViewStyle>;
-  multible?: boolean;
+  multiple?: boolean;
   numberOfLines?: number;
 }
 
@@ -41,7 +41,7 @@ const InputComponent = (props: Props) => {
     disabled,
     styleInput,
     allowClear,
-    multible,
+    multiple,
     numberOfLines,
   } = props;
   const [isShowPass, setIsShowPass] = useState(isPassword ?? false);
@@ -50,8 +50,8 @@ const InputComponent = (props: Props) => {
       style={[
         globalStyles.inputContainer,
         {
-          minHeight: numberOfLines && multible ? numberOfLines * 56 : 56,
-          alignItems: numberOfLines && multible ? 'flex-start' : 'center',
+          minHeight: numberOfLines && multiple ? numberOfLines * 56 : 56,
+          alignItems: numberOfLines && multiple ? 'flex-start' : 'center',
         },
         styleInput,
       ]}>
@@ -66,7 +66,7 @@ const InputComponent = (props: Props) => {
         placeholderTextColor={'#747688'}
         keyboardType={type ?? 'default'}
         autoCapitalize="none"
-        multiline={multible}
+        multiline={multiple}
         numberOfLines={numberOfLines}
       />
       <TouchableOpacity
@@ -86,7 +86,7 @@ const InputComponent = (props: Props) => {
               name="close"
               size={22}
               color={appColors.text}
-              style={{padding: multible ? 20 : 0}}
+              style={{padding: multiple ? 20 : 0}}
             />
           )
         )}

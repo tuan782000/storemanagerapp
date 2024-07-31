@@ -1,4 +1,4 @@
 export interface SelectModel {
-  lable: string;
+  label: string;
   value: string;
 }

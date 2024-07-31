@@ -1,5 +1,5 @@
 import {View, Text, TouchableOpacity} from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   ContainerComponent,
   DateTimePickerComponent,
@@ -21,10 +21,14 @@ import {
 } from 'iconsax-react-native';
 import {appColors} from '../constants/colors';
 import {fontFamilies} from '../constants/fontFamilies';
+import {SelectModel} from '../models/SelectModel';
+import firestore from '@react-native-firebase/firestore';
+import Toast from 'react-native-toast-message';
+import {UserModel} from '../models/UserModel';
 
 const initialTask = {
-  employee_id: '',
-  customer_id: '',
+  employee_id: [],
+  customer_id: [],
   description: '',
   assigned_at: Date.now(),
   completed_at: Date.now(),
@@ -50,10 +54,45 @@ const initialIcons = {
 const AddNewWorkScreen = () => {
   const [workForm, setWorkForm] = useState<any>(initialTask);
   const [errors, setErrors] = useState<any>(initialErrors);
+  const [staffsSelect, setStaffsSelect] = useState<SelectModel[]>([]);
+
   const icons: any = initialIcons;
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleChangeValue = (key: string, value: string | Date) => {
+  useEffect(() => {
+    handleGetAllStaffs();
+  }, []);
+
+  const handleGetAllStaffs = async () => {
+    try {
+      const snapshot = await firestore()
+        .collection('users')
+        .where('role', '==', 'employee')
+        .get();
+      const items: SelectModel[] = [];
+
+      snapshot.docs.forEach((doc: any) => {
+        const data = doc.data();
+        data.email &&
+          items.push({
+            label: data.name ? data.name : data.email,
+            value: doc.id,
+          });
+      });
+
+      setStaffsSelect(items);
+    } catch (error: any) {
+      console.error('Error fetching data: ', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Thất bại',
+        text2: error.message,
+        visibilityTime: 10000,
+      });
+    }
+  };
+
+  const handleChangeValue = (key: string, value: string | Date | string[]) => {
     const data: any = {...workForm};
     data[`${key}`] = value;
 
@@ -187,9 +226,12 @@ const AddNewWorkScreen = () => {
 
           {/* <InputComponent value="" onChange={() => {}} /> */}
           <DropDownPickerComponent
-            selected={undefined}
-            onSelect={(val: string) => console.log(val)}
-            values={[]}
+            values={staffsSelect}
+            onSelect={(val: string | string[]) =>
+              handleChangeValue('employee_id', val)
+            }
+            selected={workForm.employee_id}
+            // multiple
           />
         </RowComponent>
         <RowComponent
@@ -230,7 +272,7 @@ const AddNewWorkScreen = () => {
             value={workForm.description}
             onChange={val => handleChangeValue('description', val)}
             placeholder="Mô tả công việc"
-            multible
+            multiple
             numberOfLines={4}
             allowClear
             styleInput={{
