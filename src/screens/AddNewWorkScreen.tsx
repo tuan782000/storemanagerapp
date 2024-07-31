@@ -3,6 +3,7 @@ import React, {useState} from 'react';
 import {
   ContainerComponent,
   DateTimePickerComponent,
+  DropDownPickerComponent,
   InputComponent,
   RowComponent,
   SectionComponent,
@@ -184,7 +185,12 @@ const AddNewWorkScreen = () => {
           />
           <SpaceComponent height={10} />
 
-          <InputComponent value="" onChange={() => {}} />
+          {/* <InputComponent value="" onChange={() => {}} /> */}
+          <DropDownPickerComponent
+            selected={undefined}
+            onSelect={(val: string) => console.log(val)}
+            values={[]}
+          />
         </RowComponent>
         <RowComponent
           styles={{
