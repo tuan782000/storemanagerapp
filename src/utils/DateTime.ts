@@ -58,4 +58,9 @@ export class DateTime {
 
     return `${day}/${month}/${year}`;
   };
+
+  static convertToTimestamp = (isoString: string): number => {
+    const date = new Date(isoString);
+    return date.getTime();
+  };
 }

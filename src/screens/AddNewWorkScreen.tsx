@@ -27,6 +27,7 @@ import firestore from '@react-native-firebase/firestore';
 import Toast from 'react-native-toast-message';
 import {UserModel} from '../models/UserModel';
 import ButtonComponent from '../components/ButtonComponent';
+import {DateTime} from '../utils/DateTime';
 
 const initialTask = {
   employee_id: [],
@@ -61,6 +62,16 @@ const AddNewWorkScreen = ({navigation}: any) => {
 
   // const icons: any = initialIcons;
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    // Lắng nghe sự kiện khi màn hình được focus
+    const unsubscribe = navigation.addListener('focus', () => {
+      handleGetAllCustomers();
+    });
+
+    // Dọn dẹp listener khi component bị unmount
+    return unsubscribe;
+  }, [navigation]);
 
   // tránh bị vòng lặp vô tận việc gọi hàm handleGetAllStaffs
   // khi đi từ bất cứ đâu vào đảm bảo cái hàm này sẽ chạy được lần đầu tiên
@@ -244,22 +255,24 @@ const AddNewWorkScreen = ({navigation}: any) => {
       try {
         console.log(workForm);
 
-        await firestore().collection('works').add({
-          employee_id: workForm.employee_id,
-          customer_id: workForm.customer_id,
-          description: workForm.description,
-          assigned_at: workForm.assigned_at,
-          completed_at: workForm.completed_at,
-          status: TaskStatus.Pending,
-          created_at: Date.now(),
-          updated_at: Date.now(),
-        });
+        await firestore()
+          .collection('works')
+          .add({
+            employee_id: workForm.employee_id,
+            customer_id: workForm.customer_id,
+            description: workForm.description,
+            assigned_at: DateTime.convertToTimestamp(workForm.assigned_at),
+            completed_at: DateTime.convertToTimestamp(workForm.completed_at),
+            status: TaskStatus.Pending,
+            created_at: Date.now(),
+            updated_at: Date.now(),
+          });
         setWorkForm(initialTask);
         Toast.show({
           type: 'success',
           text1: 'Thành công',
-          text2: 'Đăng ký nhân viên thành công!!!',
-          visibilityTime: 10000,
+          text2: 'Đăng ký công việc thành công!!!',
+          visibilityTime: 1000,
         });
         navigation.goBack();
       } catch (error: any) {
