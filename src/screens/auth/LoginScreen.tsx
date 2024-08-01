@@ -98,7 +98,12 @@ const LoginScreen = ({navigation}: any) => {
     }
     // Check for errors before submitting
     if (Object.values(errors).some(error => error !== '')) {
-      console.log('There are errors in the form'); // thay chỗ này bằng toast
+      Toast.show({
+        type: 'error',
+        text1: 'Thất bại',
+        text2: 'Có lỗi trong form',
+        visibilityTime: 10000,
+      });
       return;
     }
 

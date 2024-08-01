@@ -86,7 +86,7 @@ const InputComponent = (props: Props) => {
               name="close"
               size={22}
               color={appColors.text}
-              style={{padding: multiple ? 20 : 0}}
+              style={{paddingTop: multiple ? 22 : 0}}
             />
           )
         )}

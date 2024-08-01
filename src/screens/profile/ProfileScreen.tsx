@@ -191,9 +191,6 @@ const ProfileScreen = () => {
             font={fontFamilies.medium}
           />
         </RowComponent>
-        {/* <TouchableOpacity onPress={handleSignOut}>
-        <Logout size={22} color="coral" />
-      </TouchableOpacity> */}
         <SpaceComponent height={20} />
         <ButtonComponent
           styles={{backgroundColor: appColors.red}}

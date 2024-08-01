@@ -3,6 +3,7 @@ import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import TabsNavigators from './TabsNavigators';
 import {
+  AddNewCustomerScreen,
   AddNewUserScreen,
   AddNewWorkScreen,
   StaffDetailScreen,
@@ -24,6 +25,10 @@ const MainNavigator = () => {
       <Stack.Screen name="AddNewUserScreen" component={AddNewUserScreen} />
       <Stack.Screen name="AddNewWorkScreen" component={AddNewWorkScreen} />
       <Stack.Screen name="StaffDetailScreen" component={StaffDetailScreen} />
+      <Stack.Screen
+        name="AddNewCustomerScreen"
+        component={AddNewCustomerScreen}
+      />
     </Stack.Navigator>
   );
 };

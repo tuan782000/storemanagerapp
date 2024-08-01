@@ -7,7 +7,7 @@ import WorkScreen from './work/WorkScreen';
 import AddNewUserScreen from './AddNewUserScreen';
 import StaffDetailScreen from './staff/StaffDetailScreen';
 import AddNewWorkScreen from './AddNewWorkScreen';
-
+import AddNewCustomerScreen from './AddNewCustomerScreen';
 export {
   HomeScreen,
   LoginScreen,
@@ -18,4 +18,5 @@ export {
   ScheduleScreen,
   AddNewUserScreen,
   AddNewWorkScreen,
+  AddNewCustomerScreen,
 };
