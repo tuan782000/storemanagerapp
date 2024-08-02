@@ -22,7 +22,11 @@ const ScheduleScreen = () => {
   return (
     <ContainerComponent isScroll>
       <SectionComponent>
-        <TextComponent text="Quản lý lịch" title font={fontFamilies.bold} />
+        <TextComponent
+          text="Quản lý lịch bảo trì"
+          title
+          font={fontFamilies.bold}
+        />
       </SectionComponent>
       {/* <SectionComponent>
         <TabComponent />

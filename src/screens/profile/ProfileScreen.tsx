@@ -26,9 +26,7 @@ const ProfileScreen = () => {
   const [userData, setUserData] = useState<UserModel | null>(null);
   const [isVisibleEditModal, setIsVisibleEditModal] = useState(false);
   const [isVisibledResetPassword, setIsVisibledResetPassword] = useState(false);
-  const [fileImageSelected, setfileImageSelected] = useState<
-    string | ImageOrVideo
-  >('');
+
   const [oldImageUrl, setOldImageUrl] = useState<string | null>(null);
 
   const user = auth().currentUser;
@@ -64,44 +62,6 @@ const ProfileScreen = () => {
     });
     // navigation.navigate('LoginScreen');
   };
-
-  // const handleImageSelect = async (image: {
-  //   type: 'url' | 'file';
-  //   value: string | ImageOrVideo;
-  // }) => {
-  //   if (!user) return;
-  //   try {
-  //     let imageUrl = '';
-  //     if (image.type === 'url') {
-  //       imageUrl = image.value as string;
-  //     } else if (image.type === 'file') {
-  //       const file = image.value as ImageOrVideo;
-  //       const fileName = `${user.uid}_${Date.now()}`;
-  //       const reference = storage().ref(`/profile_pictures/${fileName}`);
-  //       await reference.putFile(file.path);
-  //       imageUrl = await reference.getDownloadURL();
-  //     }
-
-  //     await firestore().collection('users').doc(user.uid).update({
-  //       profilePicture: imageUrl,
-  //     });
-
-  //     Toast.show({
-  //       type: 'success',
-  //       text1: 'Cập nhật ảnh đại diện',
-  //       text2: 'Cập nhật ảnh đại diện thành công',
-  //     });
-
-  //     fetchUserData();
-  //   } catch (error) {
-  //     console.error('Error updating profile picture: ', error);
-  //     Toast.show({
-  //       type: 'error',
-  //       text1: 'Lỗi',
-  //       text2: 'Không thể cập nhật ảnh đại diện',
-  //     });
-  //   }
-  // };
 
   const handleImageSelect = async (val: {
     type: 'url' | 'file';
@@ -217,21 +177,7 @@ const ProfileScreen = () => {
             <SpaceComponent height={2} />
             <TextComponent text={user ? user.uid : ''} />
             <SpaceComponent height={2} />
-            {/* <ButtonComponent
-              text="Đổi ảnh đại diện"
-              type="text"
-              textAndLinkStyle={{color: appColors.primary}}
-            /> */}
-            {/* {fileImageSelected ? <Image source={{
-              uri: fileImageSelected
-            }} /> : <></>} */}
-            {/* <ButtonImagePicker
-              onSelect={val =>
-                val.type === 'url'
-                  ? console.log(val)
-                  : setfileImageSelected(val.value)
-              }
-            /> */}
+
             <ButtonImagePicker onSelect={handleImageSelect} />
           </View>
         </RowComponent>

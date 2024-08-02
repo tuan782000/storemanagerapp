@@ -86,16 +86,22 @@ const StaffDetailScreen = ({navigation, route}: any) => {
                 alignItems: 'center',
               }}>
               <Image
-                source={require('../../assets/images/icon-logo.png')}
-                style={{width: 150, height: 150}}
-                resizeMode="contain"
+                source={
+                  infoUser?.profilePicture
+                    ? {
+                        uri: infoUser?.profilePicture,
+                      }
+                    : require('../../assets/images/icon-logo.png')
+                }
+                style={{width: 160, height: 160, borderRadius: 999}}
+                resizeMode="cover"
               />
               <SpaceComponent height={20} />
-              <ButtonComponent
+              {/* <ButtonComponent
                 text="Đổi ảnh đại diện"
                 type="link"
                 onPress={() => console.log('Đổi ảnh đại diện')}
-              />
+              /> */}
             </View>
             <SpaceComponent height={20} />
             {Object.entries(infoUser).map(([key, value]) => (

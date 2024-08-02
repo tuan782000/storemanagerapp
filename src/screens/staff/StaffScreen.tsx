@@ -24,7 +24,7 @@ import Toast from 'react-native-toast-message';
 
 type EmployeeData = Pick<
   UserModel,
-  `email` | `name` | `phone` | `created_at`
+  `email` | `name` | `phone` | `profilePicture` | `created_at`
 > & {
   id: string;
 };
@@ -77,6 +77,7 @@ const StaffScreen = ({navigation}: any) => {
           name: data.name,
           phone: data.phone,
           email: data.email,
+          profilePicture: data.profilePicture,
           created_at: data.created_at,
         };
       });
@@ -156,12 +157,21 @@ const StaffScreen = ({navigation}: any) => {
         <View
           style={{
             borderRadius: 999,
-            borderWidth: 1,
-            borderColor: appColors.primary,
           }}>
-          <Image
+          {/* <Image
             source={require('../../assets/images/icon-logo.png')}
             style={{width: 100, height: 100}}
+          /> */}
+          <Image
+            source={
+              item?.profilePicture
+                ? {
+                    uri: item?.profilePicture,
+                  }
+                : require('../../assets/images/icon-logo.png')
+            }
+            style={{width: 100, height: 100, borderRadius: 999}}
+            resizeMode="cover"
           />
         </View>
       </RowComponent>
