@@ -9,6 +9,7 @@ export interface UserModel {
   phone: string;
   username: string;
   role: UserRole;
+  profilePicture: any;
   created_at: number;
   updated_at: number;
 }

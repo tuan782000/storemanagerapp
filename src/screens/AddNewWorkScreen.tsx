@@ -16,6 +16,7 @@ import {
   AddCircle,
   Calendar,
   CalendarTick,
+  Edit2,
   Location,
   Note,
   User,
@@ -370,11 +371,7 @@ const AddNewWorkScreen = ({navigation}: any) => {
             multiple
             numberOfLines={4}
             affix={
-              <Location
-                size={20}
-                color={appColors.gray}
-                style={{marginTop: 22}}
-              />
+              <Edit2 size={20} color={appColors.gray} style={{marginTop: 22}} />
             }
             allowClear
           />

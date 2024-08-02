@@ -2,6 +2,7 @@ import {Key, Logout, UserSquare} from 'iconsax-react-native';
 import React, {useEffect, useState} from 'react';
 import {Image, View} from 'react-native';
 import {
+  ButtonImagePicker,
   ContainerComponent,
   InputComponent,
   RowComponent,
@@ -18,11 +19,18 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {EditAccountModal, ResetPasswordModal} from '../../modals';
 import Toast from 'react-native-toast-message';
+import {ImageOrVideo} from 'react-native-image-crop-picker';
+import storage from '@react-native-firebase/storage';
 
 const ProfileScreen = () => {
   const [userData, setUserData] = useState<UserModel | null>(null);
   const [isVisibleEditModal, setIsVisibleEditModal] = useState(false);
   const [isVisibledResetPassword, setIsVisibledResetPassword] = useState(false);
+  const [fileImageSelected, setfileImageSelected] = useState<
+    string | ImageOrVideo
+  >('');
+  const [oldImageUrl, setOldImageUrl] = useState<string | null>(null);
+
   const user = auth().currentUser;
   useEffect(() => {
     fetchUserData();
@@ -38,6 +46,7 @@ const ProfileScreen = () => {
           .get();
         if (userDoc.exists) {
           setUserData(userDoc.data());
+          setOldImageUrl(userDoc.data().profilePicture); // assuming profilePicture field exists
         }
       } catch (error) {
         console.error('Error fetching user data: ', error);
@@ -54,6 +63,101 @@ const ProfileScreen = () => {
       visibilityTime: 1000,
     });
     // navigation.navigate('LoginScreen');
+  };
+
+  // const handleImageSelect = async (image: {
+  //   type: 'url' | 'file';
+  //   value: string | ImageOrVideo;
+  // }) => {
+  //   if (!user) return;
+  //   try {
+  //     let imageUrl = '';
+  //     if (image.type === 'url') {
+  //       imageUrl = image.value as string;
+  //     } else if (image.type === 'file') {
+  //       const file = image.value as ImageOrVideo;
+  //       const fileName = `${user.uid}_${Date.now()}`;
+  //       const reference = storage().ref(`/profile_pictures/${fileName}`);
+  //       await reference.putFile(file.path);
+  //       imageUrl = await reference.getDownloadURL();
+  //     }
+
+  //     await firestore().collection('users').doc(user.uid).update({
+  //       profilePicture: imageUrl,
+  //     });
+
+  //     Toast.show({
+  //       type: 'success',
+  //       text1: 'Cập nhật ảnh đại diện',
+  //       text2: 'Cập nhật ảnh đại diện thành công',
+  //     });
+
+  //     fetchUserData();
+  //   } catch (error) {
+  //     console.error('Error updating profile picture: ', error);
+  //     Toast.show({
+  //       type: 'error',
+  //       text1: 'Lỗi',
+  //       text2: 'Không thể cập nhật ảnh đại diện',
+  //     });
+  //   }
+  // };
+
+  const handleImageSelect = async (val: {
+    type: 'url' | 'file';
+    value: string | ImageOrVideo;
+  }) => {
+    if (val.type === 'file' && user) {
+      const image = val.value as ImageOrVideo;
+      const filePath = image.path;
+      const fileName = `${user.uid}_${Date.now()}`;
+      const storageRef = storage().ref(`profilePictures/${fileName}`);
+
+      try {
+        await storageRef.putFile(filePath);
+        const downloadUrl = await storageRef.getDownloadURL();
+        await updateUserProfilePicture(downloadUrl);
+        if (oldImageUrl) {
+          await deleteOldImage(oldImageUrl);
+        }
+      } catch (error) {
+        console.error('Error uploading file: ', error);
+      }
+    } else if (val.type === 'url' && typeof val.value === 'string') {
+      await updateUserProfilePicture(val.value);
+      if (oldImageUrl) {
+        await deleteOldImage(oldImageUrl);
+      }
+    }
+  };
+
+  const updateUserProfilePicture = async (newImageUrl: string) => {
+    if (user) {
+      try {
+        await firestore().collection('users').doc(user.uid).update({
+          profilePicture: newImageUrl,
+        });
+        setUserData(prevState =>
+          prevState ? {...prevState, profilePicture: newImageUrl} : null,
+        );
+        setOldImageUrl(newImageUrl);
+        Toast.show({
+          type: 'success',
+          text1: 'Cập nhật ảnh đại diện thành công',
+        });
+      } catch (error) {
+        console.error('Error updating profile picture: ', error);
+      }
+    }
+  };
+
+  const deleteOldImage = async (imageUrl: string) => {
+    try {
+      const storageRef = storage().refFromURL(imageUrl);
+      await storageRef.delete();
+    } catch (error) {
+      console.error('Error deleting old profile picture: ', error);
+    }
   };
 
   return (
@@ -87,12 +191,24 @@ const ProfileScreen = () => {
           <View
             style={{
               borderRadius: 999,
-              borderWidth: 1,
-              borderColor: appColors.primary,
+              // borderWidth: 1,
+              // borderColor: appColors.primary,
             }}>
-            <Image
+            {/* <Image
               source={require('../../assets/images/icon-logo.png')}
               style={{width: 60, height: 60}}
+              resizeMode="cover"
+            /> */}
+            <Image
+              source={
+                userData?.profilePicture
+                  ? {
+                      uri: userData?.profilePicture,
+                    }
+                  : require('../../assets/images/icon-logo.png')
+              }
+              style={{width: 60, height: 60, borderRadius: 999}}
+              resizeMode="cover"
             />
           </View>
           <SpaceComponent width={20} />
@@ -101,11 +217,22 @@ const ProfileScreen = () => {
             <SpaceComponent height={2} />
             <TextComponent text={user ? user.uid : ''} />
             <SpaceComponent height={2} />
-            <ButtonComponent
+            {/* <ButtonComponent
               text="Đổi ảnh đại diện"
               type="text"
               textAndLinkStyle={{color: appColors.primary}}
-            />
+            /> */}
+            {/* {fileImageSelected ? <Image source={{
+              uri: fileImageSelected
+            }} /> : <></>} */}
+            {/* <ButtonImagePicker
+              onSelect={val =>
+                val.type === 'url'
+                  ? console.log(val)
+                  : setfileImageSelected(val.value)
+              }
+            /> */}
+            <ButtonImagePicker onSelect={handleImageSelect} />
           </View>
         </RowComponent>
       </SectionComponent>

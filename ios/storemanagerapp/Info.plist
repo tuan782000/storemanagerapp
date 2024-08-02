@@ -47,6 +47,12 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSPhotoLibraryUsageDescription</key>
+  	<string>Sử dụng để tải lên hình ảnh thiết bị hoặc cập nhật thông tin người dùng</string>
+  	<key>NSPhotoLibraryAddUsageDescription</key>
+  	<string>Sử dụng để tải lên hình ảnh thiết bị hoặc cập nhật thông tin người dùng</string>
+    <key>NSCameraUsageDescription</key>
+  	<string>Sử dụng để tải lên hình ảnh thiết bị hoặc cập nhật thông tin người dùng</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Montserrat-Black.ttf</string>

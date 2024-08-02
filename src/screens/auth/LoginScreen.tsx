@@ -28,6 +28,7 @@ const initialValue = {
   role: UserRole.Employee,
   name: '',
   phone: '',
+  profilePicture: '',
   created_at: Date.now(),
   updated_at: Date.now(),
 };

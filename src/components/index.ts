@@ -1,3 +1,4 @@
+import ButtonImagePicker from './ButtonImagePicker';
 import CardComponent from './CardComponent';
 import ContainerComponent from './ContainerComponent';
 import DateTimePickerComponent from './DateTimePickerComponent';
@@ -26,4 +27,5 @@ export {
   TextComponent,
   SpaceComponent,
   TabComponent,
+  ButtonImagePicker,
 };

@@ -17,6 +17,8 @@ import firestore from '@react-native-firebase/firestore';
 import DividerComponent from '../../components/DividerComponent';
 import {getLastSevenCharacters} from '../../utils/getLastSevenCharacters';
 import {DateTime} from '../../utils/DateTime';
+import {globalStyles} from '../../styles/globalStyle';
+import Octicons from 'react-native-vector-icons/Octicons';
 
 const WorkScreen = ({navigation}: any) => {
   const [selectedTab, setSelectedTab] = useState<TaskStatus>(
@@ -134,7 +136,7 @@ const WorkScreen = ({navigation}: any) => {
             paddingBottom: 0,
           }}>
           <TextComponent
-            text="Quản lý đơn hàng"
+            text="Quản lý công việc"
             title
             font={fontFamilies.bold}
           />
@@ -148,15 +150,19 @@ const WorkScreen = ({navigation}: any) => {
             setSelectedTab={setSelectedTab}
           />
         </SectionComponent>
-        <SectionComponent>
-          <FlatList
-            data={
-              selectedTab === TaskStatus.Pending ? pendingTasks : completedTasks
-            }
-            renderItem={renderItem}
-            // keyExtractor={(item) => item.id}
-          />
-        </SectionComponent>
+        <FlatList
+          data={
+            selectedTab === TaskStatus.Pending ? pendingTasks : completedTasks
+          }
+          renderItem={renderItem}
+          ListEmptyComponent={
+            <SectionComponent styles={[globalStyles.center, {flex: 1}]}>
+              <Octicons name="inbox" size={38} color={appColors.gray3} />
+              <TextComponent text="Trống" color={appColors.gray3} />
+            </SectionComponent>
+          }
+          // keyExtractor={(item) => item.id}
+        />
       </ContainerComponent>
       <TouchableOpacity
         activeOpacity={0.9}
