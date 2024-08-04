@@ -1,6 +1,7 @@
 import AddUrlModal from './AddUrlModal';
 import DeleteUserConfirmModal from './DeleteUserConfirmModal';
 import EditAccountModal from './EditAccountModal';
+import LoadingModal from './LoadingModal';
 import ResetPasswordModal from './ResetPasswordModal';
 
 export {
@@ -8,4 +9,5 @@ export {
   EditAccountModal,
   DeleteUserConfirmModal,
   AddUrlModal,
+  LoadingModal,
 };

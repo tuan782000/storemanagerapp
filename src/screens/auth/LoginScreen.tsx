@@ -18,9 +18,11 @@ import {UserModel, UserRole} from '../../models/UserModel';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {extractUsernameFromEmail} from '../../utils/extractUsernameFromEmail';
-import {ResetPasswordModal} from '../../modals';
+import {LoadingModal, ResetPasswordModal} from '../../modals';
 import Toast from 'react-native-toast-message';
 import {handleAuthAPI} from '../../apis/authAPI';
+import {useDispatch} from 'react-redux';
+import {addAuth} from '../../redux/reducers/authReducer';
 
 const initialValue = {
   email: '',
@@ -51,6 +53,8 @@ const LoginScreen = ({navigation}: any) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const [isVisibledResetPassword, setIsVisibledResetPassword] = useState(false);
+
+  const dispatch = useDispatch();
 
   // useEffect(() => {
   //   setErrors(initialErrors);
@@ -88,167 +92,197 @@ const LoginScreen = ({navigation}: any) => {
     setErrors(newErrors);
   };
 
-  const handleLoginWithEmail = async () => {
-    if (values.email === '' || values.password === '') {
-      // let newErrors = {...errors};
-      // newErrors.email = 'Vui lòng kiểm tra lại email hoặc mật khẩu không đúng';
-      // setErrors(newErrors);
-      setErrorFromFirebase(
-        'Vui lòng kiểm tra lại email hoặc mật khẩu không đúng',
-      );
-      return;
-    }
-    // Check for errors before submitting
-    if (Object.values(errors).some(error => error !== '')) {
-      Toast.show({
-        type: 'error',
-        text1: 'Thất bại',
-        text2: 'Có lỗi trong form',
-        visibilityTime: 10000,
-      });
-      return;
-    }
+  // const handleLoginWithEmail = async () => {
+  //   if (values.email === '' || values.password === '') {
+  //     // let newErrors = {...errors};
+  //     // newErrors.email = 'Vui lòng kiểm tra lại email hoặc mật khẩu không đúng';
+  //     // setErrors(newErrors);
+  //     setErrorFromFirebase(
+  //       'Vui lòng kiểm tra lại email hoặc mật khẩu không đúng',
+  //     );
+  //     return;
+  //   }
+  //   // Check for errors before submitting
+  //   if (Object.values(errors).some(error => error !== '')) {
+  //     Toast.show({
+  //       type: 'error',
+  //       text1: 'Thất bại',
+  //       text2: 'Có lỗi trong form',
+  //       visibilityTime: 10000,
+  //     });
+  //     return;
+  //   }
 
-    setIsLoading(true);
+  //   setIsLoading(true);
 
-    if (values.email !== '' && values.password !== '') {
-      setErrors(initialErrors);
-      console.log(values);
+  //   if (values.email !== '' && values.password !== '') {
+  //     setErrors(initialErrors);
+  //     console.log(values);
 
-      try {
-        const userCredential = await auth().signInWithEmailAndPassword(
-          values.email,
-          values.password,
-        );
-        const user = userCredential.user;
-        Toast.show({
-          type: 'success',
-          text1: 'Thành công',
-          text2: 'Đăng nhập thành công!!!',
-          visibilityTime: 1000,
-        });
-        console.log(user);
-      } catch (error: any) {
-        Toast.show({
-          type: 'error',
-          text1: 'Thất bại',
-          text2: error.message,
-          visibilityTime: 1000,
-        });
-        setErrorFromFirebase(error.message);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-  };
+  //     try {
+  //       const userCredential = await auth().signInWithEmailAndPassword(
+  //         values.email,
+  //         values.password,
+  //       );
+  //       const user = userCredential.user;
+  //       Toast.show({
+  //         type: 'success',
+  //         text1: 'Thành công',
+  //         text2: 'Đăng nhập thành công!!!',
+  //         visibilityTime: 1000,
+  //       });
+  //       console.log(user);
+  //     } catch (error: any) {
+  //       Toast.show({
+  //         type: 'error',
+  //         text1: 'Thất bại',
+  //         text2: error.message,
+  //         visibilityTime: 1000,
+  //       });
+  //       setErrorFromFirebase(error.message);
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   }
+  // };
 
   const handleLogin = async () => {
+    setIsLoading(true);
     try {
-      const res = await handleAuthAPI('/login/');
+      const res = await handleAuthAPI('/login', values, 'post');
       console.log(res);
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRegister = async () => {
+    // console.log(values);
+    setIsLoading(true);
+
+    try {
+      const res = await handleAuthAPI(
+        '/register',
+        {
+          email: values.email,
+          password: values.password,
+          role: values.role,
+        },
+        'post',
+      );
+      console.log(res);
+      dispatch(addAuth(res.data));
+      await AsyncStorage.setItem('auth', JSON.stringify(res.data));
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <ContainerComponent isScroll>
-      <SectionComponent
-        styles={[globalStyles.center, {marginTop: 75, marginBottom: 30}]}>
-        <Image
-          source={require('../../assets/images/icon-logo.png')}
-          style={{width: 162, height: 114}}
-          resizeMode="contain"
-        />
-        <SpaceComponent height={20} />
-        <TextComponent
-          text="Điện lạnh Việt Nam"
-          size={28}
-          font={fontFamilies.bold}
-        />
-      </SectionComponent>
-      <SectionComponent>
-        <TextComponent text="Đăng nhập" size={20} title />
-        <SpaceComponent height={20} />
-        {errorFromFirebase ? (
-          <>
-            <TextComponent text={errorFromFirebase} color={appColors.red} />
-            <SpaceComponent height={5} />
-          </>
-        ) : null}
-        {errors['email'] ? (
-          <>
-            <TextComponent text={errors['email']} color={appColors.red} />
-            <SpaceComponent height={5} />
-          </>
-        ) : null}
-        <InputComponent
-          onChange={val => handleChangeValue('email', val)}
-          value={values.email}
-          placeholder="Vui lòng nhập email"
-          allowClear
-          affix={<Sms size={22} color={appColors.gray} />}
-        />
-        {errors['password'] ? (
-          <>
-            <TextComponent text={errors['password']} color={appColors.red} />
-            <SpaceComponent height={5} />
-          </>
-        ) : null}
-        <InputComponent
-          onChange={val => handleChangeValue('password', val)}
-          value={values.password}
-          placeholder="Vui lòng nhập mật khẩu"
-          isPassword
-          affix={<Lock size={22} color={appColors.gray} />}
-        />
-        <RowComponent justify="space-between">
-          <RowComponent
-            justify="flex-start"
-            onPress={() => setIsRemember(!isRemember)}>
-            <Switch
-              thumbColor={appColors.white}
-              trackColor={{true: appColors.primary}}
-              value={isRemember}
-              onChange={() => setIsRemember(!isRemember)}
-            />
-            <TextComponent text="Ghi nhớ đăng nhập" />
-          </RowComponent>
-          <ButtonComponent
-            text="Quên mật khẩu"
-            type="text"
-            onPress={() => {
-              setIsVisibledResetPassword(true);
-              handleLogin();
-            }}
+    <>
+      <ContainerComponent isScroll>
+        <SectionComponent
+          styles={[globalStyles.center, {marginTop: 75, marginBottom: 30}]}>
+          <Image
+            source={require('../../assets/images/icon-logo.png')}
+            style={{width: 162, height: 114}}
+            resizeMode="contain"
           />
-        </RowComponent>
-      </SectionComponent>
-      <SpaceComponent height={16} />
-      <SectionComponent>
-        <ButtonComponent
-          isLoading={isLoading}
-          text="ĐĂNG NHẬP"
-          type="primary"
-          onPress={handleLoginWithEmail}
-          // onPress={handleRegister}
-          icon={<ArrowRight2 size={20} color={appColors.white} />}
-          iconPostion="right"
-        />
-      </SectionComponent>
-      <SpaceComponent height={16} />
-      <SectionComponent styles={[globalStyles.center]}>
-        <TextComponent
-          text={`Dĩ tín giao tình, khách nhớ thương, \n Hài lòng khách đến, bền chặt giao thương.`}
-          styles={{textAlign: 'center'}}
-        />
-      </SectionComponent>
+          <SpaceComponent height={20} />
+          <TextComponent
+            text="Điện lạnh Việt Nam"
+            size={28}
+            font={fontFamilies.bold}
+          />
+        </SectionComponent>
+        <SectionComponent>
+          <TextComponent text="Đăng nhập" size={20} title />
+          <SpaceComponent height={20} />
+          {errorFromFirebase ? (
+            <>
+              <TextComponent text={errorFromFirebase} color={appColors.red} />
+              <SpaceComponent height={5} />
+            </>
+          ) : null}
+          {errors['email'] ? (
+            <>
+              <TextComponent text={errors['email']} color={appColors.red} />
+              <SpaceComponent height={5} />
+            </>
+          ) : null}
+          <InputComponent
+            onChange={val => handleChangeValue('email', val)}
+            value={values.email}
+            placeholder="Vui lòng nhập email"
+            allowClear
+            affix={<Sms size={22} color={appColors.gray} />}
+          />
+          {errors['password'] ? (
+            <>
+              <TextComponent text={errors['password']} color={appColors.red} />
+              <SpaceComponent height={5} />
+            </>
+          ) : null}
+          <InputComponent
+            onChange={val => handleChangeValue('password', val)}
+            value={values.password}
+            placeholder="Vui lòng nhập mật khẩu"
+            isPassword
+            affix={<Lock size={22} color={appColors.gray} />}
+          />
+          <RowComponent justify="space-between">
+            <RowComponent
+              justify="flex-start"
+              onPress={() => setIsRemember(!isRemember)}>
+              <Switch
+                thumbColor={appColors.white}
+                trackColor={{true: appColors.primary}}
+                value={isRemember}
+                onChange={() => setIsRemember(!isRemember)}
+              />
+              <TextComponent text="Ghi nhớ đăng nhập" />
+            </RowComponent>
+            <ButtonComponent
+              text="Quên mật khẩu"
+              type="text"
+              onPress={() => {
+                setIsVisibledResetPassword(true);
+              }}
+            />
+          </RowComponent>
+        </SectionComponent>
+        <SpaceComponent height={16} />
+        <SectionComponent>
+          <ButtonComponent
+            isLoading={isLoading}
+            text="ĐĂNG NHẬP"
+            type="primary"
+            // onPress={handleLoginWithEmail}
+            // onPress={handleLogin}
+            onPress={handleRegister}
+            icon={<ArrowRight2 size={20} color={appColors.white} />}
+            iconPostion="right"
+          />
+        </SectionComponent>
+        <SpaceComponent height={16} />
+        <SectionComponent styles={[globalStyles.center]}>
+          <TextComponent
+            text={`Dĩ tín giao tình, khách nhớ thương, \n Hài lòng khách đến, bền chặt giao thương.`}
+            styles={{textAlign: 'center'}}
+          />
+        </SectionComponent>
 
-      <ResetPasswordModal
-        onClose={() => setIsVisibledResetPassword(!isVisibledResetPassword)}
-        visible={isVisibledResetPassword}
-      />
-    </ContainerComponent>
+        <ResetPasswordModal
+          onClose={() => setIsVisibledResetPassword(!isVisibledResetPassword)}
+          visible={isVisibledResetPassword}
+        />
+      </ContainerComponent>
+      <LoadingModal visible={isLoading} />
+    </>
   );
 };
 

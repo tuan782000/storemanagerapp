@@ -8,6 +8,8 @@ import Toast, {BaseToast, ErrorToast} from 'react-native-toast-message';
 import {appColors} from './src/constants/colors';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {Host} from 'react-native-portalize';
+import {Provider} from 'react-redux';
+import store from './src/redux/store';
 
 const toastConfig = {
   success: (props: any) => (
@@ -73,7 +75,9 @@ const App = () => {
             barStyle="dark-content"
             translucent
           />
-          <Routers />
+          <Provider store={store}>
+            <Routers />
+          </Provider>
           <Toast config={toastConfig} />
         </Host>
       </GestureHandlerRootView>

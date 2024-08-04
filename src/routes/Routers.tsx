@@ -6,14 +6,20 @@ import AuthNavigator from './navigators/AuthNavigator';
 import {NavigationContainer} from '@react-navigation/native';
 import {useAsyncStorage} from '@react-native-async-storage/async-storage';
 import auth from '@react-native-firebase/auth';
+import {addAuth, authSelector} from '../redux/reducers/authReducer';
+import {useDispatch, useSelector} from 'react-redux';
 
 const Routers = () => {
   const [isShowSplash, setIsShowSplash] = useState(true);
-  // const [accessToken, setAccessToken] = useState('');
-  const [isLogin, setIsLogin] = useState(false);
+
+  const auth = useSelector(authSelector);
+  const dispatch = useDispatch();
 
   // lấy và gán vào trong asyncStore của cái phone accessToken dựa vào useAsyncStorage
   // const {getItem, setItem} = useAsyncStorage('keyAccessToken');
+
+  // lấy
+  const {getItem} = useAsyncStorage('auth');
 
   // chạy từ trên xuống - những j của useEffect sẽ luôn chạy lần đầu tiên - nên sẽ được để qua 1 bên Build xong UI rồi quay lại chạy
   useEffect(() => {
@@ -24,45 +30,20 @@ const Routers = () => {
     return () => clearTimeout(timeout);
   }, []);
 
-  // useEffect(() => {
-  //   auth().onAuthStateChanged(user => {
-  //     if (user) {
-  //       setIsLogin(true);
-  //     } else {
-  //       setIsLogin(false);
-  //     }
-  //   });
-  // }, []);
-
-  // useEffect(() => {
-  //   handleCheckLogin();
-  // }, []);
-
-  // const handleCheckLogin = async () => {
-  //   const token = await getItem();
-  //   console.log(token);
-
-  //   if (token) {
-  //     token && setAccessToken(token);
-  //   }
-  // };
-
   useEffect(() => {
-    auth().onAuthStateChanged(user => {
-      if (user) {
-        setIsLogin(true);
-      } else {
-        setIsLogin(false);
-      }
-    });
+    checkLogin();
   }, []);
+
+  const checkLogin = async () => {
+    const res = await getItem();
+    res && dispatch(addAuth(JSON.parse(res)));
+  };
 
   return isShowSplash ? (
     <SplashScreen />
   ) : (
     <NavigationContainer>
-      {/* {accessToken ? <MainNavigator /> : <AuthNavigator />} */}
-      {isLogin ? <MainNavigator /> : <AuthNavigator />}
+      {auth.accesstoken ? <MainNavigator /> : <AuthNavigator />}
     </NavigationContainer>
   );
 };
