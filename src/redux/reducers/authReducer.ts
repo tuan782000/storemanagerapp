@@ -22,11 +22,14 @@ const authSlice = createSlice({
     addAuth: (state, action) => {
       state.authData = action.payload; // action mang các thông tin - các thông tin nằm trong payload, nhiệm vụ của state.authData là giúp cập nhật state bằng cách mang các thông tin đó di cập nhật
     },
+    removeAuth: (state, action) => {
+      state.authData = initialState;
+    },
   },
   // chứa các hàm - hay còn gọi là các action
 });
 
 export const authReducer = authSlice.reducer;
-export const {addAuth} = authSlice.actions;
+export const {addAuth, removeAuth} = authSlice.actions;
 
 export const authSelector = (state: any) => state.authReducer.authData;

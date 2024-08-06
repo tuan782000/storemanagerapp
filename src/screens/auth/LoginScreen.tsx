@@ -18,7 +18,7 @@ import {UserModel, UserRole} from '../../models/UserModel';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {extractUsernameFromEmail} from '../../utils/extractUsernameFromEmail';
-import {LoadingModal, ResetPasswordModal} from '../../modals';
+import {LoadingModal, ResetModal, ResetPasswordModal} from '../../modals';
 import Toast from 'react-native-toast-message';
 import {handleAuthAPI} from '../../apis/authAPI';
 import {useDispatch} from 'react-redux';
@@ -92,65 +92,22 @@ const LoginScreen = ({navigation}: any) => {
     setErrors(newErrors);
   };
 
-  // const handleLoginWithEmail = async () => {
-  //   if (values.email === '' || values.password === '') {
-  //     // let newErrors = {...errors};
-  //     // newErrors.email = 'Vui lòng kiểm tra lại email hoặc mật khẩu không đúng';
-  //     // setErrors(newErrors);
-  //     setErrorFromFirebase(
-  //       'Vui lòng kiểm tra lại email hoặc mật khẩu không đúng',
-  //     );
-  //     return;
-  //   }
-  //   // Check for errors before submitting
-  //   if (Object.values(errors).some(error => error !== '')) {
-  //     Toast.show({
-  //       type: 'error',
-  //       text1: 'Thất bại',
-  //       text2: 'Có lỗi trong form',
-  //       visibilityTime: 10000,
-  //     });
-  //     return;
-  //   }
-
-  //   setIsLoading(true);
-
-  //   if (values.email !== '' && values.password !== '') {
-  //     setErrors(initialErrors);
-  //     console.log(values);
-
-  //     try {
-  //       const userCredential = await auth().signInWithEmailAndPassword(
-  //         values.email,
-  //         values.password,
-  //       );
-  //       const user = userCredential.user;
-  //       Toast.show({
-  //         type: 'success',
-  //         text1: 'Thành công',
-  //         text2: 'Đăng nhập thành công!!!',
-  //         visibilityTime: 1000,
-  //       });
-  //       console.log(user);
-  //     } catch (error: any) {
-  //       Toast.show({
-  //         type: 'error',
-  //         text1: 'Thất bại',
-  //         text2: error.message,
-  //         visibilityTime: 1000,
-  //       });
-  //       setErrorFromFirebase(error.message);
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   }
-  // };
-
   const handleLogin = async () => {
     setIsLoading(true);
     try {
-      const res = await handleAuthAPI('/login', values, 'post');
-      console.log(res);
+      const res = await handleAuthAPI(
+        '/login',
+        {email: values.email, password: values.password},
+        'post',
+      );
+      await AsyncStorage.setItem('auth', JSON.stringify(res.data));
+      dispatch(addAuth(res.data));
+      Toast.show({
+        type: 'success',
+        text1: 'Thành công',
+        text2: 'Đăng nhập thành công!!!',
+        visibilityTime: 1000,
+      });
     } catch (error) {
       console.log(error);
     } finally {
@@ -169,12 +126,16 @@ const LoginScreen = ({navigation}: any) => {
           email: values.email,
           password: values.password,
           role: values.role,
+          username: extractUsernameFromEmail(values.email),
+          name: values.name,
+          phone: values.phone,
+          profilePicture: values.profilePicture,
         },
         'post',
       );
       console.log(res);
-      dispatch(addAuth(res.data));
-      await AsyncStorage.setItem('auth', JSON.stringify(res.data));
+      // dispatch(addAuth(res.data));
+      // await AsyncStorage.setItem('auth', JSON.stringify(res.data));
     } catch (error) {
       console.log(error);
     } finally {
@@ -262,8 +223,8 @@ const LoginScreen = ({navigation}: any) => {
             text="ĐĂNG NHẬP"
             type="primary"
             // onPress={handleLoginWithEmail}
-            // onPress={handleLogin}
-            onPress={handleRegister}
+            onPress={handleLogin}
+            // onPress={handleRegister}
             icon={<ArrowRight2 size={20} color={appColors.white} />}
             iconPostion="right"
           />
@@ -276,7 +237,7 @@ const LoginScreen = ({navigation}: any) => {
           />
         </SectionComponent>
 
-        <ResetPasswordModal
+        <ResetModal
           onClose={() => setIsVisibledResetPassword(!isVisibledResetPassword)}
           visible={isVisibledResetPassword}
         />

@@ -15,11 +15,17 @@ import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {UserModel} from '../../models/UserModel';
+import {useDispatch} from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {HandleUserAPI} from '../../apis/handleUserAPI';
 
 const TabsNavigators = () => {
   const [userData, setUserData] = useState<UserModel | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const Tabs = createBottomTabNavigator();
+  // const dispatch = useDispatch();
+
+  console.log(userData);
 
   useEffect(() => {
     fetchUserData();
@@ -30,22 +36,34 @@ const TabsNavigators = () => {
   }, [userData]);
 
   const fetchUserData = async () => {
-    const user = auth().currentUser;
+    const user = await AsyncStorage.getItem('auth');
+    // console.log(user);
     if (user) {
+      const parsedUser = JSON.parse(user);
+      const api = `/info?id=${parsedUser.id}`;
       try {
-        const userDoc: any = await firestore()
-          .collection('users')
-          .doc(user.uid)
-          .get();
-        if (userDoc.exists) {
-          setUserData(userDoc.data());
-        }
-
-        // handleCheckUserAdmin();
+        const res = await HandleUserAPI.Info(api);
+        setUserData(res.data);
       } catch (error) {
-        console.error('Error fetching user data: ', error);
+        console.error('Lỗi khi lấy thông tin user: ', error);
       }
     }
+    // const user = auth().currentUser;
+    // if (user) {
+    //   try {
+    //     const userDoc: any = await firestore()
+    //       .collection('users')
+    //       .doc(user.uid)
+    //       .get();
+    //     if (userDoc.exists) {
+    //       setUserData(userDoc.data());
+    //     }
+
+    //     // handleCheckUserAdmin();
+    //   } catch (error) {
+    //     console.error('Error fetching user data: ', error);
+    //   }
+    // }
   };
 
   // 1 bugs nhỏ khi login vào staff - quay lại login bằng admin thì vẵn ăn isAdmin là false

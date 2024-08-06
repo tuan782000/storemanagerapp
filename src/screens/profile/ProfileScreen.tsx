@@ -1,4 +1,11 @@
-import {Key, Logout, UserSquare} from 'iconsax-react-native';
+import {
+  Camera,
+  Key,
+  Logout,
+  User,
+  UserSquare,
+  WalletMoney,
+} from 'iconsax-react-native';
 import React, {useEffect, useState} from 'react';
 import {Image, View} from 'react-native';
 import {
@@ -21,6 +28,10 @@ import {EditAccountModal, ResetPasswordModal} from '../../modals';
 import Toast from 'react-native-toast-message';
 import {ImageOrVideo} from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
+import {useDispatch} from 'react-redux';
+import {removeAuth} from '../../redux/reducers/authReducer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {HandleUserAPI} from '../../apis/handleUserAPI';
 
 const ProfileScreen = () => {
   const [userData, setUserData] = useState<UserModel | null>(null);
@@ -29,48 +40,49 @@ const ProfileScreen = () => {
 
   const [oldImageUrl, setOldImageUrl] = useState<string | null>(null);
 
-  const user = auth().currentUser;
+  const dispatch = useDispatch();
+
   useEffect(() => {
     fetchUserData();
   }, []);
 
   const fetchUserData = async () => {
-    const user = auth().currentUser;
+    const user = await AsyncStorage.getItem('auth');
     if (user) {
+      const parsedUser = JSON.parse(user);
+      const api = `/info?id=${parsedUser.id}`;
+
       try {
-        const userDoc: any = await firestore()
-          .collection('users')
-          .doc(user.uid)
-          .get();
-        if (userDoc.exists) {
-          setUserData(userDoc.data());
-          setOldImageUrl(userDoc.data().profilePicture); // assuming profilePicture field exists
-        }
+        const res = await HandleUserAPI.Info(api);
+        setUserData(res.data);
       } catch (error) {
-        console.error('Error fetching user data: ', error);
+        console.error('Lỗi khi lấy thông tin người dùng: ', error);
       }
     }
   };
 
   const handleSignOut = async () => {
-    await auth().signOut();
+    await AsyncStorage.removeItem('auth');
+    dispatch(removeAuth({}));
     Toast.show({
       type: 'error',
       text1: 'Đăng xuất',
       text2: 'Đăng xuất thành công',
       visibilityTime: 1000,
     });
-    // navigation.navigate('LoginScreen');
   };
 
   const handleImageSelect = async (val: {
     type: 'url' | 'file';
     value: string | ImageOrVideo;
   }) => {
+    const user = await AsyncStorage.getItem('auth');
+
     if (val.type === 'file' && user) {
+      const parsedUser = JSON.parse(user);
       const image = val.value as ImageOrVideo;
       const filePath = image.path;
-      const fileName = `${user.uid}_${Date.now()}`;
+      const fileName = `${parsedUser.id}_${Date.now()}`;
       const storageRef = storage().ref(`profilePictures/${fileName}`);
 
       try {
@@ -92,11 +104,18 @@ const ProfileScreen = () => {
   };
 
   const updateUserProfilePicture = async (newImageUrl: string) => {
+    const user = await AsyncStorage.getItem('auth');
     if (user) {
+      const parsedUser = JSON.parse(user);
+
       try {
-        await firestore().collection('users').doc(user.uid).update({
-          profilePicture: newImageUrl,
-        });
+        // call api để set lại link
+        const api = `/editInfoAvatar?id=${parsedUser.id}`;
+        await HandleUserAPI.Info(api, {profilePicture: newImageUrl}, 'put');
+        // await firestore().collection('users').doc(user.uid).update({
+        //   profilePicture: newImageUrl,
+        // });
+
         setUserData(prevState =>
           prevState ? {...prevState, profilePicture: newImageUrl} : null,
         );
@@ -167,18 +186,33 @@ const ProfileScreen = () => {
                     }
                   : require('../../assets/images/icon-logo.png')
               }
-              style={{width: 60, height: 60, borderRadius: 999}}
+              style={{width: 100, height: 100, borderRadius: 999}}
               resizeMode="cover"
             />
           </View>
           <SpaceComponent width={20} />
           <View style={{flex: 1}}>
-            <TextComponent text={userData ? userData.username : ''} />
-            <SpaceComponent height={2} />
-            <TextComponent text={user ? user.uid : ''} />
-            <SpaceComponent height={2} />
+            <RowComponent>
+              <User size={20} color={appColors.text} />
+              <SpaceComponent width={10} />
+              <TextComponent text={userData ? userData.username : ''} />
+            </RowComponent>
+            <SpaceComponent height={10} />
+            {/* <TextComponent text={user ? user.uid : ''} /> */}
+            <RowComponent>
+              <WalletMoney size={20} color={appColors.text} />
+              <SpaceComponent width={10} />
+              <TextComponent text="10.000.000 vnđ" />
+            </RowComponent>
+            <SpaceComponent height={10} />
+            <RowComponent>
+              <Camera size={20} color={appColors.text} />
+              <SpaceComponent width={10} />
+              {/* <TextComponent text="Đổi ảnh đại diện" /> */}
+              <ButtonImagePicker onSelect={handleImageSelect} />
+            </RowComponent>
 
-            <ButtonImagePicker onSelect={handleImageSelect} />
+            <TextComponent text={''} />
           </View>
         </RowComponent>
       </SectionComponent>
@@ -285,6 +319,7 @@ const ProfileScreen = () => {
       <ResetPasswordModal
         visible={isVisibledResetPassword}
         onClose={() => setIsVisibledResetPassword(!isVisibledResetPassword)}
+        onUpdate={fetchUserData}
       />
     </ContainerComponent>
   );

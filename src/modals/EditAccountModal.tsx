@@ -14,6 +14,8 @@ import {fontFamilies} from '../constants/fontFamilies';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import Toast from 'react-native-toast-message';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {HandleUserAPI} from '../apis/handleUserAPI';
 
 interface Props {
   visible: boolean;
@@ -67,17 +69,27 @@ const EditAccountModal = (props: Props) => {
     // console.log(editPhone);
     setIsLoading(true);
     try {
-      const user = auth().currentUser;
+      // const user = auth().currentUser;
+      const user = await AsyncStorage.getItem('auth');
       if (user) {
-        await firestore().collection('users').doc(user.uid).update({
-          name: editName,
-          phone: editPhone,
-        });
+        const parsedUser = JSON.parse(user);
+        const api = `/editInfoUser?id=${parsedUser.id}`;
+        try {
+          await HandleUserAPI.Info(
+            api,
+            {name: editName, phone: editPhone},
+            'put',
+          );
+        } catch (error) {
+          console.error('Lỗi chỉnh sửa thông tin người dùng: ', error);
+        }
+        // await firestore().collection('users').doc(user.uid).update({
+        //   name: editName,
+        //   phone: editPhone,
+        // });
 
         // Call onUpdate to refresh ProfileScreen data
         onUpdate();
-
-        // Close modal after updating
         onClose();
         Toast.show({
           type: 'success',

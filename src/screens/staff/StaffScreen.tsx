@@ -1,5 +1,13 @@
 import firestore from '@react-native-firebase/firestore';
-import {Add, Call, SearchNormal1} from 'iconsax-react-native';
+import {
+  Add,
+  Calendar,
+  Call,
+  Money2,
+  SearchNormal1,
+  Sms,
+  User,
+} from 'iconsax-react-native';
 import React, {useEffect, useState} from 'react';
 import {Image, TouchableOpacity, View, Linking} from 'react-native';
 import Octicons from 'react-native-vector-icons/Octicons';
@@ -21,6 +29,8 @@ import {globalStyles} from '../../styles/globalStyle';
 import {DateTime} from '../../utils/DateTime';
 import {getLastSevenCharacters} from '../../utils/getLastSevenCharacters';
 import Toast from 'react-native-toast-message';
+import {HandleUserAPI} from '../../apis/handleUserAPI';
+import ButtonComponent from '../../components/ButtonComponent';
 
 type EmployeeData = Pick<
   UserModel,
@@ -56,7 +66,7 @@ const StaffScreen = ({navigation}: any) => {
     const filtered = data.filter(
       item =>
         item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        // item.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.phone.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.email.toLowerCase().includes(searchQuery.toLowerCase()),
     );
@@ -65,25 +75,11 @@ const StaffScreen = ({navigation}: any) => {
 
   const getListEmployees = async () => {
     try {
-      const snapshot = await firestore()
-        .collection('users')
-        .where('role', '==', 'employee')
-        .get();
+      const response = await HandleUserAPI.Info('/getListEmployees');
+      const listUsers: EmployeeData[] = response.data;
 
-      const users: EmployeeData[] = snapshot.docs.map(doc => {
-        const data = doc.data() as UserModel;
-        return {
-          id: doc.id,
-          name: data.name,
-          phone: data.phone,
-          email: data.email,
-          profilePicture: data.profilePicture,
-          created_at: data.created_at,
-        };
-      });
-
-      setData(users);
-      setFilteredData(users);
+      setData(listUsers);
+      setFilteredData(listUsers);
     } catch (error: any) {
       console.error('Error fetching data: ', error);
       Toast.show({
@@ -118,12 +114,6 @@ const StaffScreen = ({navigation}: any) => {
           id: item.id,
         })
       }>
-      <RowComponent>
-        <TextComponent text="Mã số nhân viên: " />
-        <TextComponent text={getLastSevenCharacters(item.id)} />
-      </RowComponent>
-      <SpaceComponent height={10} />
-      <DividerComponent />
       <SpaceComponent height={10} />
       <RowComponent styles={{alignItems: 'flex-start'}}>
         <RowComponent
@@ -133,24 +123,41 @@ const StaffScreen = ({navigation}: any) => {
             alignItems: 'flex-start',
           }}>
           <RowComponent>
-            <TextComponent text="Họ và tên: " />
-            <TextComponent text={item.name} />
+            <User size={20} color={appColors.text} />
+            <SpaceComponent width={10} />
+            <TextComponent text={item.name} size={16} />
           </RowComponent>
-          <SpaceComponent height={5} />
+          <SpaceComponent height={10} />
           <RowComponent>
-            <TextComponent text="Số điện thoại: " />
-            <TextComponent text={item.phone} />
+            <Call size={20} color={appColors.text} />
+            <SpaceComponent width={10} />
+            {/* <TextComponent text={item.phone}  /> */}
+            <ButtonComponent
+              text={item.phone}
+              type="link"
+              textAndLinkStyle={{fontSize: 16}}
+              onPress={() => makeCall(item.phone)}
+            />
           </RowComponent>
-          <SpaceComponent height={5} />
+          <SpaceComponent height={10} />
           <RowComponent>
-            <TextComponent text="Email: " />
-            <TextComponent text={item.email} />
+            <Money2 size={20} color={appColors.text} />
+            <SpaceComponent width={10} />
+            <TextComponent text="100.000.000 vnđ" size={16} />
           </RowComponent>
-          <SpaceComponent height={5} />
+          <SpaceComponent height={10} />
           <RowComponent>
-            <TextComponent text="Ngày vào làm: " />
+            <Sms size={20} color={appColors.text} />
+            <SpaceComponent width={10} />
+            <TextComponent text={item.email} size={16} />
+          </RowComponent>
+          <SpaceComponent height={10} />
+          <RowComponent>
+            <Calendar size={20} color={appColors.text} />
+            <SpaceComponent width={10} />
             <TextComponent
               text={DateTime.timestampToVietnamDate(item.created_at)}
+              size={16}
             />
           </RowComponent>
         </RowComponent>
@@ -158,10 +165,6 @@ const StaffScreen = ({navigation}: any) => {
           style={{
             borderRadius: 999,
           }}>
-          {/* <Image
-            source={require('../../assets/images/icon-logo.png')}
-            style={{width: 100, height: 100}}
-          /> */}
           <Image
             source={
               item?.profilePicture
