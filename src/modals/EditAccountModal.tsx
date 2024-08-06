@@ -23,11 +23,12 @@ interface Props {
   title?: string;
   name?: string | null;
   phone?: string | null;
+  userId: string;
   onUpdate: () => void;
 }
 
 const EditAccountModal = (props: Props) => {
-  const {onClose, visible, title, name, phone, onUpdate} = props;
+  const {onClose, visible, title, name, phone, onUpdate, userId} = props;
   const [editName, setEditName] = useState(name);
   const [editPhone, setEditPhone] = useState(phone);
   const [errorName, setErrorName] = useState('');
@@ -52,7 +53,7 @@ const EditAccountModal = (props: Props) => {
     }
   }, [editName, editPhone]);
 
-  const handleEditAccount = async () => {
+  const handleEditAccount = async (userId: string) => {
     if (editName === '') {
       setErrorName('Không được để trống');
       return;
@@ -64,16 +65,10 @@ const EditAccountModal = (props: Props) => {
     }
     setErrorPhone('');
 
-    // call api to firebase
-    // console.log(editName);
-    // console.log(editPhone);
     setIsLoading(true);
     try {
-      // const user = auth().currentUser;
-      const user = await AsyncStorage.getItem('auth');
-      if (user) {
-        const parsedUser = JSON.parse(user);
-        const api = `/editInfoUser?id=${parsedUser.id}`;
+      if (userId) {
+        const api = `/editInfoUser?id=${userId}`;
         try {
           await HandleUserAPI.Info(
             api,
@@ -83,12 +78,7 @@ const EditAccountModal = (props: Props) => {
         } catch (error) {
           console.error('Lỗi chỉnh sửa thông tin người dùng: ', error);
         }
-        // await firestore().collection('users').doc(user.uid).update({
-        //   name: editName,
-        //   phone: editPhone,
-        // });
 
-        // Call onUpdate to refresh ProfileScreen data
         onUpdate();
         onClose();
         Toast.show({
@@ -170,7 +160,7 @@ const EditAccountModal = (props: Props) => {
             text="Cập nhật thông tin"
             type="primary"
             color={appColors.edit}
-            onPress={handleEditAccount}
+            onPress={() => handleEditAccount(userId)}
           />
         </View>
       </View>

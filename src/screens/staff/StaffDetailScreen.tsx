@@ -17,12 +17,19 @@ import {fontFamilies} from '../../constants/fontFamilies';
 import {DateTime} from '../../utils/DateTime';
 import ButtonComponent from '../../components/ButtonComponent';
 import {DeleteUserConfirmModal, EditAccountModal} from '../../modals';
+import {HandleUserAPI} from '../../apis/handleUserAPI';
+
+type EmployeeData = Pick<
+  UserModel,
+  `email` | `name` | `phone` | `profilePicture`
+> & {
+  id: string;
+};
 
 const StaffDetailScreen = ({navigation, route}: any) => {
   const {id} = route.params;
-  //   console.log(id);
 
-  const [infoUser, setInfoUser] = useState<UserModel | null>(null);
+  const [infoUser, setInfoUser] = useState<EmployeeData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isVisibleDeleteStaff, setIsVisibleDeleteStaff] = useState(false);
   const [isVisibleUpdateStaff, setIsVisibleUpdateStaff] = useState(false);
@@ -35,10 +42,12 @@ const StaffDetailScreen = ({navigation, route}: any) => {
     setIsLoading(true);
 
     try {
-      const userDoc = await firestore().collection('users').doc(id).get();
+      const api = `/info?id=${id}`;
+      const userWithId = await HandleUserAPI.Info(api);
 
-      if (userDoc.exists) {
-        const userData = userDoc.data() as UserModel;
+      if (userWithId) {
+        const {email, name, phone, profilePicture} = userWithId.data;
+        const userData: EmployeeData = {email, name, phone, profilePicture, id};
         setInfoUser(userData);
       } else {
         console.log('No such user!');
@@ -97,40 +106,37 @@ const StaffDetailScreen = ({navigation, route}: any) => {
                 resizeMode="cover"
               />
               <SpaceComponent height={20} />
-              {/* <ButtonComponent
-                text="Đổi ảnh đại diện"
-                type="link"
-                onPress={() => console.log('Đổi ảnh đại diện')}
-              /> */}
             </View>
             <SpaceComponent height={20} />
-            {Object.entries(infoUser).map(([key, value]) => (
-              <RowComponent
-                key={key}
-                styles={{
-                  marginBottom: 8,
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                }}>
-                <TextComponent
-                  text={getDisplayLabel(key)}
-                  size={16}
-                  font={fontFamilies.bold}
-                />
-                {/* <TextComponent text={value} size={16} /> */}
-                <SpaceComponent height={10} />
-                <InputComponent
-                  value={
-                    key === 'created_at' || key === 'updated_at'
-                      ? DateTime.timestampToVietnamDate(value)
-                      : value
-                  }
-                  onChange={() => {}}
-                  disabled={false}
-                  styleInput={{backgroundColor: appColors.disabled}}
-                />
-              </RowComponent>
-            ))}
+            {Object.entries(infoUser)
+              .filter(([key]) => key !== 'id' && key !== 'profilePicture')
+              .map(([key, value]) => (
+                <RowComponent
+                  key={key}
+                  styles={{
+                    marginBottom: 8,
+                    flexDirection: 'column',
+                    alignItems: 'flex-start',
+                  }}>
+                  <TextComponent
+                    text={getDisplayLabel(key)}
+                    size={16}
+                    font={fontFamilies.bold}
+                  />
+                  {/* <TextComponent text={value} size={16} /> */}
+                  <SpaceComponent height={10} />
+                  <InputComponent
+                    value={
+                      key === 'created_at' || key === 'updated_at'
+                        ? DateTime.timestampToVietnamDate(value)
+                        : value
+                    }
+                    onChange={() => {}}
+                    disabled={false}
+                    styleInput={{backgroundColor: appColors.disabled}}
+                  />
+                </RowComponent>
+              ))}
             <ButtonComponent
               text="Cập nhật thông tin nhân viên"
               onPress={() => setIsVisibleUpdateStaff(true)}
@@ -163,6 +169,7 @@ const StaffDetailScreen = ({navigation, route}: any) => {
         onUpdate={() => handleGetUserWithId(id)}
         name={infoUser?.name}
         phone={infoUser?.phone}
+        userId={id}
       />
     </ContainerComponent>
   );

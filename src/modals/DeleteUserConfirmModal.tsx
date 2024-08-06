@@ -14,6 +14,7 @@ import ButtonComponent from '../components/ButtonComponent';
 import firestore from '@react-native-firebase/firestore';
 import {useNavigation} from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
+import {HandleUserAPI} from '../apis/handleUserAPI';
 
 interface Props {
   visible: boolean;
@@ -28,7 +29,9 @@ const DeleteUserConfirmModal = (props: Props) => {
 
   const handleDeleteStaff = async (id: string) => {
     try {
-      await firestore().collection('users').doc(userId).delete();
+      console.log(id);
+      const api = `/deleteEmployee?id=${id}`;
+      await HandleUserAPI.Info(api, undefined, 'delete');
       handleOnCloseModal();
       Toast.show({
         type: 'success',

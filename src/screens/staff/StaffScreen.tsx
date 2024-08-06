@@ -36,7 +36,7 @@ type EmployeeData = Pick<
   UserModel,
   `email` | `name` | `phone` | `profilePicture` | `created_at`
 > & {
-  id: string;
+  _id: string;
 };
 
 const StaffScreen = ({navigation}: any) => {
@@ -78,6 +78,8 @@ const StaffScreen = ({navigation}: any) => {
       const response = await HandleUserAPI.Info('/getListEmployees');
       const listUsers: EmployeeData[] = response.data;
 
+      console.log(listUsers);
+
       setData(listUsers);
       setFilteredData(listUsers);
     } catch (error: any) {
@@ -107,13 +109,19 @@ const StaffScreen = ({navigation}: any) => {
     Linking.openURL(url);
   };
 
-  const renderItem = ({item}: {item: EmployeeData}) => (
-    <CardComponent
-      onPress={() =>
-        navigation.navigate('StaffDetailScreen', {
+  /*
+  navigation.navigate('StaffDetailScreen', {
           id: item.id,
         })
-      }>
+  */
+
+  const renderItem = ({item}: {item: EmployeeData}) => (
+    <CardComponent
+      onPress={() => {
+        navigation.navigate('StaffDetailScreen', {
+          id: item._id,
+        });
+      }}>
       <SpaceComponent height={10} />
       <RowComponent styles={{alignItems: 'flex-start'}}>
         <RowComponent
@@ -244,7 +252,7 @@ const StaffScreen = ({navigation}: any) => {
             }
             renderItem={renderItem}
             renderRightActions={renderRightActions}
-            keyExtractor={item => item.id}
+            keyExtractor={item => item._id}
           />
           <SpaceComponent height={60} />
         </View>
