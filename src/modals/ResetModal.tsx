@@ -16,7 +16,6 @@ interface Props {
 const ResetModal = (props: Props) => {
   const {onClose, visible, title, text} = props;
   const handleCloseModal = () => {
-    console.log('Close');
     onClose();
   };
   return (

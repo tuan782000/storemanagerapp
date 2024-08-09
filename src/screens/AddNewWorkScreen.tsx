@@ -1,5 +1,5 @@
-import {View, Text, TouchableOpacity} from 'react-native';
 import React, {useEffect, useState} from 'react';
+import {TouchableOpacity} from 'react-native';
 import {
   ContainerComponent,
   DateTimePickerComponent,
@@ -11,49 +11,37 @@ import {
   TextComponent,
 } from '../components';
 import DividerComponent from '../components/DividerComponent';
-import {TaskStatus, TasksModel} from '../models/TasksModel';
-import {
-  AddCircle,
-  Calendar,
-  CalendarTick,
-  Edit2,
-  Location,
-  Note,
-  User,
-} from 'iconsax-react-native';
+// import {TaskStatus, TasksModel} from '../models/TasksModel';
+import {AddCircle, Edit2, Money2} from 'iconsax-react-native';
+import Toast from 'react-native-toast-message';
+import {HandleCustomerAPI} from '../apis/handleCustomerAPI';
+import {HandleUserAPI} from '../apis/handleUserAPI';
+import {HandleWorkSessionAPI} from '../apis/handleWorkSessionAPI';
+import ButtonComponent from '../components/ButtonComponent';
 import {appColors} from '../constants/colors';
 import {fontFamilies} from '../constants/fontFamilies';
 import {SelectModel} from '../models/SelectModel';
-import firestore from '@react-native-firebase/firestore';
-import Toast from 'react-native-toast-message';
-import {UserModel} from '../models/UserModel';
-import ButtonComponent from '../components/ButtonComponent';
+import {TaskStatus} from '../models/WorkSessionModel';
 import {DateTime} from '../utils/DateTime';
 
 const initialTask = {
   employee_id: [],
   customer_id: [],
   description: '',
+  amount: 0,
   assigned_at: Date.now(),
   completed_at: Date.now(),
-  status: TaskStatus.Pending,
+  status: TaskStatus.Assigned,
 };
 
 const initialErrors = {
   employee_id: '',
   customer_id: '',
   description: '',
+  amount: '',
   assigned_at: '',
   completed_at: '',
 };
-
-// const initialIcons = {
-//   employee_id: <User size={20} color={appColors.gray} />,
-//   customer_id: <User size={20} color={appColors.gray} />,
-//   description: <Note size={20} color={appColors.gray} />,
-//   assigned_at: <Calendar size={20} color={appColors.gray} />,
-//   completed_at: <CalendarTick size={20} color={appColors.gray} />,
-// };
 
 const AddNewWorkScreen = ({navigation}: any) => {
   const [workForm, setWorkForm] = useState<any>(initialTask);
@@ -61,7 +49,6 @@ const AddNewWorkScreen = ({navigation}: any) => {
   const [staffsSelect, setStaffsSelect] = useState<SelectModel[]>([]);
   const [customersSelect, setCustomersSelect] = useState<SelectModel[]>([]);
 
-  // const icons: any = initialIcons;
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -83,18 +70,16 @@ const AddNewWorkScreen = ({navigation}: any) => {
 
   const handleGetAllStaffs = async () => {
     try {
-      const snapshot = await firestore()
-        .collection('users')
-        .where('role', '==', 'employee')
-        .get();
+      const api = '/getListEmployees';
+      const listStaff = await HandleUserAPI.Info(api);
+
       const items: SelectModel[] = [];
 
-      snapshot.docs.forEach((doc: any) => {
-        const data = doc.data();
-        data.email &&
+      listStaff.data.forEach((staff: any) => {
+        staff.email &&
           items.push({
-            label: data.username ? data.username : data.email,
-            value: doc.id,
+            label: staff.username ? staff.username : staff.email,
+            value: staff._id,
           });
       });
 
@@ -105,23 +90,23 @@ const AddNewWorkScreen = ({navigation}: any) => {
         type: 'error',
         text1: 'Thất bại',
         text2: error.message,
-        visibilityTime: 10000,
+        visibilityTime: 1000,
       });
     }
   };
 
   const handleGetAllCustomers = async () => {
     try {
-      const snapshot = await firestore().collection('customers').get();
+      const api = '/listCustomer';
+      const listCustomer = await HandleCustomerAPI.Customer(api);
 
       const items: SelectModel[] = [];
 
-      snapshot.docs.forEach((doc: any) => {
-        const data = doc.data();
-        data.email &&
+      listCustomer.data.forEach((customer: any) => {
+        customer.email &&
           items.push({
-            label: data.username ? data.username : data.email,
-            value: doc.id,
+            label: customer.name ? customer.name : customer.email,
+            value: customer._id,
           });
       });
 
@@ -255,19 +240,22 @@ const AddNewWorkScreen = ({navigation}: any) => {
       setErrors(initialErrors);
       try {
         console.log(workForm);
-
-        await firestore()
-          .collection('works')
-          .add({
+        const api = '/createWorkSession';
+        await HandleWorkSessionAPI.WorkSession(
+          api,
+          {
             employee_id: workForm.employee_id,
             customer_id: workForm.customer_id,
             description: workForm.description,
+            amount: workForm.amount,
             assigned_at: DateTime.convertToTimestamp(workForm.assigned_at),
             completed_at: DateTime.convertToTimestamp(workForm.completed_at),
-            status: TaskStatus.Pending,
+            status: TaskStatus.Assigned,
             created_at: Date.now(),
             updated_at: Date.now(),
-          });
+          },
+          'post',
+        );
         setWorkForm(initialTask);
         Toast.show({
           type: 'success',
@@ -374,6 +362,32 @@ const AddNewWorkScreen = ({navigation}: any) => {
               <Edit2 size={20} color={appColors.gray} style={{marginTop: 22}} />
             }
             allowClear
+          />
+        </RowComponent>
+        <RowComponent
+          styles={{
+            marginBottom: 8,
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+          }}>
+          <RowComponent>
+            <TextComponent
+              text="Nhập giá tiền"
+              size={16}
+              font={fontFamilies.bold}
+              flex={1}
+            />
+          </RowComponent>
+          <SpaceComponent height={10} />
+          {errors['amount'] ? (
+            <TextComponent text={errors['amount']} color={appColors.red} />
+          ) : null}
+          <InputComponent
+            type="numeric"
+            value={workForm.amount}
+            onChange={val => handleChangeValue('amount', val)}
+            placeholder="Vui lòng nhập số tiền công việc"
+            affix={<Money2 size={20} color={appColors.gray} />}
           />
         </RowComponent>
         <RowComponent justify="space-between">

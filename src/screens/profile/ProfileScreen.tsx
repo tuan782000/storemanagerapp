@@ -35,7 +35,7 @@ import {HandleUserAPI} from '../../apis/handleUserAPI';
 
 const ProfileScreen = () => {
   const [userData, setUserData] = useState<UserModel | null>(null);
-  const [userId, setuserId] = useState('');
+  const [userId, setUserId] = useState('');
   const [isVisibleEditModal, setIsVisibleEditModal] = useState(false);
   const [isVisibledResetPassword, setIsVisibledResetPassword] = useState(false);
 
@@ -52,7 +52,7 @@ const ProfileScreen = () => {
     if (user) {
       const parsedUser = JSON.parse(user);
       const api = `/info?id=${parsedUser.id}`;
-      setuserId(parsedUser.id);
+      setUserId(parsedUser.id);
       try {
         const res = await HandleUserAPI.Info(api);
         setUserData(res.data);

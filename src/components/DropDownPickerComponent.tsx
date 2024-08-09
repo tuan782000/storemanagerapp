@@ -22,7 +22,6 @@ interface Props {
 
 const DropDownPickerComponent = (props: Props) => {
   const {title, values, selected, onSelect, multiple} = props;
-  // console.log(values);
   const [isVisible, setIsVisible] = useState(false);
   // keyword người dùng đã search
   const [searchKey, setSearchKey] = useState('');

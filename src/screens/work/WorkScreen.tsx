@@ -1,4 +1,4 @@
-import {View, Text, TouchableOpacity, FlatList} from 'react-native';
+import {View, Text, TouchableOpacity, FlatList, Linking} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {
   CardComponent,
@@ -10,120 +10,315 @@ import {
 } from '../../components';
 import {fontFamilies} from '../../constants/fontFamilies';
 import TabComponent, {TabButtonType} from '../../components/TabComponent';
-import {TaskStatus, TasksModel} from '../../models/TasksModel';
+// import {TaskStatus, TasksModel} from '../../models/TasksModel';
 import {appColors} from '../../constants/colors';
-import {Add} from 'iconsax-react-native';
+import {Add, Book1} from 'iconsax-react-native';
 import firestore from '@react-native-firebase/firestore';
 import DividerComponent from '../../components/DividerComponent';
 import {getLastSevenCharacters} from '../../utils/getLastSevenCharacters';
 import {DateTime} from '../../utils/DateTime';
 import {globalStyles} from '../../styles/globalStyle';
 import Octicons from 'react-native-vector-icons/Octicons';
+import WorkSession, {TaskStatus} from '../../models/WorkSessionModel';
+import {HandleWorkSessionAPI} from '../../apis/handleWorkSessionAPI';
+import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {UserModel} from '../../models/UserModel';
+import {HandleUserAPI} from '../../apis/handleUserAPI';
+import {formatCurrencyVND} from '../../utils/moneyFormatCurrency';
+import {CustomerModel} from '../../models/CustomerModel';
+import {HandleCustomerAPI} from '../../apis/handleCustomerAPI';
+import Toast from 'react-native-toast-message';
+import ButtonComponent from '../../components/ButtonComponent';
 
 const WorkScreen = ({navigation}: any) => {
-  const [selectedTab, setSelectedTab] = useState<TaskStatus>(
-    TaskStatus.Pending,
-  );
+  const [userData, setUserData] = useState<UserModel | null>(null);
+  const [customerData, setCustomerData] = useState<any>([]);
+  const [listWorkSession, setlistWorkSession] = useState<WorkSession[]>([]);
 
-  const [pendingTasks, setPendingTasks] = useState<TasksModel[]>([]);
-  const [completedTasks, setCompletedTasks] = useState<TasksModel[]>([]);
-
-  const buttons: TabButtonType[] = [
-    {
-      title: 'Đang xử lý',
-    },
-    {
-      title: 'Hoàn thành',
-    },
-  ];
-
+  // phải call 2 lần useEffect để tránh bị trễ 1 bước
   useEffect(() => {
-    // Lắng nghe sự kiện khi màn hình được focus
-    const unsubscribe = navigation.addListener('focus', () => {
-      fetchTasks(TaskStatus.Pending);
-      fetchTasks(TaskStatus.Completed);
-    });
-
-    // Dọn dẹp listener khi component bị unmount
-    return unsubscribe;
-  }, [navigation]);
-
-  useEffect(() => {
-    fetchTasks(TaskStatus.Pending);
-    fetchTasks(TaskStatus.Completed);
+    fetchUserData();
   }, []);
 
-  const fetchTasks = async (status: TaskStatus) => {
-    try {
-      const snapshot = await firestore()
-        .collection('works')
-        .where('status', '==', status)
-        .get();
+  useEffect(() => {
+    if (userData) {
+      fetchTasks();
+      fetchCustomerData();
+    }
+  }, [userData]);
 
-      const tasks: TasksModel[] = snapshot.docs.map((doc: any) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+  const fetchTasks = async () => {
+    const userAuth = await AsyncStorage.getItem('auth');
+    console.log(userAuth);
+    if (userAuth && userData?.role === 'admin') {
+      try {
+        const api = '/listWorkSessions';
+        const listWork: any = await HandleWorkSessionAPI.WorkSession(api);
 
-      if (status === TaskStatus.Pending) {
-        setPendingTasks(tasks);
-      } else if (status === TaskStatus.Completed) {
-        setCompletedTasks(tasks);
+        setlistWorkSession(listWork.data);
+      } catch (error: any) {
+        console.error('Lỗi khi lấy ra các phiên làm việc: ', error);
       }
-    } catch (error: any) {
-      console.error('Error fetching tasks: ', error);
+    } else if (userAuth && userData?.role === 'employee') {
+      try {
+        const parsedUser = JSON.parse(userAuth);
+        const api = `/getWorkSessionsByEmployeeId?employee_id=${parsedUser.id}`;
+        const listWork: any = await HandleWorkSessionAPI.WorkSession(api);
+        setlistWorkSession(listWork.data);
+      } catch (error: any) {
+        console.error('Lỗi khi lấy ra các phiên làm việc: ', error);
+      }
     }
   };
 
-  const renderItem = ({item}: any) => (
-    <CardComponent>
-      <RowComponent>
-        <TextComponent text="Mã số nhiệm vụ: " />
-        <TextComponent text={getLastSevenCharacters(item.id)} />
-      </RowComponent>
-      <SpaceComponent height={10} />
-      <DividerComponent />
-      <SpaceComponent height={10} />
-      <RowComponent styles={{alignItems: 'flex-start'}}>
-        <RowComponent
-          styles={{
-            flex: 1,
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-          }}>
-          <TextComponent text="Mô tả nhiệm vụ: " />
-          <TextComponent
-            text={`- ${item.description}`}
-            styles={{flex: 0, flexWrap: 'wrap'}}
-          />
-          <RowComponent>
-            <TextComponent text="Trạng thái: " />
-            <TextComponent
-              text={`${item.status === 0 ? 'Đang xử lý' : ''}`}
-              color={appColors.warning}
-              font={fontFamilies.bold}
-            />
-          </RowComponent>
-          <RowComponent>
-            <TextComponent text="Ngày bắt đầu: " />
-            {item.assigned_at && (
-              <TextComponent
-                text={`${DateTime.timestampToVietnamDate(item.assigned_at)}`}
+  const fetchUserData = async () => {
+    const user = await AsyncStorage.getItem('auth');
+    if (user) {
+      const parsedUser = JSON.parse(user);
+      const api = `/info?id=${parsedUser.id}`;
+      // setuserId(parsedUser.id);
+      try {
+        const res = await HandleUserAPI.Info(api);
+        setUserData(res.data);
+      } catch (error) {
+        console.error('Lỗi khi lấy thông tin người dùng: ', error);
+      }
+    }
+  };
+
+  const fetchCustomerData = async () => {
+    const api = `/listCustomer`;
+    try {
+      const res = await HandleCustomerAPI.Customer(api);
+      setCustomerData(res.data);
+    } catch (error) {
+      console.error('Lỗi khi lấy thông tin danh sách khách hàng: ', error);
+    }
+  };
+
+  // console.log(customerData);
+
+  const getCustomerInfo = (customer_id: string) => {
+    if (!customerData) return {name: '', phone: ''};
+    const customer = customerData.find((cust: any) => cust._id === customer_id);
+    return customer
+      ? {name: customer.name, phone: customer.phone, address: customer.address}
+      : {name: '', phone: '', address: ''};
+  };
+
+  const makeCall = (phoneNumber: string) => {
+    if (!phoneNumber) {
+      Toast.show({
+        type: 'error',
+        text1: 'Thất bại',
+        text2: 'Người dùng chưa có số điện thoại',
+        visibilityTime: 10000,
+      });
+      return;
+    }
+    const url = `tel:${phoneNumber}`;
+
+    Linking.openURL(url);
+  };
+
+  const renderItem = ({item}: any) => {
+    const customerInfo = getCustomerInfo(item.customer_id);
+    console.log(customerInfo);
+
+    return (
+      <CardComponent
+        styles={{borderRadius: 12}}
+        onPress={() => {
+          navigation.navigate('WorkDetailScreen', {
+            id: item._id,
+          });
+        }}>
+        <RowComponent styles={{alignItems: 'flex-start'}}>
+          <RowComponent
+            styles={{
+              flex: 1,
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+            }}>
+            <RowComponent styles={{alignItems: 'flex-start'}}>
+              <FontAwesome6
+                name="screwdriver-wrench"
+                size={25}
+                color={appColors.text}
               />
-            )}
-          </RowComponent>
-          <RowComponent>
-            <TextComponent text="Dự kiến hoàn thành: " />
-            {item.completed_at && (
+              <SpaceComponent width={15} />
               <TextComponent
-                text={`${DateTime.timestampToVietnamDate(item.completed_at)}`}
+                text={item.description}
+                styles={{flex: 1, flexWrap: 'wrap'}}
+                size={16}
+                font={fontFamilies.medium}
               />
+            </RowComponent>
+            <SpaceComponent height={15} />
+            <RowComponent>
+              <TextComponent text="Trạng thái: " size={16} />
+              <TextComponent
+                size={16}
+                text={`${
+                  item.status === 'assigned'
+                    ? 'Đã giao việc'
+                    : item.status === 'accepted'
+                    ? 'Thợ đã nhận'
+                    : item.status === 'pending'
+                    ? 'Thợ đang xử lý'
+                    : item.status === 'rejected'
+                    ? 'Thợ đã từ chối'
+                    : item.status === 'completed'
+                    ? 'Đã hoàn thành'
+                    : 'Có lỗi xảy ra'
+                }`}
+                color={appColors.white}
+                font={fontFamilies.bold}
+                styles={{
+                  backgroundColor: `${
+                    item.status === 'assigned'
+                      ? appColors.primary
+                      : item.status === 'accepted'
+                      ? appColors.warning
+                      : item.status === 'pending'
+                      ? appColors.edit
+                      : item.status === 'rejected'
+                      ? appColors.danager
+                      : item.status === 'completed'
+                      ? appColors.success
+                      : appColors.red
+                  }`,
+                  paddingHorizontal: 4,
+                  paddingVertical: 5,
+                  color: appColors.white,
+                  borderRadius: 5,
+                }}
+              />
+            </RowComponent>
+            <SpaceComponent height={15} />
+            {userData?.role === 'admin' && (
+              <>
+                <RowComponent>
+                  <TextComponent text="Số tiền dự án: " size={16} />
+                  <TextComponent
+                    text={`${formatCurrencyVND(item.amount)}`}
+                    size={16}
+                    styles={{
+                      backgroundColor: appColors.success,
+                      paddingHorizontal: 8,
+                      paddingVertical: 5,
+                      color: appColors.white,
+                      borderRadius: 5,
+                    }}
+                    font={fontFamilies.bold}
+                  />
+                </RowComponent>
+                <SpaceComponent height={15} />
+                <RowComponent>
+                  <TextComponent text="Số tiền nhân viên nhận: " size={16} />
+                  <TextComponent
+                    text={`${formatCurrencyVND(item.payment_amount)}`}
+                    size={16}
+                    styles={{
+                      backgroundColor: appColors.danager,
+                      paddingHorizontal: 8,
+                      paddingVertical: 5,
+                      color: appColors.white,
+                      borderRadius: 5,
+                    }}
+                    font={fontFamilies.bold}
+                  />
+                </RowComponent>
+                <SpaceComponent height={15} />
+                <RowComponent>
+                  <TextComponent text="Lợi nhuận: " size={16} />
+                  <TextComponent
+                    text={`${formatCurrencyVND(
+                      item.amount - item.payment_amount,
+                    )}`}
+                    size={16}
+                    styles={{
+                      backgroundColor: appColors.success,
+                      paddingHorizontal: 8,
+                      paddingVertical: 5,
+                      color: appColors.white,
+                      borderRadius: 5,
+                    }}
+                    font={fontFamilies.bold}
+                  />
+                </RowComponent>
+                <SpaceComponent height={15} />
+              </>
             )}
+            {userData?.role === 'employee' && (
+              <>
+                <RowComponent>
+                  <TextComponent text="Số tiền nhiệm vụ: " size={16} />
+                  <TextComponent
+                    text={`${formatCurrencyVND(item.payment_amount)}`}
+                    size={16}
+                    styles={{
+                      backgroundColor: appColors.success,
+                      paddingHorizontal: 8,
+                      paddingVertical: 5,
+                      color: appColors.white,
+                      borderRadius: 5,
+                    }}
+                    font={fontFamilies.bold}
+                  />
+                </RowComponent>
+                <SpaceComponent height={15} />
+              </>
+            )}
+            <RowComponent>
+              <TextComponent text="Tên khác hàng: " size={16} />
+              <TextComponent text={customerInfo.name} size={16} />
+            </RowComponent>
+            <SpaceComponent height={15} />
+            <RowComponent styles={{alignItems: 'flex-start'}}>
+              <TextComponent text="Địa chỉ: " size={16} />
+              <TextComponent
+                text={customerInfo.address}
+                size={16}
+                styles={{flex: 1, flexWrap: 'wrap'}}
+              />
+            </RowComponent>
+            <SpaceComponent height={15} />
+            <RowComponent>
+              <TextComponent text="Số điện thoại: " size={16} />
+              <ButtonComponent
+                text={customerInfo.phone}
+                type="link"
+                textAndLinkStyle={{fontSize: 16}}
+                onPress={() => makeCall(customerInfo.phone)}
+              />
+              {/* <TextComponent
+                text={customerInfo.phone}
+                size={16}
+                color={appColors.primary}
+              /> */}
+            </RowComponent>
+            <SpaceComponent height={15} />
+            {/* <RowComponent>
+              <TextComponent text="Ngày bắt đầu: " size={16} />
+              <TextComponent
+                text={`${DateTime.dateToDateString(item.start_time)}`}
+              />
+            </RowComponent>
+            <SpaceComponent height={15} />
+            <RowComponent>
+              <TextComponent text="Dự kiến hoàn thành: " size={16} />
+              <TextComponent
+                text={`${DateTime.dateToDateString(item.end_time)}`}
+              />
+            </RowComponent>
+            <SpaceComponent height={15} /> */}
           </RowComponent>
         </RowComponent>
-      </RowComponent>
-    </CardComponent>
-  );
+      </CardComponent>
+    );
+  };
 
   return (
     <>
@@ -143,17 +338,8 @@ const WorkScreen = ({navigation}: any) => {
         </SectionComponent>
         <SpaceComponent height={20} />
 
-        <SectionComponent>
-          <TabComponent
-            buttons={buttons}
-            selectedTab={selectedTab}
-            setSelectedTab={setSelectedTab}
-          />
-        </SectionComponent>
         <FlatList
-          data={
-            selectedTab === TaskStatus.Pending ? pendingTasks : completedTasks
-          }
+          data={listWorkSession}
           renderItem={renderItem}
           ListEmptyComponent={
             <SectionComponent styles={[globalStyles.center, {flex: 1}]}>
@@ -161,7 +347,6 @@ const WorkScreen = ({navigation}: any) => {
               <TextComponent text="Trống" color={appColors.gray3} />
             </SectionComponent>
           }
-          // keyExtractor={(item) => item.id}
         />
       </ContainerComponent>
       <TouchableOpacity

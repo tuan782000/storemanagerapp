@@ -56,7 +56,6 @@ const ResetPasswordModal = (props: Props) => {
   };
 
   const handleCloseModal = () => {
-    console.log('Close');
     onClose();
   };
 

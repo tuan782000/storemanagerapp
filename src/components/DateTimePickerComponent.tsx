@@ -20,7 +20,6 @@ interface Props {
 const DateTimePickerComponent = (props: Props) => {
   const {onSelect, placeholder, selected, type, disable} = props;
   const [isShowDatePicker, setIsShowDatePicker] = useState(false);
-  // console.log(selected);
   return (
     <View>
       <RowComponent
@@ -45,6 +44,7 @@ const DateTimePickerComponent = (props: Props) => {
         )}
       </RowComponent>
       <DatePicker
+        title={'Chọn ngày'}
         confirmText="Chọn"
         cancelText="Huỷ"
         mode={type}
@@ -56,6 +56,7 @@ const DateTimePickerComponent = (props: Props) => {
           onSelect(val);
         }}
         modal
+        locale="vi"
       />
     </View>
   );

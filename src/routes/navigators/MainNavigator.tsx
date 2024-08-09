@@ -7,6 +7,7 @@ import {
   AddNewUserScreen,
   AddNewWorkScreen,
   StaffDetailScreen,
+  WorkDetailScreen,
 } from '../../screens';
 
 const MainNavigator = () => {
@@ -23,8 +24,9 @@ const MainNavigator = () => {
       }}>
       <Stack.Screen name="Main" component={TabsNavigators} />
       <Stack.Screen name="AddNewUserScreen" component={AddNewUserScreen} />
-      <Stack.Screen name="AddNewWorkScreen" component={AddNewWorkScreen} />
       <Stack.Screen name="StaffDetailScreen" component={StaffDetailScreen} />
+      <Stack.Screen name="AddNewWorkScreen" component={AddNewWorkScreen} />
+      <Stack.Screen name="WorkDetailScreen" component={WorkDetailScreen} />
       <Stack.Screen
         name="AddNewCustomerScreen"
         component={AddNewCustomerScreen}

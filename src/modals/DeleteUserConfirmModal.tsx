@@ -29,7 +29,6 @@ const DeleteUserConfirmModal = (props: Props) => {
 
   const handleDeleteStaff = async (id: string) => {
     try {
-      console.log(id);
       const api = `/deleteEmployee?id=${id}`;
       await HandleUserAPI.Info(api, undefined, 'delete');
       handleOnCloseModal();
@@ -97,18 +96,19 @@ const DeleteUserConfirmModal = (props: Props) => {
           {/* <SpaceComponent height={20} /> */}
           <RowComponent justify="flex-end">
             <ButtonComponent
-              text="Đồng ý"
-              type="primary"
-              color={appColors.success}
-              onPress={() => handleDeleteStaff(userId)}
-            />
-            <SpaceComponent width={10} />
-            <ButtonComponent
               text="Huỷ"
               type="primary"
               color={appColors.red}
               styles={{paddingHorizontal: 30}}
               onPress={handleOnCloseModal}
+            />
+            <SpaceComponent width={10} />
+
+            <ButtonComponent
+              text="Đồng ý"
+              type="primary"
+              color={appColors.success}
+              onPress={() => handleDeleteStaff(userId)}
             />
           </RowComponent>
         </View>

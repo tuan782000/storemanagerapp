@@ -1,18 +1,30 @@
-export interface MaintenanceSchedule {
-  date: Date;
-  notes: string;
+export enum TaskStatus {
+  Assigned, // đã giao
+  Accepted, // đã chấp nhận
+  Pending, // đang xử lý
+  Rejected, // từ chối nhiệm vụ
+  Completed, // hoàn thành
 }
 
-export interface WorkSessionModel {
-  employee_id: string;
-  customer_id: string;
-  start_time: Date;
-  end_time: Date;
-  result: string;
-  amount: number; // Lưu ý ở điểm này 10.000 vnđ 1.000.0000 vnđ
-  before_image_url: string;
-  after_image_url: string;
-  maintenance_schedule: MaintenanceSchedule;
-  created_at: Date;
-  updated_at: Date;
-}
+type WorkSession = {
+  customer_id: string[];
+  employee_id: string[];
+  start_time?: Date | null;
+  end_time?: Date | null;
+  result?: string | null;
+  amount: number;
+  payment_amount?: number;
+  before_image?: string[];
+  after_image?: string[];
+  task_description: string;
+  status?: TaskStatus;
+  rejection_reason?: string | null;
+  created_at?: Date;
+  updated_at?: Date;
+  isDeleted?: boolean;
+  deletedAt?: Date;
+  maintenance_schedule?: string[];
+  comments?: string[];
+};
+
+export default WorkSession;

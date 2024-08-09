@@ -17,6 +17,8 @@ import Toast from 'react-native-toast-message';
 import DividerComponent from '../components/DividerComponent';
 import ButtonComponent from '../components/ButtonComponent';
 import {extractUsernameFromEmail} from '../utils/extractUsernameFromEmail';
+import {HandleUserAPI} from '../apis/handleUserAPI';
+import {HandleCustomerAPI} from '../apis/handleCustomerAPI';
 
 const initialCustomer = {
   email: '',
@@ -110,31 +112,9 @@ const AddNewCustomerScreen = ({navigation}: any) => {
     ) {
       setErrors(initialErrors);
       try {
-        const userSnapshot = await firestore()
-          .collection('customers')
-          .where('email', '==', customerForm.email)
-          .get();
+        const api = '/registerCustomer';
 
-        if (!userSnapshot.empty) {
-          let newErrors: any = {...errors};
-          newErrors.email = 'Email đã được sử dụng. Vui lòng chọn email khác.';
-          setErrors(newErrors);
-          setIsLoading(false);
-          return;
-        }
-
-        // Tạo người dùng mới trong Firestore
-        await firestore()
-          .collection('customers')
-          .add({
-            email: customerForm.email,
-            username: extractUsernameFromEmail(customerForm.email),
-            name: customerForm.name,
-            phone: customerForm.phone,
-            address: customerForm.address,
-            created_at: Date.now(),
-            updated_at: Date.now(),
-          });
+        await HandleCustomerAPI.Customer(api, customerForm, 'post');
 
         setCustomerForm(initialCustomer);
         Toast.show({

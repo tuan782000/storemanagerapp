@@ -18,6 +18,7 @@ import {View} from 'react-native';
 import ButtonComponent from '../components/ButtonComponent';
 import bcrypt from 'bcryptjs';
 import Toast from 'react-native-toast-message';
+import {HandleUserAPI} from '../apis/handleUserAPI';
 
 const initialUser = {
   email: '',
@@ -108,35 +109,22 @@ const AddNewUserScreen = ({navigation}: any) => {
     ) {
       setErrors(initialErrors);
       try {
-        const userSnapshot = await firestore()
-          .collection('users')
-          .where('email', '==', userForm.email)
-          .get();
+        const api = '/registerEmployee';
 
-        if (!userSnapshot.empty) {
-          let newErrors: any = {...errors};
-          newErrors.email = 'Email đã được sử dụng. Vui lòng chọn email khác.';
-          setErrors(newErrors);
-          setIsLoading(false);
-          return;
-        }
-
-        // Băm mật khẩu
-        const hashedPassword = await bcrypt.hash(userForm.password, 10);
-
-        // Tạo người dùng mới trong Firestore
-        await firestore()
-          .collection('users')
-          .add({
+        await HandleUserAPI.Info(
+          api,
+          {
             email: userForm.email,
-            password: hashedPassword,
+            password: userForm.password,
             username: extractUsernameFromEmail(userForm.email),
             role: UserRole.Employee,
             name: userForm.name,
             phone: userForm.phone,
             created_at: Date.now(),
             updated_at: Date.now(),
-          });
+          },
+          'post',
+        );
 
         setUserForm(initialUser);
         Toast.show({
@@ -166,7 +154,6 @@ const AddNewUserScreen = ({navigation}: any) => {
       <DividerComponent />
       <SpaceComponent height={10} />
       <SectionComponent>
-        {/* <TextComponent text="Name" /> */}
         {Object.keys(userForm).map(key => (
           <View key={key}>
             {errors[key] ? (
