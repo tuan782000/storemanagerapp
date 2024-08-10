@@ -29,8 +29,8 @@ const initialTask = {
   customer_id: [],
   description: '',
   amount: 0,
-  assigned_at: Date.now(),
-  completed_at: Date.now(),
+  start_time: Date.now(),
+  end_time: Date.now(),
   status: TaskStatus.Assigned,
 };
 
@@ -39,8 +39,8 @@ const initialErrors = {
   customer_id: '',
   description: '',
   amount: '',
-  assigned_at: '',
-  completed_at: '',
+  start_time: '',
+  end_time: '',
 };
 
 const AddNewWorkScreen = ({navigation}: any) => {
@@ -176,10 +176,10 @@ const AddNewWorkScreen = ({navigation}: any) => {
       return;
     }
 
-    if (new Date(workForm.assigned_at) > new Date(workForm.completed_at)) {
+    if (new Date(workForm.start_time) > new Date(workForm.end_time)) {
       setErrors((prevErrors: any) => ({
         ...prevErrors,
-        assigned_at: 'Ngày bắt đầu phải nhỏ hơn ngày dự kiến hoàn thành',
+        start_time: 'Ngày bắt đầu phải nhỏ hơn ngày dự kiến hoàn thành',
       }));
       Toast.show({
         type: 'error',
@@ -248,8 +248,8 @@ const AddNewWorkScreen = ({navigation}: any) => {
             customer_id: workForm.customer_id,
             description: workForm.description,
             amount: workForm.amount,
-            assigned_at: DateTime.convertToTimestamp(workForm.assigned_at),
-            completed_at: DateTime.convertToTimestamp(workForm.completed_at),
+            start_time: DateTime.convertToTimestamp(workForm.start_time),
+            end_time: DateTime.convertToTimestamp(workForm.end_time),
             status: TaskStatus.Assigned,
             created_at: Date.now(),
             updated_at: Date.now(),
@@ -406,8 +406,8 @@ const AddNewWorkScreen = ({navigation}: any) => {
             <SpaceComponent height={10} />
             <DateTimePickerComponent
               type="date"
-              onSelect={val => handleChangeValue('assigned_at', val)}
-              selected={workForm.assigned_at}
+              onSelect={val => handleChangeValue('start_time', val)}
+              selected={workForm.start_time}
             />
           </RowComponent>
           <SpaceComponent width={10} />
@@ -426,8 +426,8 @@ const AddNewWorkScreen = ({navigation}: any) => {
             <SpaceComponent height={10} />
             <DateTimePickerComponent
               type="date"
-              onSelect={val => handleChangeValue('completed_at', val)}
-              selected={workForm.completed_at}
+              onSelect={val => handleChangeValue('end_time', val)}
+              selected={workForm.end_time}
             />
           </RowComponent>
         </RowComponent>

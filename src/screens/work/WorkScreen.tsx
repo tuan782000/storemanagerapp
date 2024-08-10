@@ -43,6 +43,19 @@ const WorkScreen = ({navigation}: any) => {
 
   useEffect(() => {
     if (userData) {
+      // Lắng nghe sự kiện khi màn hình được focus
+      const unsubscribe = navigation.addListener('focus', () => {
+        fetchTasks();
+        fetchCustomerData();
+      });
+
+      // Dọn dẹp listener khi component bị unmount
+      return unsubscribe;
+    }
+  }, [navigation, userData]);
+
+  useEffect(() => {
+    if (userData) {
       fetchTasks();
       fetchCustomerData();
     }
@@ -50,7 +63,6 @@ const WorkScreen = ({navigation}: any) => {
 
   const fetchTasks = async () => {
     const userAuth = await AsyncStorage.getItem('auth');
-    console.log(userAuth);
     if (userAuth && userData?.role === 'admin') {
       try {
         const api = '/listWorkSessions';
@@ -97,8 +109,6 @@ const WorkScreen = ({navigation}: any) => {
     }
   };
 
-  // console.log(customerData);
-
   const getCustomerInfo = (customer_id: string) => {
     if (!customerData) return {name: '', phone: ''};
     const customer = customerData.find((cust: any) => cust._id === customer_id);
@@ -124,7 +134,6 @@ const WorkScreen = ({navigation}: any) => {
 
   const renderItem = ({item}: any) => {
     const customerInfo = getCustomerInfo(item.customer_id);
-    console.log(customerInfo);
 
     return (
       <CardComponent
@@ -189,7 +198,7 @@ const WorkScreen = ({navigation}: any) => {
                       ? appColors.success
                       : appColors.red
                   }`,
-                  paddingHorizontal: 4,
+                  paddingHorizontal: 10,
                   paddingVertical: 5,
                   color: appColors.white,
                   borderRadius: 5,
@@ -272,7 +281,7 @@ const WorkScreen = ({navigation}: any) => {
               </>
             )}
             <RowComponent>
-              <TextComponent text="Tên khác hàng: " size={16} />
+              <TextComponent text="Tên khách hàng: " size={16} />
               <TextComponent text={customerInfo.name} size={16} />
             </RowComponent>
             <SpaceComponent height={15} />

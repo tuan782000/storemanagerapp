@@ -50,7 +50,7 @@ const StaffDetailScreen = ({navigation, route}: any) => {
         const userData: EmployeeData = {email, name, phone, profilePicture, id};
         setInfoUser(userData);
       } else {
-        console.log('No such user!');
+        console.log('Không có thông tin liên quan!');
       }
     } catch (error: any) {
       console.log(error.message);
