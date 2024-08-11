@@ -2,6 +2,8 @@ import {View, Text, ActivityIndicator, Linking} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {
   ContainerComponent,
+  DropDownPickerStatusComponent,
+  InputComponent,
   RowComponent,
   SectionComponent,
   SpaceComponent,
@@ -25,6 +27,54 @@ import {HandleCommentAPI} from '../../apis/handleCommentAPI';
 import {AddSquare} from 'iconsax-react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {HandleMaintanceScheduleAPI} from '../../apis/handleMaintanceScheduleAPI';
+import {TaskStatus} from '../../models/WorkSessionModel';
+import {SelectModel} from '../../models/SelectModel';
+import {SelectStatusModel} from '../../models/SelectStatusModel';
+
+const initialStatus = [
+  {
+    id: 0,
+    value: TaskStatus.Assigned,
+  },
+  {
+    id: 1,
+    value: TaskStatus.Accepted,
+  },
+  {
+    id: 2,
+    value: TaskStatus.Pending,
+  },
+  {
+    id: 3,
+    value: TaskStatus.Rejected,
+  },
+  {
+    id: 4,
+    value: TaskStatus.Completed,
+  },
+  // Assigned, // đã giao
+  // Accepted, // đã chấp nhận
+  // Pending, // đang xử lý
+  // Rejected, // từ chối nhiệm vụ
+  // Completed, // hoàn thành
+];
+
+const initialUpdateWorkSession = {
+  status: 0, // Thay đổi giá trị theo yêu cầu của bạn
+  rejection_reason: '', // Có thể là null nếu không có lý do từ chối
+  before_image: [] as string[], // Danh sách các URL hình ảnh trước khi làm
+  after_image: [] as string[], // Danh sách các URL hình ảnh sau khi làm
+  comments: '', // Có thể là null nếu không có nhận xét
+  result: '', // Có thể là null nếu không có kết quả
+};
+
+const initialErrors = {
+  rejection_reason: '',
+  before_image: '',
+  after_image: '',
+  comments: '',
+  result: '',
+};
 
 const WorkDetailScreen = ({navigation, route}: any) => {
   const {id} = route.params;
@@ -36,6 +86,14 @@ const WorkDetailScreen = ({navigation, route}: any) => {
   const [existingMaintanceSchedule, setExistingMaintanceSchedule] =
     useState<any>();
   const [isLoading, setIsLoading] = useState(false);
+
+  const [workFormUpdate, setWorkFormUpdate] = useState<any>(
+    initialUpdateWorkSession,
+  );
+
+  const [statusSelect, setStatusSelect] = useState<SelectStatusModel[]>([]);
+
+  console.log(workFormUpdate.status);
 
   useEffect(() => {
     fetchUserData();
@@ -56,6 +114,7 @@ const WorkDetailScreen = ({navigation, route}: any) => {
         workSessionById.employee_id,
         workSessionById.customer_id,
       );
+      handleGetAllStatus();
     }
   }, [workSessionById]);
 
@@ -159,6 +218,17 @@ const WorkDetailScreen = ({navigation, route}: any) => {
     }
   };
 
+  const handleGetAllStatus = async () => {
+    const items: SelectStatusModel[] = [];
+    await initialStatus.forEach(status => {
+      items.push({
+        label: status.value,
+        value: status.id,
+      });
+    });
+    setStatusSelect(items);
+  };
+
   const makeCall = (phoneNumber: string) => {
     if (!phoneNumber) {
       Toast.show({
@@ -186,10 +256,21 @@ const WorkDetailScreen = ({navigation, route}: any) => {
     navigation.goBack(); // Nếu sử dụng react-navigation
   };
 
-  // console.log(workSessionById);
+  const handleChangeValue = (
+    key: string,
+    value: string | number | string[],
+  ) => {
+    const data: any = {...workFormUpdate};
+    data[`${key}`] = value;
+
+    setWorkFormUpdate(data);
+    // handleValidateInput(key, value);
+  };
+
+  console.log(workSessionById);
   // console.log(staffById);
   // console.log(customerById);
-  console.log(existingMaintanceSchedule);
+  // console.log(existingMaintanceSchedule);
   // console.log(commentById);
   // console.log(commentById[0]?.comment);
   // Hàm render giao diện cho admin
@@ -230,13 +311,13 @@ const WorkDetailScreen = ({navigation, route}: any) => {
               workSessionById.status === 'assigned'
                 ? 'Đã giao việc'
                 : workSessionById.status === 'accepted'
-                ? 'Thợ đã nhận'
+                ? 'Nhận công việc'
                 : workSessionById.status === 'pending'
-                ? 'Thợ đang xử lý'
+                ? 'Xử lý công việc'
                 : workSessionById.status === 'rejected'
-                ? 'Thợ đã từ chối'
+                ? 'Từ chối công việc'
                 : workSessionById.status === 'completed'
-                ? 'Đã hoàn thành'
+                ? 'Đã hoàn thành công việc'
                 : 'Có lỗi xảy ra'
             }`}
             color={appColors.white}
@@ -496,13 +577,13 @@ const WorkDetailScreen = ({navigation, route}: any) => {
               workSessionById.status === 'assigned'
                 ? 'Đã giao việc'
                 : workSessionById.status === 'accepted'
-                ? 'Thợ đã nhận'
+                ? 'Nhận công việc'
                 : workSessionById.status === 'pending'
-                ? 'Thợ đang xử lý'
+                ? 'Xử lý công việc'
                 : workSessionById.status === 'rejected'
-                ? 'Thợ đã từ chối'
+                ? 'Từ chối công việc'
                 : workSessionById.status === 'completed'
-                ? 'Đã hoàn thành'
+                ? 'Đã hoàn thành công việc'
                 : 'Có lỗi xảy ra'
             }`}
             color={appColors.white}
@@ -625,13 +706,26 @@ const WorkDetailScreen = ({navigation, route}: any) => {
           size={16}
           font={fontFamilies.bold}
         />
+        <SpaceComponent height={10} />
 
-        <SpaceComponent height={15} />
+        {/* <DropDownPickerStatusComponent onSelect={}/> */}
+        {/* <DropDownPickerStatusComponent
+          title="Chọn trạng thái công việc" // Optional title
+          selected={selectedStatus} // The currently selected status
+          onSelect={handleStatusSelect} // Function to handle the status selection
+        /> */}
+        <DropDownPickerStatusComponent
+          selected={workSessionById.status}
+          onSelect={val => handleChangeValue('status', val)}
+          items={statusSelect}
+        />
+
         <TextComponent
           text="Cập nhật hình ảnh trước khi sửa"
           size={16}
           font={fontFamilies.bold}
         />
+
         <SpaceComponent height={15} />
         <TextComponent
           text="Cập nhật hình ảnh sau khi sửa"
@@ -644,13 +738,33 @@ const WorkDetailScreen = ({navigation, route}: any) => {
           size={16}
           font={fontFamilies.bold}
         />
+        <SpaceComponent height={10} />
+
+        <InputComponent
+          onChange={() => {}}
+          value=""
+          multiple
+          numberOfLines={2}
+        />
         <SpaceComponent height={15} />
         <TextComponent
           text="Nhận xét khách hàng"
           size={16}
           font={fontFamilies.bold}
         />
+        <SpaceComponent height={10} />
+        <InputComponent
+          onChange={() => {}}
+          value=""
+          multiple
+          numberOfLines={2}
+        />
         <SpaceComponent height={15} />
+        <ButtonComponent
+          text="Cập nhật kết quả công việc"
+          type="primary"
+          styles={{backgroundColor: appColors.warning}}
+        />
       </>
     );
   };

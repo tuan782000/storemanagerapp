@@ -3,6 +3,7 @@ import CardComponent from './CardComponent';
 import ContainerComponent from './ContainerComponent';
 import DateTimePickerComponent from './DateTimePickerComponent';
 import DropDownPickerComponent from './DropDownPickerComponent';
+import DropDownPickerStatusComponent from './DropDownPickerStatusComponent';
 import InputComponent from './InputComponent';
 import LoadingComponent from './LoadingComponent';
 import RowComponent from './RowComponent';
@@ -28,4 +29,5 @@ export {
   SpaceComponent,
   TabComponent,
   ButtonImagePicker,
+  DropDownPickerStatusComponent,
 };
