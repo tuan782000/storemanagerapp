@@ -22,6 +22,9 @@ import {HandleCustomerAPI} from '../../apis/handleCustomerAPI';
 import Toast from 'react-native-toast-message';
 import ButtonComponent from '../../components/ButtonComponent';
 import {HandleCommentAPI} from '../../apis/handleCommentAPI';
+import {AddSquare} from 'iconsax-react-native';
+import {TouchableOpacity} from 'react-native-gesture-handler';
+import {HandleMaintanceScheduleAPI} from '../../apis/handleMaintanceScheduleAPI';
 
 const WorkDetailScreen = ({navigation, route}: any) => {
   const {id} = route.params;
@@ -30,6 +33,8 @@ const WorkDetailScreen = ({navigation, route}: any) => {
   const [staffById, setStaffById] = useState<any>();
   const [customerById, setcustomerById] = useState<any>();
   const [commentById, setCommentById] = useState<any>();
+  const [existingMaintanceSchedule, setExistingMaintanceSchedule] =
+    useState<any>();
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -47,6 +52,10 @@ const WorkDetailScreen = ({navigation, route}: any) => {
       fetchDetailStaff(workSessionById.employee_id);
       fetchDetailCustomer(workSessionById.customer_id);
       fetchComment(workSessionById.comments);
+      fetchCheckMaintanceSchedule(
+        workSessionById.employee_id,
+        workSessionById.customer_id,
+      );
     }
   }, [workSessionById]);
 
@@ -111,13 +120,38 @@ const WorkDetailScreen = ({navigation, route}: any) => {
   };
 
   const fetchComment = async (id: string) => {
-    console.log(id);
+    // console.log(id);
 
     setIsLoading(true);
     const api = `/getComment?id=${id}`;
     try {
       const commentWithId = await HandleCommentAPI.Comment(api);
       setCommentById(commentWithId.data);
+    } catch (error: any) {
+      console.log(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchCheckMaintanceSchedule = async (
+    employee_id: string,
+    customer_id: string,
+  ) => {
+    console.log(employee_id, customer_id);
+    const api = '/checkMaintanceSchedule';
+    try {
+      const checkExistingSchedule =
+        await HandleMaintanceScheduleAPI.MaintanceSchedule(
+          api,
+          {
+            employee_id: employee_id,
+            customer_id: customer_id,
+            work_session_id: id,
+          },
+          'post',
+        );
+      setExistingMaintanceSchedule(checkExistingSchedule.data);
     } catch (error: any) {
       console.log(error.message);
     } finally {
@@ -152,9 +186,10 @@ const WorkDetailScreen = ({navigation, route}: any) => {
     navigation.goBack(); // Nếu sử dụng react-navigation
   };
 
-  console.log(workSessionById);
+  // console.log(workSessionById);
   // console.log(staffById);
   // console.log(customerById);
+  console.log(existingMaintanceSchedule);
   // console.log(commentById);
   // console.log(commentById[0]?.comment);
   // Hàm render giao diện cho admin
@@ -428,7 +463,194 @@ const WorkDetailScreen = ({navigation, route}: any) => {
   const renderEmployeeView = () => {
     return (
       <>
-        <TextComponent text="Employee" title />
+        <TextComponent
+          text="I. Mô tả công việc"
+          size={18}
+          font={fontFamilies.bold}
+        />
+        <SpaceComponent height={15} />
+        <RowComponent styles={{alignItems: 'flex-start'}}>
+          <FontAwesome6
+            name="screwdriver-wrench"
+            size={25}
+            color={appColors.text}
+          />
+          <SpaceComponent width={10} />
+          <TextComponent
+            text={workSessionById.description}
+            size={16}
+            font={fontFamilies.bold}
+            flex={1}
+          />
+        </RowComponent>
+        <SpaceComponent height={15} />
+        <RowComponent>
+          <TextComponent
+            text="Trạng thái: "
+            size={16}
+            font={fontFamilies.bold}
+          />
+          <TextComponent
+            size={16}
+            text={`${
+              workSessionById.status === 'assigned'
+                ? 'Đã giao việc'
+                : workSessionById.status === 'accepted'
+                ? 'Thợ đã nhận'
+                : workSessionById.status === 'pending'
+                ? 'Thợ đang xử lý'
+                : workSessionById.status === 'rejected'
+                ? 'Thợ đã từ chối'
+                : workSessionById.status === 'completed'
+                ? 'Đã hoàn thành'
+                : 'Có lỗi xảy ra'
+            }`}
+            color={appColors.white}
+            font={fontFamilies.bold}
+            styles={{
+              backgroundColor: `${
+                workSessionById.status === 'assigned'
+                  ? appColors.primary
+                  : workSessionById.status === 'accepted'
+                  ? appColors.warning
+                  : workSessionById.status === 'pending'
+                  ? appColors.edit
+                  : workSessionById.status === 'rejected'
+                  ? appColors.danager
+                  : workSessionById.status === 'completed'
+                  ? appColors.success
+                  : appColors.red
+              }`,
+              paddingHorizontal: 10,
+              paddingVertical: 5,
+              color: appColors.white,
+              borderRadius: 5,
+            }}
+          />
+        </RowComponent>
+        <SpaceComponent height={15} />
+        <RowComponent>
+          <TextComponent text="Số tiền bạn sẽ được nhận: " size={16} />
+          <TextComponent
+            text={`${formatCurrencyVND(workSessionById.payment_amount)}`}
+            size={16}
+            styles={{
+              backgroundColor: appColors.success,
+              paddingHorizontal: 8,
+              paddingVertical: 5,
+              color: appColors.white,
+              borderRadius: 5,
+            }}
+            font={fontFamilies.bold}
+          />
+        </RowComponent>
+        <SpaceComponent height={15} />
+        <RowComponent>
+          <TextComponent text="Ngày bắt đầu: " size={16} />
+          <TextComponent
+            text={`${DateTime.dateToDateString(workSessionById.start_time)}`}
+            size={16}
+          />
+        </RowComponent>
+        <SpaceComponent height={15} />
+        <RowComponent>
+          <TextComponent text="Dự kiến kết thúc: " size={16} />
+          <TextComponent
+            text={`${DateTime.dateToDateString(workSessionById.end_time)}`}
+            size={16}
+          />
+        </RowComponent>
+        <SpaceComponent height={15} />
+        <RowComponent>
+          <TextComponent text="Tên khách hàng: " size={16} />
+          <TextComponent text={customerById?.name} size={16} />
+        </RowComponent>
+        <SpaceComponent height={15} />
+        <RowComponent>
+          <TextComponent text="Số điện thoại:  " size={16} />
+          <ButtonComponent
+            text={customerById?.phone}
+            type="link"
+            textAndLinkStyle={{fontSize: 16}}
+            onPress={() => makeCall(customerById?.phone)}
+          />
+        </RowComponent>
+        <SpaceComponent height={15} />
+        <RowComponent styles={{alignItems: 'flex-start'}}>
+          <TextComponent text="Địa chỉ:  " size={16} />
+          <TextComponent text={customerById?.address} size={16} flex={1} />
+        </RowComponent>
+        <SpaceComponent height={15} />
+        <TextComponent
+          text="II. Thợ cập nhật công việc"
+          size={18}
+          font={fontFamilies.bold}
+        />
+        <SpaceComponent height={15} />
+
+        <RowComponent justify="space-between">
+          <TextComponent
+            text="Lịch bảo trì"
+            size={16}
+            font={fontFamilies.bold}
+          />
+          {existingMaintanceSchedule?.length > 0 ? (
+            <>
+              <TextComponent
+                text={`${DateTime.dateToDateString(
+                  existingMaintanceSchedule[0].scheduled_date,
+                )}`}
+                size={16}
+              />
+            </>
+          ) : (
+            <>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate('AddNewScheduleScreen', {
+                    workSessionId: id,
+                    employeeId: staffById?._id,
+                    customerId: customerById?._id,
+                  })
+                }>
+                <AddSquare size={22} color={appColors.primary} variant="Bold" />
+              </TouchableOpacity>
+            </>
+          )}
+        </RowComponent>
+
+        <SpaceComponent height={15} />
+        <TextComponent
+          text="Cập nhật trạng thái nhiệm vụ"
+          size={16}
+          font={fontFamilies.bold}
+        />
+
+        <SpaceComponent height={15} />
+        <TextComponent
+          text="Cập nhật hình ảnh trước khi sửa"
+          size={16}
+          font={fontFamilies.bold}
+        />
+        <SpaceComponent height={15} />
+        <TextComponent
+          text="Cập nhật hình ảnh sau khi sửa"
+          size={16}
+          font={fontFamilies.bold}
+        />
+        <SpaceComponent height={15} />
+        <TextComponent
+          text="Cập nhật kết quả"
+          size={16}
+          font={fontFamilies.bold}
+        />
+        <SpaceComponent height={15} />
+        <TextComponent
+          text="Nhận xét khách hàng"
+          size={16}
+          font={fontFamilies.bold}
+        />
+        <SpaceComponent height={15} />
       </>
     );
   };

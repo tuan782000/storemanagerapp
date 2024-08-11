@@ -4,6 +4,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import TabsNavigators from './TabsNavigators';
 import {
   AddNewCustomerScreen,
+  AddNewScheduleScreen,
   AddNewUserScreen,
   AddNewWorkScreen,
   StaffDetailScreen,
@@ -27,6 +28,10 @@ const MainNavigator = () => {
       <Stack.Screen name="StaffDetailScreen" component={StaffDetailScreen} />
       <Stack.Screen name="AddNewWorkScreen" component={AddNewWorkScreen} />
       <Stack.Screen name="WorkDetailScreen" component={WorkDetailScreen} />
+      <Stack.Screen
+        name="AddNewScheduleScreen"
+        component={AddNewScheduleScreen}
+      />
       <Stack.Screen
         name="AddNewCustomerScreen"
         component={AddNewCustomerScreen}

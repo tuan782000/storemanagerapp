@@ -12,7 +12,18 @@ import {fontFamilies} from '../../constants/fontFamilies';
 import TabComponent, {TabButtonType} from '../../components/TabComponent';
 // import {TaskStatus, TasksModel} from '../../models/TasksModel';
 import {appColors} from '../../constants/colors';
-import {Add, Book1} from 'iconsax-react-native';
+import {
+  Add,
+  Book1,
+  Call,
+  Location,
+  Money3,
+  MoneyRecive,
+  MoneySend,
+  Status,
+  UserSquare,
+  WalletMoney,
+} from 'iconsax-react-native';
 import firestore from '@react-native-firebase/firestore';
 import DividerComponent from '../../components/DividerComponent';
 import {getLastSevenCharacters} from '../../utils/getLastSevenCharacters';
@@ -166,7 +177,9 @@ const WorkScreen = ({navigation}: any) => {
             </RowComponent>
             <SpaceComponent height={15} />
             <RowComponent>
-              <TextComponent text="Trạng thái: " size={16} />
+              {/* <TextComponent text="Trạng thái: " size={16} /> */}
+              <Status size={22} color={appColors.primary} />
+              <SpaceComponent width={10} />
               <TextComponent
                 size={16}
                 text={`${
@@ -209,7 +222,11 @@ const WorkScreen = ({navigation}: any) => {
             {userData?.role === 'admin' && (
               <>
                 <RowComponent>
-                  <TextComponent text="Số tiền dự án: " size={16} />
+                  {/* <TextComponent text="Số tiền dự án: " size={16} /> */}
+                  {/* WalletMoney */}
+                  <WalletMoney size={22} color={appColors.primary} />
+                  <SpaceComponent width={10} />
+
                   <TextComponent
                     text={`${formatCurrencyVND(item.amount)}`}
                     size={16}
@@ -225,7 +242,10 @@ const WorkScreen = ({navigation}: any) => {
                 </RowComponent>
                 <SpaceComponent height={15} />
                 <RowComponent>
-                  <TextComponent text="Số tiền nhân viên nhận: " size={16} />
+                  {/* <TextComponent text="Số tiền nhân viên nhận: " size={16} /> */}
+                  {/* MoneySend */}
+                  <MoneySend size={22} color={appColors.primary} />
+                  <SpaceComponent width={10} />
                   <TextComponent
                     text={`${formatCurrencyVND(item.payment_amount)}`}
                     size={16}
@@ -241,7 +261,9 @@ const WorkScreen = ({navigation}: any) => {
                 </RowComponent>
                 <SpaceComponent height={15} />
                 <RowComponent>
-                  <TextComponent text="Lợi nhuận: " size={16} />
+                  {/* <TextComponent text="Lợi nhuận: " size={16} /> */}
+                  <MoneyRecive size={22} color={appColors.primary} />
+                  <SpaceComponent width={10} />
                   <TextComponent
                     text={`${formatCurrencyVND(
                       item.amount - item.payment_amount,
@@ -263,7 +285,9 @@ const WorkScreen = ({navigation}: any) => {
             {userData?.role === 'employee' && (
               <>
                 <RowComponent>
-                  <TextComponent text="Số tiền nhiệm vụ: " size={16} />
+                  {/* <TextComponent text="Số tiền nhiệm vụ: " size={16} /> */}
+                  <Money3 size={22} color={appColors.primary} />
+                  <SpaceComponent width={10} />
                   <TextComponent
                     text={`${formatCurrencyVND(item.payment_amount)}`}
                     size={16}
@@ -281,12 +305,14 @@ const WorkScreen = ({navigation}: any) => {
               </>
             )}
             <RowComponent>
-              <TextComponent text="Tên khách hàng: " size={16} />
+              <UserSquare size={22} color={appColors.primary} />
+              <SpaceComponent width={10} />
               <TextComponent text={customerInfo.name} size={16} />
             </RowComponent>
             <SpaceComponent height={15} />
             <RowComponent styles={{alignItems: 'flex-start'}}>
-              <TextComponent text="Địa chỉ: " size={16} />
+              <Location size={22} color={appColors.primary} />
+              <SpaceComponent width={10} />
               <TextComponent
                 text={customerInfo.address}
                 size={16}
@@ -295,18 +321,14 @@ const WorkScreen = ({navigation}: any) => {
             </RowComponent>
             <SpaceComponent height={15} />
             <RowComponent>
-              <TextComponent text="Số điện thoại: " size={16} />
+              <Call size={22} color={appColors.primary} />
+              <SpaceComponent width={10} />
               <ButtonComponent
                 text={customerInfo.phone}
                 type="link"
                 textAndLinkStyle={{fontSize: 16}}
                 onPress={() => makeCall(customerInfo.phone)}
               />
-              {/* <TextComponent
-                text={customerInfo.phone}
-                size={16}
-                color={appColors.primary}
-              /> */}
             </RowComponent>
             <SpaceComponent height={15} />
             {/* <RowComponent>
@@ -358,22 +380,25 @@ const WorkScreen = ({navigation}: any) => {
           }
         />
       </ContainerComponent>
-      <TouchableOpacity
-        activeOpacity={0.9}
-        onPress={() => navigation.navigate('AddNewWorkScreen')}
-        style={{
-          position: 'absolute',
-          bottom: 20,
-          right: 20,
-          justifyContent: 'center',
-          alignItems: 'center',
-          paddingVertical: 20,
-          paddingHorizontal: 20,
-          backgroundColor: appColors.primary,
-          borderRadius: 100,
-        }}>
-        <Add size={30} color={appColors.white} />
-      </TouchableOpacity>
+
+      {userData?.role === 'admin' && (
+        <TouchableOpacity
+          activeOpacity={0.9}
+          onPress={() => navigation.navigate('AddNewWorkScreen')}
+          style={{
+            position: 'absolute',
+            bottom: 20,
+            right: 20,
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingVertical: 20,
+            paddingHorizontal: 20,
+            backgroundColor: appColors.primary,
+            borderRadius: 100,
+          }}>
+          <Add size={30} color={appColors.white} />
+        </TouchableOpacity>
+      )}
     </>
   );
 };
