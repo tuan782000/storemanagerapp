@@ -52,11 +52,11 @@ const AddUrlModal = (props: Props) => {
             </TouchableOpacity>
           </RowComponent>
           <SpaceComponent height={15} />
-          <InputComponent
+          {/* <InputComponent
             value={imageUrl}
             onChange={val => set}
             placeholder="URL"
-          />
+          /> */}
         </View>
       </View>
     </Modal>

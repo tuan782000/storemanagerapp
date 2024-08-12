@@ -1,4 +1,11 @@
-import {View, Text, ActivityIndicator, Linking} from 'react-native';
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  Linking,
+  Image,
+  ScrollView,
+} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {
   ContainerComponent,
@@ -24,12 +31,14 @@ import {HandleCustomerAPI} from '../../apis/handleCustomerAPI';
 import Toast from 'react-native-toast-message';
 import ButtonComponent from '../../components/ButtonComponent';
 import {HandleCommentAPI} from '../../apis/handleCommentAPI';
-import {AddSquare} from 'iconsax-react-native';
+import {AddSquare, Camera, Edit2} from 'iconsax-react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {HandleMaintanceScheduleAPI} from '../../apis/handleMaintanceScheduleAPI';
 import {TaskStatus} from '../../models/WorkSessionModel';
 import {SelectModel} from '../../models/SelectModel';
 import {SelectStatusModel} from '../../models/SelectStatusModel';
+import {ModalSelectedFile} from '../../modals';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 const initialStatus = [
   {
@@ -62,9 +71,8 @@ const initialStatus = [
 const initialUpdateWorkSession = {
   status: 0, // Thay đổi giá trị theo yêu cầu của bạn
   rejection_reason: '', // Có thể là null nếu không có lý do từ chối
-  before_image: [] as string[], // Danh sách các URL hình ảnh trước khi làm
-  after_image: [] as string[], // Danh sách các URL hình ảnh sau khi làm
-  comments: '', // Có thể là null nếu không có nhận xét
+  before_image: [], // Danh sách các URL hình ảnh trước khi làm
+  after_image: [], // Danh sách các URL hình ảnh sau khi làm
   result: '', // Có thể là null nếu không có kết quả
 };
 
@@ -72,7 +80,6 @@ const initialErrors = {
   rejection_reason: '',
   before_image: '',
   after_image: '',
-  comments: '',
   result: '',
 };
 
@@ -92,8 +99,9 @@ const WorkDetailScreen = ({navigation, route}: any) => {
   );
 
   const [statusSelect, setStatusSelect] = useState<SelectStatusModel[]>([]);
-
-  console.log(workFormUpdate.status);
+  const [visibleChoiceFileBefore, setVisibleChoiceFileBefore] = useState(false);
+  const [visibleChoiceFileAfter, setVisibleChoiceFileAfter] = useState(false);
+  const [comment, setComment] = useState('');
 
   useEffect(() => {
     fetchUserData();
@@ -267,12 +275,39 @@ const WorkDetailScreen = ({navigation, route}: any) => {
     // handleValidateInput(key, value);
   };
 
-  console.log(workSessionById);
+  const handleSelectedFile = (file: any, type: 'before' | 'after') => {
+    setWorkFormUpdate((prevState: any) => ({
+      ...prevState,
+      [`${type}_image`]: [...prevState[`${type}_image`], file.uri],
+    }));
+  };
+
+  const handleDeletedImageFile = (type: 'before' | 'after', index: number) => {
+    setWorkFormUpdate((prevState: any) => {
+      const updatedImages = [...prevState[`${type}_image`]];
+      updatedImages.splice(index, 1); // Xoá ảnh tại vị trí index
+
+      return {
+        ...prevState,
+        [`${type}_image`]: updatedImages,
+      };
+    });
+  };
+
+  const handleUpdateWork = async () => {
+    console.log(workFormUpdate);
+  };
+
+  const handleSubmitComment = async () => {
+    console.log(comment);
+  };
+  // console.log(workSessionById);
   // console.log(staffById);
   // console.log(customerById);
   // console.log(existingMaintanceSchedule);
   // console.log(commentById);
   // console.log(commentById[0]?.comment);
+  // console.log(workFormUpdate);
   // Hàm render giao diện cho admin
   const renderAdminView = () => {
     return (
@@ -708,31 +743,131 @@ const WorkDetailScreen = ({navigation, route}: any) => {
         />
         <SpaceComponent height={10} />
 
-        {/* <DropDownPickerStatusComponent onSelect={}/> */}
-        {/* <DropDownPickerStatusComponent
-          title="Chọn trạng thái công việc" // Optional title
-          selected={selectedStatus} // The currently selected status
-          onSelect={handleStatusSelect} // Function to handle the status selection
-        /> */}
         <DropDownPickerStatusComponent
           selected={workSessionById.status}
           onSelect={val => handleChangeValue('status', val)}
           items={statusSelect}
         />
 
-        <TextComponent
-          text="Cập nhật hình ảnh trước khi sửa"
-          size={16}
-          font={fontFamilies.bold}
-        />
+        <RowComponent justify="space-between">
+          <TextComponent
+            text="Cập nhật hình ảnh trước khi sửa"
+            size={16}
+            font={fontFamilies.bold}
+          />
 
+          <Camera
+            size="22"
+            color={appColors.primary}
+            variant="Bold"
+            onPress={() => {
+              setVisibleChoiceFileBefore(true);
+            }}
+          />
+        </RowComponent>
         <SpaceComponent height={15} />
-        <TextComponent
-          text="Cập nhật hình ảnh sau khi sửa"
-          size={16}
-          font={fontFamilies.bold}
-        />
+        {workFormUpdate.before_image.length > 0 ? (
+          <>
+            <ScrollView
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}>
+              <RowComponent styles={{paddingVertical: 10}}>
+                {Array.isArray(workFormUpdate.before_image) &&
+                  workFormUpdate.before_image.map((image: any, index: any) => (
+                    <View
+                      key={index}
+                      style={{position: 'relative', marginRight: 20}}>
+                      <AntDesign
+                        name="close"
+                        size={20}
+                        color={appColors.white}
+                        style={{
+                          position: 'absolute',
+                          right: -10,
+                          top: -10,
+                          zIndex: 1,
+                          backgroundColor: appColors.red,
+                          borderRadius: 999,
+                        }}
+                        // onPress={() => removeImage(item.id, index)}
+                        onPress={() => handleDeletedImageFile('before', index)}
+                      />
+                      <Image
+                        source={{uri: image}}
+                        style={{width: 100, height: 150, borderRadius: 10}}
+                      />
+                    </View>
+                  ))}
+              </RowComponent>
+            </ScrollView>
+            <SpaceComponent height={15} />
+          </>
+        ) : (
+          <>
+            <TextComponent text="Hiện chưa có ảnh nào" />
+            <SpaceComponent height={15} />
+          </>
+        )}
+
+        <RowComponent justify="space-between">
+          <TextComponent
+            text="Cập nhật hình ảnh sau khi sửa"
+            size={16}
+            font={fontFamilies.bold}
+          />
+
+          <Camera
+            size="22"
+            color={appColors.primary}
+            variant="Bold"
+            onPress={() => setVisibleChoiceFileAfter(true)}
+          />
+        </RowComponent>
         <SpaceComponent height={15} />
+
+        {workFormUpdate.after_image.length > 0 ? (
+          <>
+            <ScrollView
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}>
+              <RowComponent styles={{paddingVertical: 10}}>
+                {Array.isArray(workFormUpdate.after_image) &&
+                  workFormUpdate.after_image.map((image: any, index: any) => (
+                    <View
+                      key={index}
+                      style={{position: 'relative', marginRight: 20}}>
+                      <AntDesign
+                        name="close"
+                        size={20}
+                        color={appColors.white}
+                        style={{
+                          position: 'absolute',
+                          right: -10,
+                          top: -10,
+                          zIndex: 1,
+                          backgroundColor: appColors.red,
+                          borderRadius: 999,
+                        }}
+                        // onPress={() => removeImage(item.id, index)}
+                        onPress={() => handleDeletedImageFile('after', index)}
+                      />
+                      <Image
+                        source={{uri: image}}
+                        style={{width: 100, height: 150, borderRadius: 10}}
+                      />
+                    </View>
+                  ))}
+              </RowComponent>
+            </ScrollView>
+            <SpaceComponent height={15} />
+          </>
+        ) : (
+          <>
+            <TextComponent text="Hiện chưa có ảnh nào" />
+            <SpaceComponent height={15} />
+          </>
+        )}
+
         <TextComponent
           text="Cập nhật kết quả"
           size={16}
@@ -741,29 +876,51 @@ const WorkDetailScreen = ({navigation, route}: any) => {
         <SpaceComponent height={10} />
 
         <InputComponent
-          onChange={() => {}}
-          value=""
+          onChange={(val: string) => handleChangeValue('result', val)}
+          value={workFormUpdate.result}
           multiple
           numberOfLines={2}
+          placeholder="Viết kết quả ở đây..."
+          affix={<Edit2 size={22} color={appColors.text} />}
+          styleInput={{alignItems: 'center'}}
+          allowClear
         />
-        <SpaceComponent height={15} />
-        <TextComponent
-          text="Nhận xét khách hàng"
-          size={16}
-          font={fontFamilies.bold}
-        />
-        <SpaceComponent height={10} />
-        <InputComponent
-          onChange={() => {}}
-          value=""
-          multiple
-          numberOfLines={2}
-        />
+
         <SpaceComponent height={15} />
         <ButtonComponent
           text="Cập nhật kết quả công việc"
           type="primary"
           styles={{backgroundColor: appColors.warning}}
+          onPress={handleUpdateWork}
+        />
+        <SpaceComponent height={15} />
+        <TextComponent
+          text="III. Nhận xét khách hàng"
+          size={18}
+          font={fontFamilies.bold}
+        />
+        <TextComponent
+          text="Cảm nhận của bạn"
+          size={16}
+          font={fontFamilies.bold}
+        />
+        <SpaceComponent height={10} />
+        <InputComponent
+          onChange={val => setComment(val)}
+          value={comment}
+          multiple
+          numberOfLines={2}
+          placeholder="Viết nhận xét ở đây..."
+          affix={<Edit2 size={22} color={appColors.text} />}
+          styleInput={{alignItems: 'center'}}
+          allowClear
+        />
+        <SpaceComponent height={15} />
+        <ButtonComponent
+          text="Gửi nhận xét"
+          type="primary"
+          styles={{backgroundColor: appColors.success}}
+          onPress={handleSubmitComment}
         />
       </>
     );
@@ -789,6 +946,16 @@ const WorkDetailScreen = ({navigation, route}: any) => {
           </SectionComponent>
         )}
       </SectionComponent>
+      <ModalSelectedFile
+        visible={visibleChoiceFileBefore}
+        onClose={() => setVisibleChoiceFileBefore(false)}
+        onSelectedFile={file => handleSelectedFile(file, 'before')}
+      />
+      <ModalSelectedFile
+        visible={visibleChoiceFileAfter}
+        onClose={() => setVisibleChoiceFileAfter(false)}
+        onSelectedFile={file => handleSelectedFile(file, 'after')}
+      />
     </ContainerComponent>
   );
 };
