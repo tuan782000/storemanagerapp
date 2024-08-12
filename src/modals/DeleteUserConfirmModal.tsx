@@ -42,8 +42,8 @@ const DeleteUserConfirmModal = (props: Props) => {
     } catch (error: any) {
       console.error('Error deleting user: ', error);
       Toast.show({
-        type: 'success',
-        text1: 'Thành công',
+        type: 'error',
+        text1: 'Thất bại khi xoá nhân viên',
         text2: error.message,
         visibilityTime: 1000,
       });

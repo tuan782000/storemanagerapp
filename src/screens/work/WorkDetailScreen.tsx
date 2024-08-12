@@ -40,6 +40,30 @@ import {SelectStatusModel} from '../../models/SelectStatusModel';
 import {ModalSelectedFile} from '../../modals';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 
+// "assigned", "accepted", "pending", "rejected", "completed"
+const initialStatusWorks = [
+  {
+    id: 'assigned',
+    value: 'assigned',
+  },
+  {
+    id: 'accepted',
+    value: 'accepted',
+  },
+  {
+    id: 'pending',
+    value: 'pending',
+  },
+  {
+    id: 'rejected',
+    value: 'rejected',
+  },
+  {
+    id: 'completed',
+    value: 'completed',
+  },
+];
+
 const initialStatus = [
   {
     id: 0,
@@ -69,7 +93,7 @@ const initialStatus = [
 ];
 
 const initialUpdateWorkSession = {
-  status: 0, // Thay đổi giá trị theo yêu cầu của bạn
+  status: 'assigned', // Thay đổi giá trị theo yêu cầu của bạn
   rejection_reason: '', // Có thể là null nếu không có lý do từ chối
   before_image: [], // Danh sách các URL hình ảnh trước khi làm
   after_image: [], // Danh sách các URL hình ảnh sau khi làm
@@ -299,9 +323,37 @@ const WorkDetailScreen = ({navigation, route}: any) => {
   };
 
   const handleSubmitComment = async () => {
-    console.log(comment);
+    // console.log(comment);
+    const api = `/createComment`;
+    try {
+      await HandleCommentAPI.Comment(
+        api,
+        {
+          comment: comment,
+          customer_id: workSessionById.customer_id,
+          employee_id: workSessionById.employee_id,
+          work_session_id: id,
+        },
+        'post',
+      );
+      Toast.show({
+        type: 'success',
+        text1: 'Thành công',
+        text2: 'Nhận xét khách hàng thành công',
+        visibilityTime: 1000,
+      });
+      setComment('');
+    } catch (error: any) {
+      console.log(error.message);
+      Toast.show({
+        type: 'error',
+        text1: 'Thất bại',
+        text2: error.message,
+        visibilityTime: 1000,
+      });
+    }
   };
-  // console.log(workSessionById);
+  console.log(workSessionById);
   // console.log(staffById);
   // console.log(customerById);
   // console.log(existingMaintanceSchedule);
@@ -894,34 +946,48 @@ const WorkDetailScreen = ({navigation, route}: any) => {
           onPress={handleUpdateWork}
         />
         <SpaceComponent height={15} />
-        <TextComponent
-          text="III. Nhận xét khách hàng"
-          size={18}
-          font={fontFamilies.bold}
-        />
-        <TextComponent
-          text="Cảm nhận của bạn"
-          size={16}
-          font={fontFamilies.bold}
-        />
-        <SpaceComponent height={10} />
-        <InputComponent
-          onChange={val => setComment(val)}
-          value={comment}
-          multiple
-          numberOfLines={2}
-          placeholder="Viết nhận xét ở đây..."
-          affix={<Edit2 size={22} color={appColors.text} />}
-          styleInput={{alignItems: 'center'}}
-          allowClear
-        />
-        <SpaceComponent height={15} />
-        <ButtonComponent
-          text="Gửi nhận xét"
-          type="primary"
-          styles={{backgroundColor: appColors.success}}
-          onPress={handleSubmitComment}
-        />
+
+        {workSessionById.comments && commentById && commentById[0]?.comment ? (
+          <>
+            <TextComponent
+              text="Bạn đã gửi nhận xét khách hàng đến với Admin"
+              size={16}
+            />
+            <SpaceComponent height={15} />
+          </>
+        ) : (
+          <>
+            <TextComponent
+              text="III. Nhận xét khách hàng"
+              size={18}
+              font={fontFamilies.bold}
+            />
+            <TextComponent
+              text="Cảm nhận của bạn"
+              size={16}
+              font={fontFamilies.bold}
+            />
+            <SpaceComponent height={10} />
+            <InputComponent
+              onChange={val => setComment(val)}
+              value={comment}
+              multiple
+              numberOfLines={2}
+              placeholder="Viết nhận xét ở đây..."
+              affix={<Edit2 size={22} color={appColors.text} />}
+              styleInput={{alignItems: 'center'}}
+              allowClear
+            />
+            <SpaceComponent height={15} />
+            <ButtonComponent
+              text="Gửi nhận xét"
+              type="primary"
+              styles={{backgroundColor: appColors.success}}
+              onPress={handleSubmitComment}
+            />
+            <SpaceComponent height={15} />
+          </>
+        )}
       </>
     );
   };
