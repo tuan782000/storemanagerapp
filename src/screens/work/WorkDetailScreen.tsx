@@ -31,7 +31,7 @@ import {HandleCustomerAPI} from '../../apis/handleCustomerAPI';
 import Toast from 'react-native-toast-message';
 import ButtonComponent from '../../components/ButtonComponent';
 import {HandleCommentAPI} from '../../apis/handleCommentAPI';
-import {AddSquare, Camera, Edit2} from 'iconsax-react-native';
+import {AddSquare, Camera, DocumentUpload, Edit2} from 'iconsax-react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {HandleMaintanceScheduleAPI} from '../../apis/handleMaintanceScheduleAPI';
 import {TaskStatus} from '../../models/WorkSessionModel';
@@ -39,7 +39,7 @@ import {SelectModel} from '../../models/SelectModel';
 import {SelectStatusModel} from '../../models/SelectStatusModel';
 import {ModalSelectedFile} from '../../modals';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-// import storage from '@react-native-firebase/storage';
+import storage from '@react-native-firebase/storage';
 
 // "assigned", "accepted", "pending", "rejected", "completed"
 const initialStatusWorks = [
@@ -103,6 +103,8 @@ const initialUpdateWorkSession = {
   rejection_reason: '', // Có thể là null nếu không có lý do từ chối
   before_images: [], // Danh sách các URL hình ảnh trước khi làm
   after_images: [], // Danh sách các URL hình ảnh sau khi làm
+  before_image_firebase: [], // Danh sách các URL hình ảnh trước khi làm
+  after_image_firebase: [], // Danh sách các URL hình ảnh sau khi làm
   result: '', // Có thể là null nếu không có kết quả
 };
 
@@ -337,6 +339,71 @@ const WorkDetailScreen = ({navigation, route}: any) => {
     });
   };
 
+  const uploadImagesToFirebase = async (
+    images: string[],
+    type: 'before' | 'after',
+  ) => {
+    const uploadPromises = images.map(async (imageUri, index) => {
+      const folderName = type === 'before' ? 'before_images' : 'after_images'; // Đặt tên folder
+      const fileName = `${folderName}/${type}_image_${Date.now()}_${index}.jpg`; // Đặt tên file với folder
+      const storageRef = storage().ref(fileName);
+
+      const task = storageRef.putFile(imageUri);
+
+      try {
+        await task;
+        const downloadURL = await storageRef.getDownloadURL();
+        return downloadURL;
+      } catch (error) {
+        console.error('Upload image failed: ', error);
+        return null;
+      }
+    });
+
+    const urls = await Promise.all(uploadPromises);
+    return urls.filter(url => url !== null); // Loại bỏ những URL null (nếu có lỗi)
+  };
+
+  const handleUploadBeforeImages = async () => {
+    try {
+      const beforeImageUrls = await uploadImagesToFirebase(
+        workFormUpdate.before_images,
+        'before',
+      );
+
+      // Cập nhật lại state với các URL từ Firebase
+      setWorkFormUpdate((prevState: any) => ({
+        ...prevState,
+        before_image_firebase: beforeImageUrls,
+        before_images: [],
+      }));
+
+      console.log('Upload trước thành công và state đã được cập nhật.');
+    } catch (error) {
+      console.error('Lỗi khi upload hình ảnh trước: ', error);
+    }
+  };
+
+  const handleUploadAfterImages = async () => {
+    try {
+      const afterImageUrls = await uploadImagesToFirebase(
+        workFormUpdate.after_images,
+        'after',
+      );
+
+      // Cập nhật lại state với các URL từ Firebase
+      setWorkFormUpdate((prevState: any) => ({
+        ...prevState,
+        after_image_firebase: afterImageUrls,
+        after_images: [],
+      }));
+
+      console.log('Upload sau thành công và state đã được cập nhật.');
+    } catch (error) {
+      console.error('Lỗi khi upload hình ảnh sau: ', error);
+    }
+  };
+
   const handleUpdateWork = async () => {
     console.log(workFormUpdate.status[0]);
     // console.log(workFormUpdate.rejection_reason);
@@ -347,16 +414,16 @@ const WorkDetailScreen = ({navigation, route}: any) => {
     console.log(api);
     setIsLoading(true);
     try {
-      // await HandleWorkSessionAPI.WorkSession(
-      //   api,
-      //   {
-      //     status: workFormUpdate.status[0],
-      //     before_images: workFormUpdate.before_images,
-      //     after_images: workFormUpdate.after_images,
-      //     result: workFormUpdate.result,
-      //   },
-      //   'put',
-      // );
+      await HandleWorkSessionAPI.WorkSession(
+        api,
+        {
+          status: workFormUpdate.status[0],
+          before_images: workFormUpdate.before_image_firebase,
+          after_images: workFormUpdate.after_image_firebase,
+          result: workFormUpdate.result,
+        },
+        'put',
+      );
 
       Toast.show({
         type: 'success',
@@ -620,7 +687,45 @@ const WorkDetailScreen = ({navigation, route}: any) => {
           </>
         )}
         {workSessionById.before_images.length > 0 ? (
-          <></>
+          <>
+            <TextComponent text="Ảnh trước khi sửa" size={16} />
+
+            <ScrollView
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}>
+              <RowComponent styles={{paddingVertical: 10}}>
+                {Array.isArray(workSessionById.before_images) &&
+                  workSessionById.before_images.map(
+                    (image: any, index: any) => (
+                      <View
+                        key={index}
+                        style={{position: 'relative', marginRight: 20}}>
+                        {/* <AntDesign
+                         name="close"
+                         size={20}
+                         color={appColors.white}
+                         style={{
+                           position: 'absolute',
+                           right: -10,
+                           top: -10,
+                           zIndex: 1,
+                           backgroundColor: appColors.red,
+                           borderRadius: 999,
+                         }}
+                         // onPress={() => removeImage(item.id, index)}
+                         // onPress={() => handleDeletedImageFile('before', index)}
+                       /> */}
+                        <Image
+                          source={{uri: image}}
+                          style={{width: 100, height: 150, borderRadius: 10}}
+                        />
+                      </View>
+                    ),
+                  )}
+              </RowComponent>
+            </ScrollView>
+            <SpaceComponent height={15} />
+          </>
         ) : (
           <>
             <TextComponent text="Hiện chưa có ảnh trước khi sửa" size={16} />
@@ -628,7 +733,42 @@ const WorkDetailScreen = ({navigation, route}: any) => {
           </>
         )}
         {workSessionById.after_images.length > 0 ? (
-          <></>
+          <>
+            <TextComponent text="Ảnh sau khi sửa" size={16} />
+            <ScrollView
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}>
+              <RowComponent styles={{paddingVertical: 10}}>
+                {Array.isArray(workSessionById.after_images) &&
+                  workSessionById.after_images.map((image: any, index: any) => (
+                    <View
+                      key={index}
+                      style={{position: 'relative', marginRight: 20}}>
+                      {/* <AntDesign
+                         name="close"
+                         size={20}
+                         color={appColors.white}
+                         style={{
+                           position: 'absolute',
+                           right: -10,
+                           top: -10,
+                           zIndex: 1,
+                           backgroundColor: appColors.red,
+                           borderRadius: 999,
+                         }}
+                         // onPress={() => removeImage(item.id, index)}
+                         // onPress={() => handleDeletedImageFile('before', index)}
+                       /> */}
+                      <Image
+                        source={{uri: image}}
+                        style={{width: 100, height: 150, borderRadius: 10}}
+                      />
+                    </View>
+                  ))}
+              </RowComponent>
+            </ScrollView>
+            <SpaceComponent height={15} />
+          </>
         ) : (
           <>
             <TextComponent text="Hiện chưa có ảnh sau khi sửa" size={16} />
@@ -872,6 +1012,19 @@ const WorkDetailScreen = ({navigation, route}: any) => {
             font={fontFamilies.bold}
           />
 
+          {workFormUpdate.before_images.length > 0 ? (
+            <>
+              <DocumentUpload
+                size={22}
+                variant="Bold"
+                color={appColors.primary}
+                onPress={handleUploadBeforeImages}
+              />
+            </>
+          ) : (
+            <></>
+          )}
+
           <Camera
             size="22"
             color={appColors.primary}
@@ -920,10 +1073,94 @@ const WorkDetailScreen = ({navigation, route}: any) => {
           </>
         ) : (
           <>
-            <TextComponent text="Hiện chưa có ảnh nào" />
+            <TextComponent text="Hiện chưa có ảnh nào để tải lên hệ thống" />
             <SpaceComponent height={15} />
           </>
         )}
+
+        {workSessionById.before_images.length > 0 ? (
+          <>
+            <ScrollView
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}>
+              <RowComponent styles={{paddingVertical: 10}}>
+                {Array.isArray(workSessionById.before_images) &&
+                  workSessionById.before_images.map(
+                    (image: any, index: any) => (
+                      <View
+                        key={index}
+                        style={{position: 'relative', marginRight: 20}}>
+                        {/* <AntDesign
+                          name="close"
+                          size={20}
+                          color={appColors.white}
+                          style={{
+                            position: 'absolute',
+                            right: -10,
+                            top: -10,
+                            zIndex: 1,
+                            backgroundColor: appColors.red,
+                            borderRadius: 999,
+                          }}
+                          // onPress={() => removeImage(item.id, index)}
+                          // onPress={() => handleDeletedImageFile('before', index)}
+                        /> */}
+                        <Image
+                          source={{uri: image}}
+                          style={{width: 100, height: 150, borderRadius: 10}}
+                        />
+                      </View>
+                    ),
+                  )}
+              </RowComponent>
+            </ScrollView>
+            <SpaceComponent height={15} />
+          </>
+        ) : (
+          <></>
+        )}
+
+        {/* {workFormUpdate.before_image_firebase.length > 0 ? (
+          <>
+            <ScrollView
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}>
+              <RowComponent styles={{paddingVertical: 10}}>
+                {Array.isArray(workFormUpdate.before_image_firebase) &&
+                  workFormUpdate.before_image_firebase.map(
+                    (image: any, index: any) => (
+                      <View
+                        key={index}
+                        style={{position: 'relative', marginRight: 20}}>
+                        <AntDesign
+                          name="close"
+                          size={20}
+                          color={appColors.white}
+                          style={{
+                            position: 'absolute',
+                            right: -10,
+                            top: -10,
+                            zIndex: 1,
+                            backgroundColor: appColors.red,
+                            borderRadius: 999,
+                          }}
+                          // onPress={() => removeImage(item.id, index)}
+                          // onPress={() => handleDeletedImageFile('before', index)}
+                        />
+                        <Image
+                          source={{uri: image}}
+                          style={{width: 100, height: 150, borderRadius: 10}}
+                        />
+                      </View>
+                    ),
+                  )}
+              </RowComponent>
+            </ScrollView>
+            <SpaceComponent height={15} />
+          </>
+        ) : (
+          <></>
+        )} */}
 
         <RowComponent justify="space-between">
           <TextComponent
@@ -931,6 +1168,19 @@ const WorkDetailScreen = ({navigation, route}: any) => {
             size={16}
             font={fontFamilies.bold}
           />
+
+          {workFormUpdate.after_images.length > 0 ? (
+            <>
+              <DocumentUpload
+                size={22}
+                variant="Bold"
+                color={appColors.primary}
+                onPress={handleUploadAfterImages}
+              />
+            </>
+          ) : (
+            <></>
+          )}
 
           <Camera
             size="22"
@@ -979,9 +1229,50 @@ const WorkDetailScreen = ({navigation, route}: any) => {
           </>
         ) : (
           <>
-            <TextComponent text="Hiện chưa có ảnh nào" />
+            <TextComponent text="Hiện chưa có ảnh nào để tải lên hệ thống" />
             <SpaceComponent height={15} />
           </>
+        )}
+
+        {/* workSessionById */}
+        {workSessionById.after_images.length > 0 ? (
+          <>
+            <ScrollView
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}>
+              <RowComponent styles={{paddingVertical: 10}}>
+                {Array.isArray(workSessionById.after_images) &&
+                  workSessionById.after_images.map((image: any, index: any) => (
+                    <View
+                      key={index}
+                      style={{position: 'relative', marginRight: 20}}>
+                      {/* <AntDesign
+                          name="close"
+                          size={20}
+                          color={appColors.white}
+                          style={{
+                            position: 'absolute',
+                            right: -10,
+                            top: -10,
+                            zIndex: 1,
+                            backgroundColor: appColors.red,
+                            borderRadius: 999,
+                          }}
+                          // onPress={() => removeImage(item.id, index)}
+                          // onPress={() => handleDeletedImageFile('before', index)}
+                        /> */}
+                      <Image
+                        source={{uri: image}}
+                        style={{width: 100, height: 150, borderRadius: 10}}
+                      />
+                    </View>
+                  ))}
+              </RowComponent>
+            </ScrollView>
+            <SpaceComponent height={15} />
+          </>
+        ) : (
+          <></>
         )}
 
         <TextComponent
