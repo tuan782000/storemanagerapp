@@ -39,6 +39,7 @@ import {SelectModel} from '../../models/SelectModel';
 import {SelectStatusModel} from '../../models/SelectStatusModel';
 import {ModalSelectedFile} from '../../modals';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+// import storage from '@react-native-firebase/storage';
 
 // "assigned", "accepted", "pending", "rejected", "completed"
 const initialStatusWorks = [
@@ -64,46 +65,51 @@ const initialStatusWorks = [
   },
 ];
 
-const initialStatus = [
-  {
-    id: 0,
-    value: TaskStatus.Assigned,
-  },
-  {
-    id: 1,
-    value: TaskStatus.Accepted,
-  },
-  {
-    id: 2,
-    value: TaskStatus.Pending,
-  },
-  {
-    id: 3,
-    value: TaskStatus.Rejected,
-  },
-  {
-    id: 4,
-    value: TaskStatus.Completed,
-  },
-  // Assigned, // đã giao
-  // Accepted, // đã chấp nhận
-  // Pending, // đang xử lý
-  // Rejected, // từ chối nhiệm vụ
-  // Completed, // hoàn thành
-];
+// const initialStatus = [
+//   {
+//     id: 0,
+//     value: TaskStatus.Assigned,
+//   },
+//   {
+//     id: 1,
+//     value: TaskStatus.Accepted,
+//   },
+//   {
+//     id: 2,
+//     value: TaskStatus.Pending,
+//   },
+//   {
+//     id: 3,
+//     value: TaskStatus.Rejected,
+//   },
+//   {
+//     id: 4,
+//     value: TaskStatus.Completed,
+//   },
+//   // Assigned, // đã giao
+//   // Accepted, // đã chấp nhận
+//   // Pending, // đang xử lý
+//   // Rejected, // từ chối nhiệm vụ
+//   // Completed, // hoàn thành
+// ];
 
 const initialUpdateWorkSession = {
-  status: 'assigned', // Thay đổi giá trị theo yêu cầu của bạn
+  status: [
+    {
+      id: 'assigned',
+      value: 'assigned',
+    },
+  ], // Thay đổi giá trị theo yêu cầu của bạn
   rejection_reason: '', // Có thể là null nếu không có lý do từ chối
-  before_image: [], // Danh sách các URL hình ảnh trước khi làm
-  after_image: [], // Danh sách các URL hình ảnh sau khi làm
+  before_images: [], // Danh sách các URL hình ảnh trước khi làm
+  after_images: [], // Danh sách các URL hình ảnh sau khi làm
   result: '', // Có thể là null nếu không có kết quả
 };
 
 const initialErrors = {
   rejection_reason: '',
-  before_image: '',
-  after_image: '',
+  before_images: '',
+  after_images: '',
   result: '',
 };
 
@@ -122,13 +128,15 @@ const WorkDetailScreen = ({navigation, route}: any) => {
     initialUpdateWorkSession,
   );
 
-  const [statusSelect, setStatusSelect] = useState<SelectStatusModel[]>([]);
+  // const [statusSelect, setStatusSelect] = useState<SelectStatusModel[]>([]);
   const [visibleChoiceFileBefore, setVisibleChoiceFileBefore] = useState(false);
   const [visibleChoiceFileAfter, setVisibleChoiceFileAfter] = useState(false);
   const [comment, setComment] = useState('');
+  const [statusSelect, setStatusSelect] = useState<SelectModel[]>([]);
 
   useEffect(() => {
     fetchUserData();
+    handleGetAllStatus();
   }, []);
 
   useEffect(() => {
@@ -146,7 +154,7 @@ const WorkDetailScreen = ({navigation, route}: any) => {
         workSessionById.employee_id,
         workSessionById.customer_id,
       );
-      handleGetAllStatus();
+      // handleGetAllStatus();
     }
   }, [workSessionById]);
 
@@ -250,12 +258,23 @@ const WorkDetailScreen = ({navigation, route}: any) => {
     }
   };
 
+  // const handleGetAllStatus = async () => {
+  //   const items: SelectStatusModel[] = [];
+  //   await initialStatus.forEach(status => {
+  //     items.push({
+  //       label: status.value,
+  //       value: status.id,
+  //     });
+  //   });
+  //   setStatusSelect(items);
+  // };
+
   const handleGetAllStatus = async () => {
-    const items: SelectStatusModel[] = [];
-    await initialStatus.forEach(status => {
+    const items: SelectModel[] = [];
+    await initialStatusWorks.forEach(item => {
       items.push({
-        label: status.value,
-        value: status.id,
+        label: item.id,
+        value: item.value,
       });
     });
     setStatusSelect(items);
@@ -302,24 +321,62 @@ const WorkDetailScreen = ({navigation, route}: any) => {
   const handleSelectedFile = (file: any, type: 'before' | 'after') => {
     setWorkFormUpdate((prevState: any) => ({
       ...prevState,
-      [`${type}_image`]: [...prevState[`${type}_image`], file.uri],
+      [`${type}_images`]: [...prevState[`${type}_images`], file.uri],
     }));
   };
 
   const handleDeletedImageFile = (type: 'before' | 'after', index: number) => {
     setWorkFormUpdate((prevState: any) => {
-      const updatedImages = [...prevState[`${type}_image`]];
+      const updatedImages = [...prevState[`${type}_images`]];
       updatedImages.splice(index, 1); // Xoá ảnh tại vị trí index
 
       return {
         ...prevState,
-        [`${type}_image`]: updatedImages,
+        [`${type}_images`]: updatedImages,
       };
     });
   };
 
   const handleUpdateWork = async () => {
-    console.log(workFormUpdate);
+    console.log(workFormUpdate.status[0]);
+    // console.log(workFormUpdate.rejection_reason);
+    console.log(workFormUpdate.before_images);
+    console.log(workFormUpdate.after_images);
+    console.log(workFormUpdate.result);
+    const api = `/updatedWorkSessionById?id=${id}`;
+    console.log(api);
+    setIsLoading(true);
+    try {
+      // await HandleWorkSessionAPI.WorkSession(
+      //   api,
+      //   {
+      //     status: workFormUpdate.status[0],
+      //     before_images: workFormUpdate.before_images,
+      //     after_images: workFormUpdate.after_images,
+      //     result: workFormUpdate.result,
+      //   },
+      //   'put',
+      // );
+
+      Toast.show({
+        type: 'success',
+        text1: 'Thành công',
+        text2: 'Cập nhật thành công!!!',
+        visibilityTime: 1000,
+      });
+
+      // navigation.goBack();
+    } catch (error: any) {
+      console.error('Lỗi câoh nhật công việc: ', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Thất bại',
+        text2: error.message,
+        visibilityTime: 1000,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSubmitComment = async () => {
@@ -353,13 +410,14 @@ const WorkDetailScreen = ({navigation, route}: any) => {
       });
     }
   };
-  console.log(workSessionById);
+  // console.log(workSessionById);
   // console.log(staffById);
   // console.log(customerById);
   // console.log(existingMaintanceSchedule);
   // console.log(commentById);
   // console.log(commentById[0]?.comment);
-  // console.log(workFormUpdate);
+  // console.log(workFormUpdate.status);
+  console.log(workFormUpdate);
   // Hàm render giao diện cho admin
   const renderAdminView = () => {
     return (
@@ -561,7 +619,7 @@ const WorkDetailScreen = ({navigation, route}: any) => {
             <SpaceComponent height={15} />
           </>
         )}
-        {workSessionById.before_image.length > 0 ? (
+        {workSessionById.before_images.length > 0 ? (
           <></>
         ) : (
           <>
@@ -569,7 +627,7 @@ const WorkDetailScreen = ({navigation, route}: any) => {
             <SpaceComponent height={15} />
           </>
         )}
-        {workSessionById.after_image.length > 0 ? (
+        {workSessionById.after_images.length > 0 ? (
           <></>
         ) : (
           <>
@@ -795,10 +853,16 @@ const WorkDetailScreen = ({navigation, route}: any) => {
         />
         <SpaceComponent height={10} />
 
-        <DropDownPickerStatusComponent
+        {/* <DropDownPickerStatusComponent
           selected={workSessionById.status}
           onSelect={val => handleChangeValue('status', val)}
           items={statusSelect}
+        /> */}
+
+        <DropDownPickerStatusComponent
+          selected={workFormUpdate.status}
+          items={statusSelect}
+          onSelect={val => handleChangeValue('status', val)}
         />
 
         <RowComponent justify="space-between">
@@ -818,14 +882,14 @@ const WorkDetailScreen = ({navigation, route}: any) => {
           />
         </RowComponent>
         <SpaceComponent height={15} />
-        {workFormUpdate.before_image.length > 0 ? (
+        {workFormUpdate.before_images.length > 0 ? (
           <>
             <ScrollView
               horizontal={true}
               showsHorizontalScrollIndicator={false}>
               <RowComponent styles={{paddingVertical: 10}}>
-                {Array.isArray(workFormUpdate.before_image) &&
-                  workFormUpdate.before_image.map((image: any, index: any) => (
+                {Array.isArray(workFormUpdate.before_images) &&
+                  workFormUpdate.before_images.map((image: any, index: any) => (
                     <View
                       key={index}
                       style={{position: 'relative', marginRight: 20}}>
@@ -877,14 +941,14 @@ const WorkDetailScreen = ({navigation, route}: any) => {
         </RowComponent>
         <SpaceComponent height={15} />
 
-        {workFormUpdate.after_image.length > 0 ? (
+        {workFormUpdate.after_images.length > 0 ? (
           <>
             <ScrollView
               horizontal={true}
               showsHorizontalScrollIndicator={false}>
               <RowComponent styles={{paddingVertical: 10}}>
-                {Array.isArray(workFormUpdate.after_image) &&
-                  workFormUpdate.after_image.map((image: any, index: any) => (
+                {Array.isArray(workFormUpdate.after_images) &&
+                  workFormUpdate.after_images.map((image: any, index: any) => (
                     <View
                       key={index}
                       style={{position: 'relative', marginRight: 20}}>
