@@ -24,6 +24,7 @@ import {BarChart, LineChart, PieChart} from 'react-native-gifted-charts';
 import LinearGradient from 'react-native-linear-gradient';
 import {fontFamilies} from '../../constants/fontFamilies';
 import {appColors} from '../../constants/colors';
+import {HandleUserAPI} from '../../apis/handleUserAPI';
 
 const barChartData: any = [
   {
@@ -89,24 +90,38 @@ const pieData: any = [
 
 const HomeScreen = ({navigation}: any) => {
   const [userData, setUserData] = useState<UserModel | null>(null);
+  // const [userId, setUserId] = useState('');
 
   useEffect(() => {
     fetchUserData();
   }, []);
 
   const fetchUserData = async () => {
-    const user = auth().currentUser;
+    const user = await AsyncStorage.getItem('auth');
+
+    // const user = auth().currentUser;
+    // if (user) {
+    //   try {
+    //     const userDoc: any = await firestore()
+    //       .collection('users')
+    //       .doc(user.uid)
+    //       .get();
+    //     if (userDoc.exists) {
+    //       setUserData(userDoc.data());
+    //     }
+    //   } catch (error) {
+    //     console.error('Error fetching user data: ', error);
+    //   }
+    // }
     if (user) {
+      const parsedUser = JSON.parse(user);
+      const api = `/info?id=${parsedUser.id}`;
+      // setUserId(parsedUser.id);
       try {
-        const userDoc: any = await firestore()
-          .collection('users')
-          .doc(user.uid)
-          .get();
-        if (userDoc.exists) {
-          setUserData(userDoc.data());
-        }
+        const res = await HandleUserAPI.Info(api);
+        setUserData(res.data);
       } catch (error) {
-        console.error('Error fetching user data: ', error);
+        console.error('Lỗi khi lấy thông tin người dùng: ', error);
       }
     }
   };
@@ -117,7 +132,8 @@ const HomeScreen = ({navigation}: any) => {
   //   // navigation.navigate('LoginScreen');
   // };
 
-  const user = auth().currentUser;
+  // const user = auth().currentUser;
+  console.log(userData);
   return (
     <ContainerComponent isScroll>
       <SectionComponent styles={{marginTop: 10}}>
@@ -129,15 +145,22 @@ const HomeScreen = ({navigation}: any) => {
               borderColor: appColors.primary,
             }}>
             <Image
-              source={require('../../assets/images/icon-logo.png')}
-              style={{width: 60, height: 60}}
+              source={
+                userData?.profilePicture
+                  ? {
+                      uri: userData?.profilePicture,
+                    }
+                  : require('../../assets/images/icon-logo.png')
+              }
+              style={{width: 100, height: 100, borderRadius: 999}}
+              resizeMode="cover"
             />
           </View>
           {userData ? (
             <RowComponent
               justify="flex-start"
               styles={{flexDirection: 'column', alignItems: 'flex-end'}}>
-              <TextComponent text={`Xin chào, ${userData.username}`} />
+              <TextComponent text={`Xin chào, ${userData.name}`} />
               <SpaceComponent height={20} />
               <Notification size={22} color={appColors.text} />
             </RowComponent>

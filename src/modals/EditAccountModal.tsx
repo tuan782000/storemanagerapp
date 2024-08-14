@@ -11,8 +11,6 @@ import {
 } from '../components';
 import ButtonComponent from '../components/ButtonComponent';
 import {fontFamilies} from '../constants/fontFamilies';
-import firestore from '@react-native-firebase/firestore';
-import auth from '@react-native-firebase/auth';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {HandleUserAPI} from '../apis/handleUserAPI';

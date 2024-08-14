@@ -61,6 +61,8 @@ const ScheduleScreen = ({navigation}: any) => {
     }
   };
 
+  // Lưu ý vấn đề này - [AxiosError: Request failed with status code 404] - nếu bảo trì trống
+
   const fetchListSchedule = async () => {
     const userAuth = await AsyncStorage.getItem('auth');
     if (userAuth && userData?.role === 'admin') {
@@ -71,7 +73,13 @@ const ScheduleScreen = ({navigation}: any) => {
 
         setListMaintenanceSchedule(listSchedule.data);
       } catch (error: any) {
-        console.error('Lỗi khi lấy ra các phiên làm việc: ', error);
+        // console.error('Lỗi khi lấy ra các phiên làm việc: ', error);
+        Toast.show({
+          type: 'info',
+          text1: 'Thông báo',
+          text2: 'Hiện tại lịch bảo trì đang trống',
+          visibilityTime: 1000,
+        });
       }
     } else if (userAuth && userData?.role === 'employee') {
       try {
@@ -81,7 +89,13 @@ const ScheduleScreen = ({navigation}: any) => {
           await HandleMaintanceScheduleAPI.MaintanceSchedule(api);
         setListMaintenanceSchedule(listSchedule.data);
       } catch (error: any) {
-        console.error('Lỗi khi lấy ra các phiên làm việc: ', error);
+        // console.error('Lỗi khi lấy ra các phiên làm việc: ', error);
+        Toast.show({
+          type: 'info',
+          text1: 'Thông báo',
+          text2: 'Hiện tại lịch bảo trì đang trống',
+          visibilityTime: 1000,
+        });
       }
     }
   };

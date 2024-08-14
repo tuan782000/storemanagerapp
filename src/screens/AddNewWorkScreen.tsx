@@ -29,6 +29,7 @@ const initialTask = {
   customer_id: [],
   description: '',
   amount: 0,
+  payment_amount: 0,
   start_time: Date.now(),
   end_time: Date.now(),
   status: TaskStatus.Assigned,
@@ -39,6 +40,7 @@ const initialErrors = {
   customer_id: '',
   description: '',
   amount: '',
+  payment_amount: '',
   start_time: '',
   end_time: '',
 };
@@ -122,8 +124,23 @@ const AddNewWorkScreen = ({navigation}: any) => {
     }
   };
 
-  const handleChangeValue = (key: string, value: string | Date | string[]) => {
+  const handleChangeValue = (
+    key: string,
+    value: string | Date | string[] | number,
+  ) => {
     const data: any = {...workForm};
+    // if (key === 'amount' || key === 'payment_amount') {
+    //   data[`${key}`] = Number(value);
+    // } else {
+    //   data[`${key}`] = value;
+    // }
+
+    // Chuyển đổi giá trị thành số nếu là chuỗi có thể chuyển đổi
+    if (typeof value === 'string') {
+      value = isNaN(Number(value)) ? value : Number(value);
+    }
+
+    // Cập nhật giá trị cho workForm
     data[`${key}`] = value;
 
     setWorkForm(data);
@@ -132,7 +149,7 @@ const AddNewWorkScreen = ({navigation}: any) => {
 
   const handleValidateInput = (
     key: string,
-    value: string | Date | string[],
+    value: string | Date | string[] | number,
   ) => {
     const newErrors: any = {...errors};
     switch (key) {
@@ -157,6 +174,22 @@ const AddNewWorkScreen = ({navigation}: any) => {
         }
         break;
 
+      case 'amount':
+        if (typeof value === 'number') {
+          newErrors.amount = value > 0 ? '' : 'Không được nhập số âm';
+        }
+        break;
+      case 'payment_amount':
+        if (typeof value === 'number') {
+          newErrors.payment_amount =
+            value <= 0
+              ? 'Không được nhập số âm hoặc bằng 0'
+              : value > 100
+              ? 'Không được nhập quá 100'
+              : '';
+        }
+        break;
+
       default:
         break;
     }
@@ -165,7 +198,7 @@ const AddNewWorkScreen = ({navigation}: any) => {
   };
 
   const handleRegister = async () => {
-    // console.log(workForm);
+    console.log(workForm);
     if (Object.values(errors).some(error => error !== '')) {
       Toast.show({
         type: 'error',
@@ -239,7 +272,7 @@ const AddNewWorkScreen = ({navigation}: any) => {
     ) {
       setErrors(initialErrors);
       try {
-        console.log(workForm);
+        // console.log(workForm);
         const api = '/createWorkSession';
         await HandleWorkSessionAPI.WorkSession(
           api,
@@ -248,6 +281,7 @@ const AddNewWorkScreen = ({navigation}: any) => {
             customer_id: workForm.customer_id,
             description: workForm.description,
             amount: workForm.amount,
+            payment_amount: workForm.payment_amount,
             start_time: DateTime.convertToTimestamp(workForm.start_time),
             end_time: DateTime.convertToTimestamp(workForm.end_time),
             status: TaskStatus.Assigned,
@@ -390,6 +424,36 @@ const AddNewWorkScreen = ({navigation}: any) => {
             affix={<Money2 size={20} color={appColors.gray} />}
           />
         </RowComponent>
+        <RowComponent
+          styles={{
+            marginBottom: 8,
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+          }}>
+          <RowComponent>
+            <TextComponent
+              text="Phần trăm chia cho thợ"
+              size={16}
+              font={fontFamilies.bold}
+              flex={1}
+            />
+          </RowComponent>
+          <SpaceComponent height={10} />
+          {errors['payment_amount'] ? (
+            <TextComponent
+              text={errors['payment_amount']}
+              color={appColors.red}
+            />
+          ) : null}
+          <InputComponent
+            type="numeric"
+            value={workForm.payment_amount}
+            onChange={val => handleChangeValue('payment_amount', val)}
+            placeholder="Vui lòng nhập số phần trăm"
+            affix={<Money2 size={20} color={appColors.gray} />}
+          />
+        </RowComponent>
+
         <RowComponent justify="space-between">
           <RowComponent
             styles={{

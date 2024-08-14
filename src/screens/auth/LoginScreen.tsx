@@ -48,7 +48,6 @@ const LoginScreen = ({navigation}: any) => {
 
   const [values, setValues] = useState<UserModel>(initialValue);
   const [errors, setErrors] = useState(initialErrors);
-  const [errorFromFirebase, setErrorFromFirebase] = useState('');
   const [isRemember, setIsRemember] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -67,7 +66,6 @@ const LoginScreen = ({navigation}: any) => {
     // lúc này data đã được chỉnh sửa
 
     setValues(data);
-    setErrorFromFirebase('');
     validateInput(key, value);
   };
 
@@ -109,39 +107,44 @@ const LoginScreen = ({navigation}: any) => {
         visibilityTime: 1000,
       });
     } catch (error) {
-      console.log(error);
+      Toast.show({
+        type: 'error',
+        text1: 'Thất bại',
+        text2: 'Đăng nhập thất bại!!!',
+        visibilityTime: 1000,
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleRegister = async () => {
-    // console.log(values);
-    setIsLoading(true);
+  // const handleRegister = async () => {
+  //   // console.log(values);
+  //   setIsLoading(true);
 
-    try {
-      const res = await handleAuthAPI(
-        '/register',
-        {
-          email: values.email,
-          password: values.password,
-          role: values.role,
-          username: extractUsernameFromEmail(values.email),
-          name: values.name,
-          phone: values.phone,
-          profilePicture: values.profilePicture,
-        },
-        'post',
-      );
-      console.log(res);
-      // dispatch(addAuth(res.data));
-      // await AsyncStorage.setItem('auth', JSON.stringify(res.data));
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //   try {
+  //     const res = await handleAuthAPI(
+  //       '/register',
+  //       {
+  //         email: values.email,
+  //         password: values.password,
+  //         role: values.role,
+  //         username: extractUsernameFromEmail(values.email),
+  //         name: values.name,
+  //         phone: values.phone,
+  //         profilePicture: values.profilePicture,
+  //       },
+  //       'post',
+  //     );
+  //     console.log(res);
+  //     // dispatch(addAuth(res.data));
+  //     // await AsyncStorage.setItem('auth', JSON.stringify(res.data));
+  //   } catch (error) {
+  //     console.log(error);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   return (
     <>
@@ -163,12 +166,6 @@ const LoginScreen = ({navigation}: any) => {
         <SectionComponent>
           <TextComponent text="Đăng nhập" size={20} title />
           <SpaceComponent height={20} />
-          {errorFromFirebase ? (
-            <>
-              <TextComponent text={errorFromFirebase} color={appColors.red} />
-              <SpaceComponent height={5} />
-            </>
-          ) : null}
           {errors['email'] ? (
             <>
               <TextComponent text={errors['email']} color={appColors.red} />

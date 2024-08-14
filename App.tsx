@@ -4,7 +4,11 @@ import {fontFamilies} from './src/constants/fontFamilies';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Routers from './src/routes/Routers';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import Toast, {BaseToast, ErrorToast} from 'react-native-toast-message';
+import Toast, {
+  BaseToast,
+  ErrorToast,
+  InfoToast,
+} from 'react-native-toast-message';
 import {appColors} from './src/constants/colors';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {Host} from 'react-native-portalize';
@@ -45,6 +49,25 @@ const toastConfig = {
         backgroundColor: appColors.red,
         borderLeftWidth: 0,
         borderLeftColor: appColors.red,
+      }}
+      text1Style={{
+        fontSize: 17,
+        color: appColors.white,
+      }}
+      text2Style={{
+        fontSize: 15,
+        color: appColors.white,
+      }}
+    />
+  ),
+
+  info: (props: any) => (
+    <InfoToast
+      {...props}
+      contentContainerStyle={{
+        backgroundColor: appColors.primary,
+        borderLeftWidth: 0,
+        borderLeftColor: appColors.primary,
       }}
       text1Style={{
         fontSize: 17,

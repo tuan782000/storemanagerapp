@@ -1,5 +1,8 @@
-import {View, Text} from 'react-native';
+import {CallAdd, Location, Sms, User} from 'iconsax-react-native';
 import React, {useState} from 'react';
+import {View} from 'react-native';
+import Toast from 'react-native-toast-message';
+import {HandleCustomerAPI} from '../apis/handleCustomerAPI';
 import {
   ContainerComponent,
   InputComponent,
@@ -8,17 +11,9 @@ import {
   SpaceComponent,
   TextComponent,
 } from '../components';
-import {CallAdd, Location, Lock1, Sms, User} from 'iconsax-react-native';
-import {appColors} from '../constants/colors';
-import {CustomerModel} from '../models/CustomerModel';
-import firestore from '@react-native-firebase/firestore';
-import bcrypt from 'bcryptjs';
-import Toast from 'react-native-toast-message';
-import DividerComponent from '../components/DividerComponent';
 import ButtonComponent from '../components/ButtonComponent';
-import {extractUsernameFromEmail} from '../utils/extractUsernameFromEmail';
-import {HandleUserAPI} from '../apis/handleUserAPI';
-import {HandleCustomerAPI} from '../apis/handleCustomerAPI';
+import DividerComponent from '../components/DividerComponent';
+import {appColors} from '../constants/colors';
 
 const initialCustomer = {
   email: '',

@@ -1,6 +1,7 @@
 import AddUrlModal from './AddUrlModal';
 import DeleteUserConfirmModal from './DeleteUserConfirmModal';
 import EditAccountModal from './EditAccountModal';
+import EditWorkSessionModal from './EditWorkSessionModal';
 import LoadingModal from './LoadingModal';
 import ModalSelectedFile from './ModalSelectedFile';
 import ResetModal from './ResetModal';
@@ -14,4 +15,5 @@ export {
   LoadingModal,
   ResetModal,
   ModalSelectedFile,
+  EditWorkSessionModal,
 };

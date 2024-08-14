@@ -24,7 +24,7 @@ import {fontFamilies} from '../../constants/fontFamilies';
 import {UserModel} from '../../models/UserModel';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import {EditAccountModal, ResetPasswordModal} from '../../modals';
+import {EditAccountModal, LoadingModal, ResetPasswordModal} from '../../modals';
 import Toast from 'react-native-toast-message';
 import {ImageOrVideo} from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
@@ -40,6 +40,7 @@ const ProfileScreen = () => {
   const [isVisibledResetPassword, setIsVisibledResetPassword] = useState(false);
 
   const [oldImageUrl, setOldImageUrl] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -50,6 +51,7 @@ const ProfileScreen = () => {
   const fetchUserData = async () => {
     const user = await AsyncStorage.getItem('auth');
     if (user) {
+      setIsLoading(true);
       const parsedUser = JSON.parse(user);
       const api = `/info?id=${parsedUser.id}`;
       setUserId(parsedUser.id);
@@ -58,11 +60,14 @@ const ProfileScreen = () => {
         setUserData(res.data);
       } catch (error) {
         console.error('Lỗi khi lấy thông tin người dùng: ', error);
+      } finally {
+        setIsLoading(false);
       }
     }
   };
 
   const handleSignOut = async () => {
+    setIsLoading(true);
     await AsyncStorage.removeItem('auth');
     dispatch(removeAuth({}));
     Toast.show({
@@ -71,6 +76,7 @@ const ProfileScreen = () => {
       text2: 'Đăng xuất thành công',
       visibilityTime: 1000,
     });
+    setIsLoading(false);
   };
 
   const handleImageSelect = async (val: {
@@ -107,8 +113,8 @@ const ProfileScreen = () => {
   const updateUserProfilePicture = async (newImageUrl: string) => {
     const user = await AsyncStorage.getItem('auth');
     if (user) {
+      setIsLoading(true);
       const parsedUser = JSON.parse(user);
-
       try {
         // call api để set lại link
         const api = `/editInfoAvatar?id=${parsedUser.id}`;
@@ -127,6 +133,8 @@ const ProfileScreen = () => {
         });
       } catch (error) {
         console.error('Error updating profile picture: ', error);
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -323,6 +331,7 @@ const ProfileScreen = () => {
         onClose={() => setIsVisibledResetPassword(!isVisibledResetPassword)}
         onUpdate={fetchUserData}
       />
+      <LoadingModal visible={isLoading} />
     </ContainerComponent>
   );
 };

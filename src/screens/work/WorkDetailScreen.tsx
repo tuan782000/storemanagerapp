@@ -37,7 +37,7 @@ import {HandleMaintanceScheduleAPI} from '../../apis/handleMaintanceScheduleAPI'
 import {TaskStatus} from '../../models/WorkSessionModel';
 import {SelectModel} from '../../models/SelectModel';
 import {SelectStatusModel} from '../../models/SelectStatusModel';
-import {ModalSelectedFile} from '../../modals';
+import {EditWorkSessionModal, ModalSelectedFile} from '../../modals';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import storage from '@react-native-firebase/storage';
 
@@ -135,6 +135,7 @@ const WorkDetailScreen = ({navigation, route}: any) => {
   const [visibleChoiceFileAfter, setVisibleChoiceFileAfter] = useState(false);
   const [comment, setComment] = useState('');
   const [statusSelect, setStatusSelect] = useState<SelectModel[]>([]);
+  const [isVisibleEditModal, setIsVisibleEditModal] = useState(false);
 
   useEffect(() => {
     fetchUserData();
@@ -239,7 +240,7 @@ const WorkDetailScreen = ({navigation, route}: any) => {
     employee_id: string,
     customer_id: string,
   ) => {
-    console.log(employee_id, customer_id);
+    // console.log(employee_id, customer_id);
     const api = '/checkMaintanceSchedule';
     try {
       const checkExistingSchedule =
@@ -480,7 +481,7 @@ const WorkDetailScreen = ({navigation, route}: any) => {
   // console.log(workSessionById);
   // console.log(staffById);
   // console.log(customerById);
-  // console.log(existingMaintanceSchedule);
+  // console.log(existingMaintanceSchedule[0].scheduled_date);
   // console.log(commentById);
   // console.log(commentById[0]?.comment);
   // console.log(workFormUpdate.status);
@@ -662,8 +663,17 @@ const WorkDetailScreen = ({navigation, route}: any) => {
 
         <RowComponent>
           <TextComponent text="Lịch bảo trì: " size={16} />
-          {workSessionById.maintenance_schedule ? (
-            <></>
+          {workSessionById.maintenance_schedule &&
+          existingMaintanceSchedule &&
+          existingMaintanceSchedule[0]?.scheduled_date ? (
+            <>
+              <TextComponent
+                text={`${DateTime.dateToDateString(
+                  existingMaintanceSchedule[0].scheduled_date,
+                )}`}
+                size={16}
+              />
+            </>
           ) : (
             <>
               <TextComponent text="Hiện chưa có lịch bảo trì" size={16} />
@@ -790,7 +800,7 @@ const WorkDetailScreen = ({navigation, route}: any) => {
         {workSessionById.comments && commentById && commentById[0]?.comment ? (
           <>
             <TextComponent text="Bình luận" size={16} />
-            <SpaceComponent height={10} />
+            {/* <SpaceComponent height={10} /> */}
             <TextComponent text={commentById[0]?.comment} size={16} />
             <SpaceComponent height={15} />
           </>
@@ -805,7 +815,7 @@ const WorkDetailScreen = ({navigation, route}: any) => {
           <>
             <ButtonComponent
               text="Chỉnh sửa công việc"
-              onPress={() => console.log('Chỉnh sửa công việc')}
+              onPress={() => setIsVisibleEditModal(true)}
               type="primary"
               color={appColors.warning}
             />
@@ -1377,6 +1387,19 @@ const WorkDetailScreen = ({navigation, route}: any) => {
         onClose={() => setVisibleChoiceFileAfter(false)}
         onSelectedFile={file => handleSelectedFile(file, 'after')}
       />
+      {workSessionById &&
+        workSessionById.amount &&
+        workSessionById.payment_amount && (
+          <EditWorkSessionModal
+            title="Chỉnh sửa phiên làm việc"
+            visible={isVisibleEditModal}
+            onClose={() => setIsVisibleEditModal(!isVisibleEditModal)}
+            onUpdate={() => navigation.goBack()}
+            workId={id}
+            amount={workSessionById.amount}
+            payment_amount={workSessionById.payment_amount}
+          />
+        )}
     </ContainerComponent>
   );
 };
