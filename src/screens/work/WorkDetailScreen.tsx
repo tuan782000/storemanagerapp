@@ -1,12 +1,24 @@
-import {
-  View,
-  Text,
-  ActivityIndicator,
-  Linking,
-  Image,
-  ScrollView,
-} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import storage from '@react-native-firebase/storage';
+import {AddSquare, Camera, DocumentUpload, Edit2} from 'iconsax-react-native';
 import React, {useEffect, useState} from 'react';
+import {
+  ActivityIndicator,
+  Image,
+  Linking,
+  ScrollView,
+  View,
+} from 'react-native';
+import {TouchableOpacity} from 'react-native-gesture-handler';
+import Toast from 'react-native-toast-message';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
+import Octicons from 'react-native-vector-icons/Octicons';
+import {HandleCommentAPI} from '../../apis/handleCommentAPI';
+import {HandleCustomerAPI} from '../../apis/handleCustomerAPI';
+import {HandleMaintanceScheduleAPI} from '../../apis/handleMaintanceScheduleAPI';
+import {HandleUserAPI} from '../../apis/handleUserAPI';
+import {HandleWorkSessionAPI} from '../../apis/handleWorkSessionAPI';
 import {
   ContainerComponent,
   DropDownPickerStatusComponent,
@@ -16,30 +28,15 @@ import {
   SpaceComponent,
   TextComponent,
 } from '../../components';
-import {UserModel} from '../../models/UserModel';
-import {HandleUserAPI} from '../../apis/handleUserAPI';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {globalStyles} from '../../styles/globalStyle';
-import {appColors} from '../../constants/colors';
-import Octicons from 'react-native-vector-icons/Octicons';
-import {HandleWorkSessionAPI} from '../../apis/handleWorkSessionAPI';
-import {fontFamilies} from '../../constants/fontFamilies';
-import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
-import {formatCurrencyVND} from '../../utils/moneyFormatCurrency';
-import {DateTime} from '../../utils/DateTime';
-import {HandleCustomerAPI} from '../../apis/handleCustomerAPI';
-import Toast from 'react-native-toast-message';
 import ButtonComponent from '../../components/ButtonComponent';
-import {HandleCommentAPI} from '../../apis/handleCommentAPI';
-import {AddSquare, Camera, DocumentUpload, Edit2} from 'iconsax-react-native';
-import {TouchableOpacity} from 'react-native-gesture-handler';
-import {HandleMaintanceScheduleAPI} from '../../apis/handleMaintanceScheduleAPI';
-import {TaskStatus} from '../../models/WorkSessionModel';
-import {SelectModel} from '../../models/SelectModel';
-import {SelectStatusModel} from '../../models/SelectStatusModel';
+import {appColors} from '../../constants/colors';
+import {fontFamilies} from '../../constants/fontFamilies';
 import {EditWorkSessionModal, ModalSelectedFile} from '../../modals';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import storage from '@react-native-firebase/storage';
+import {SelectStatusModel} from '../../models/SelectStatusModel';
+import {UserModel} from '../../models/UserModel';
+import {globalStyles} from '../../styles/globalStyle';
+import {DateTime} from '../../utils/DateTime';
+import {formatCurrencyVND} from '../../utils/moneyFormatCurrency';
 
 const initialStatusWorks = [
   {
@@ -350,13 +347,13 @@ const WorkDetailScreen = ({navigation, route}: any) => {
   };
 
   const handleUpdateWork = async () => {
-    console.log(workFormUpdate.status);
-    console.log(workFormUpdate.rejection_reason);
-    console.log(workFormUpdate.before_images);
-    console.log(workFormUpdate.after_images);
-    console.log(workFormUpdate.result);
+    // console.log(workFormUpdate.status);
+    // console.log(workFormUpdate.rejection_reason);
+    // console.log(workFormUpdate.before_images);
+    // console.log(workFormUpdate.after_images);
+    // console.log(workFormUpdate.result);
     const api = `/updatedWorkSessionById?id=${id}`;
-    console.log(api);
+    // console.log(api);
     setIsLoading(true);
     try {
       await HandleWorkSessionAPI.WorkSession(
@@ -380,7 +377,7 @@ const WorkDetailScreen = ({navigation, route}: any) => {
 
       navigation.goBack();
     } catch (error: any) {
-      console.error('Lỗi câoh nhật công việc: ', error);
+      console.error('Lỗi cập nhật công việc: ', error);
       Toast.show({
         type: 'error',
         text1: 'Thất bại',
@@ -430,7 +427,7 @@ const WorkDetailScreen = ({navigation, route}: any) => {
   // console.log(commentById);
   // console.log(commentById[0]?.comment);
   // console.log(workFormUpdate.status);
-  console.log(workFormUpdate);
+  // console.log(workFormUpdate);
   // Hàm render giao diện cho admin
   const renderAdminView = () => {
     return (

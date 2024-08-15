@@ -28,7 +28,7 @@ const EditWorkSessionModal = (props: Props) => {
   const {onClose, visible, title, amount, payment_amount, workId, onUpdate} =
     props;
 
-  console.log(amount, payment_amount);
+  // console.log(amount, payment_amount);
 
   const calcPaymentAmount =
     payment_amount && amount ? (payment_amount * 100) / amount : 0;
