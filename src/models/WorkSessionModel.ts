@@ -16,7 +16,7 @@ type WorkSession = {
   payment_amount?: number;
   before_image?: string[];
   after_image?: string[];
-  task_description: string;
+  description: string;
   status?: TaskStatus;
   rejection_reason?: string | null;
   created_at?: Date;

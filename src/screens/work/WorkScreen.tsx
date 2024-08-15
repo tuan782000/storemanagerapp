@@ -3,6 +3,7 @@ import React, {useEffect, useState} from 'react';
 import {
   CardComponent,
   ContainerComponent,
+  InputComponent,
   RowComponent,
   SectionComponent,
   SpaceComponent,
@@ -20,6 +21,7 @@ import {
   Money3,
   MoneyRecive,
   MoneySend,
+  SearchNormal1,
   Status,
   UserSquare,
   WalletMoney,
@@ -46,6 +48,8 @@ const WorkScreen = ({navigation}: any) => {
   const [userData, setUserData] = useState<UserModel | null>(null);
   const [customerData, setCustomerData] = useState<any>([]);
   const [listWorkSession, setlistWorkSession] = useState<WorkSession[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredData, setFilteredData] = useState<WorkSession[]>([]);
 
   // phải call 2 lần useEffect để tránh bị trễ 1 bước
   useEffect(() => {
@@ -71,6 +75,27 @@ const WorkScreen = ({navigation}: any) => {
       fetchCustomerData();
     }
   }, [userData]);
+
+  // useEffect(() => {
+  //   const filtered = listWorkSession.filter(item =>
+  //     item.description.toLowerCase().includes(searchQuery.toLowerCase()),
+  //   );
+  //   setFilteredData(filtered);
+  // }, [searchQuery, listWorkSession]);
+
+  useEffect(() => {
+    const filtered = listWorkSession.filter((item: any) => {
+      const customerInfo = getCustomerInfo(item.customer_id);
+      const query = searchQuery.toLowerCase();
+
+      return (
+        item.description.toLowerCase().includes(query) ||
+        customerInfo.name.toLowerCase().includes(query) ||
+        customerInfo.phone.includes(query)
+      );
+    });
+    setFilteredData(filtered);
+  }, [searchQuery, listWorkSession]);
 
   const fetchTasks = async () => {
     const userAuth = await AsyncStorage.getItem('auth');
@@ -142,6 +167,8 @@ const WorkScreen = ({navigation}: any) => {
 
     Linking.openURL(url);
   };
+
+  // console.log(listWorkSession);
 
   const renderItem = ({item}: any) => {
     const customerInfo = getCustomerInfo(item.customer_id);
@@ -366,11 +393,18 @@ const WorkScreen = ({navigation}: any) => {
             title
             font={fontFamilies.bold}
           />
+          <SpaceComponent height={20} />
+          <InputComponent
+            value={searchQuery}
+            onChange={val => setSearchQuery(val)}
+            suffix={<SearchNormal1 size={20} color="#747688" />}
+            placeholder="Tìm kiếm phiên làm việc..."
+            allowClear
+          />
         </SectionComponent>
-        <SpaceComponent height={20} />
 
         <FlatList
-          data={listWorkSession}
+          data={filteredData}
           renderItem={renderItem}
           ListEmptyComponent={
             <SectionComponent styles={[globalStyles.center, {flex: 1}]}>
