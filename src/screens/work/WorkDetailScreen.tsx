@@ -306,63 +306,32 @@ const WorkDetailScreen = ({navigation, route}: any) => {
     return urls.filter(url => url !== null); // Loại bỏ những URL null (nếu có lỗi)
   };
 
-  const handleUploadBeforeImages = async () => {
-    try {
-      const beforeImageUrls = await uploadImagesToFirebase(
-        workFormUpdate.before_images,
-        'before',
-      );
-
-      // Cập nhật lại state với các URL từ Firebase
-      setWorkFormUpdate((prevState: any) => ({
-        ...prevState,
-        before_image_firebase: beforeImageUrls,
-        before_images: [],
-      }));
-
-      console.log('Upload trước thành công và state đã được cập nhật.');
-    } catch (error) {
-      console.error('Lỗi khi upload hình ảnh trước: ', error);
-    }
-  };
-
-  const handleUploadAfterImages = async () => {
-    try {
-      const afterImageUrls = await uploadImagesToFirebase(
-        workFormUpdate.after_images,
-        'after',
-      );
-
-      // Cập nhật lại state với các URL từ Firebase
-      setWorkFormUpdate((prevState: any) => ({
-        ...prevState,
-        after_image_firebase: afterImageUrls,
-        after_images: [],
-      }));
-
-      console.log('Upload sau thành công và state đã được cập nhật.');
-    } catch (error) {
-      console.error('Lỗi khi upload hình ảnh sau: ', error);
-    }
-  };
-
   const handleUpdateWork = async () => {
+    setIsLoading(true);
+
     // console.log(workFormUpdate.status);
     // console.log(workFormUpdate.rejection_reason);
     // console.log(workFormUpdate.before_images);
     // console.log(workFormUpdate.after_images);
     // console.log(workFormUpdate.result);
-    const api = `/updatedWorkSessionById?id=${id}`;
     // console.log(api);
-    setIsLoading(true);
     try {
+      const beforeImageUrls = await uploadImagesToFirebase(
+        workFormUpdate.before_images,
+        'before',
+      );
+      const afterImageUrls = await uploadImagesToFirebase(
+        workFormUpdate.after_images,
+        'after',
+      );
+      const api = `/updatedWorkSessionById?id=${id}`;
       await HandleWorkSessionAPI.WorkSession(
         api,
         {
           status: workFormUpdate.status,
           rejection_reason: workFormUpdate.rejection_reason,
-          before_images: workFormUpdate.before_image_firebase,
-          after_images: workFormUpdate.after_image_firebase,
+          before_images: beforeImageUrls,
+          after_images: afterImageUrls,
           result: workFormUpdate.result,
         },
         'put',
@@ -911,387 +880,140 @@ const WorkDetailScreen = ({navigation, route}: any) => {
         ) : workSessionById.status === 'completed' ? (
           <>
             <TextComponent
-              text="II. Thợ cập nhật công việc"
+              text="II. Thợ hoàn thành công việc"
               size={18}
               font={fontFamilies.bold}
             />
 
             <SpaceComponent height={15} />
-            {(workFormUpdate.status === 'completed' ||
-              workSessionById.status === 'completed') &&
-              workFormUpdate.status !== 'rejected' && (
+            <RowComponent justify="space-between">
+              <TextComponent
+                text="Lịch bảo trì"
+                size={16}
+                font={fontFamilies.bold}
+              />
+              {existingMaintanceSchedule?.length > 0 ? (
                 <>
-                  <RowComponent justify="space-between">
-                    <TextComponent
-                      text="Lịch bảo trì"
-                      size={16}
-                      font={fontFamilies.bold}
-                    />
-                    {existingMaintanceSchedule?.length > 0 ? (
-                      <>
-                        <TextComponent
-                          text={`${DateTime.dateToDateString(
-                            existingMaintanceSchedule[0].scheduled_date,
-                          )}`}
-                          size={16}
-                        />
-                      </>
-                    ) : (
-                      <>
-                        <TouchableOpacity
-                          onPress={() =>
-                            navigation.navigate('AddNewScheduleScreen', {
-                              workSessionId: id,
-                              employeeId: staffById?._id,
-                              customerId: customerById?._id,
-                            })
-                          }>
-                          <AddSquare
-                            size={22}
-                            color={appColors.primary}
-                            variant="Bold"
-                          />
-                        </TouchableOpacity>
-                      </>
-                    )}
-                  </RowComponent>
-                  <SpaceComponent height={15} />
-
-                  <RowComponent justify="space-between">
-                    <TextComponent
-                      text="Cập nhật hình ảnh trước khi sửa"
-                      size={16}
-                      font={fontFamilies.bold}
-                    />
-
-                    {workFormUpdate.before_images.length > 0 ? (
-                      <>
-                        <DocumentUpload
-                          size={22}
-                          variant="Bold"
-                          color={appColors.primary}
-                          onPress={handleUploadBeforeImages}
-                        />
-                      </>
-                    ) : (
-                      <></>
-                    )}
-
-                    <Camera
-                      size="22"
-                      color={appColors.primary}
-                      variant="Bold"
-                      onPress={() => {
-                        setVisibleChoiceFileBefore(true);
-                      }}
-                    />
-                  </RowComponent>
-                  <SpaceComponent height={15} />
-                  {workFormUpdate.before_images.length > 0 ? (
-                    <>
-                      <ScrollView
-                        horizontal={true}
-                        showsHorizontalScrollIndicator={false}>
-                        <RowComponent styles={{paddingVertical: 10}}>
-                          {Array.isArray(workFormUpdate.before_images) &&
-                            workFormUpdate.before_images.map(
-                              (image: any, index: any) => (
-                                <View
-                                  key={index}
-                                  style={{
-                                    position: 'relative',
-                                    marginRight: 20,
-                                  }}>
-                                  <AntDesign
-                                    name="close"
-                                    size={20}
-                                    color={appColors.white}
-                                    style={{
-                                      position: 'absolute',
-                                      right: -10,
-                                      top: -10,
-                                      zIndex: 1,
-                                      backgroundColor: appColors.red,
-                                      borderRadius: 999,
-                                    }}
-                                    // onPress={() => removeImage(item.id, index)}
-                                    onPress={() =>
-                                      handleDeletedImageFile('before', index)
-                                    }
-                                  />
-                                  <Image
-                                    source={{uri: image}}
-                                    style={{
-                                      width: 100,
-                                      height: 150,
-                                      borderRadius: 10,
-                                    }}
-                                  />
-                                </View>
-                              ),
-                            )}
-                        </RowComponent>
-                      </ScrollView>
-                      <SpaceComponent height={15} />
-                    </>
-                  ) : (
-                    <>
-                      <TextComponent text="Hiện chưa có ảnh nào để tải lên hệ thống" />
-                      <SpaceComponent height={15} />
-                    </>
-                  )}
-
-                  {workSessionById.before_images.length > 0 ? (
-                    <>
-                      <ScrollView
-                        horizontal={true}
-                        showsHorizontalScrollIndicator={false}>
-                        <RowComponent styles={{paddingVertical: 10}}>
-                          {Array.isArray(workSessionById.before_images) &&
-                            workSessionById.before_images.map(
-                              (image: any, index: any) => (
-                                <View
-                                  key={index}
-                                  style={{
-                                    position: 'relative',
-                                    marginRight: 20,
-                                  }}>
-                                  {/* <AntDesign
-                                  name="close"
-                                  size={20}
-                                  color={appColors.white}
-                                  style={{
-                                    position: 'absolute',
-                                    right: -10,
-                                    top: -10,
-                                    zIndex: 1,
-                                    backgroundColor: appColors.red,
-                                    borderRadius: 999,
-                                  }}
-                                  // onPress={() => removeImage(item.id, index)}
-                                  // onPress={() => handleDeletedImageFile('before', index)}
-                                /> */}
-                                  <Image
-                                    source={{uri: image}}
-                                    style={{
-                                      width: 100,
-                                      height: 150,
-                                      borderRadius: 10,
-                                    }}
-                                  />
-                                </View>
-                              ),
-                            )}
-                        </RowComponent>
-                      </ScrollView>
-                      <SpaceComponent height={15} />
-                    </>
-                  ) : (
-                    <></>
-                  )}
-
-                  {/* {workFormUpdate.before_image_firebase.length > 0 ? (
-                  <>
-                    <ScrollView
-                      horizontal={true}
-                      showsHorizontalScrollIndicator={false}>
-                      <RowComponent styles={{paddingVertical: 10}}>
-                        {Array.isArray(workFormUpdate.before_image_firebase) &&
-                          workFormUpdate.before_image_firebase.map(
-                            (image: any, index: any) => (
-                              <View
-                                key={index}
-                                style={{position: 'relative', marginRight: 20}}>
-                                <AntDesign
-                                  name="close"
-                                  size={20}
-                                  color={appColors.white}
-                                  style={{
-                                    position: 'absolute',
-                                    right: -10,
-                                    top: -10,
-                                    zIndex: 1,
-                                    backgroundColor: appColors.red,
-                                    borderRadius: 999,
-                                  }}
-                                  // onPress={() => removeImage(item.id, index)}
-                                  // onPress={() => handleDeletedImageFile('before', index)}
-                                />
-                                <Image
-                                  source={{uri: image}}
-                                  style={{width: 100, height: 150, borderRadius: 10}}
-                                />
-                              </View>
-                            ),
-                          )}
-                      </RowComponent>
-                    </ScrollView>
-                    <SpaceComponent height={15} />
-                  </>
-                ) : (
-                  <></>
-                )} */}
-
-                  <RowComponent justify="space-between">
-                    <TextComponent
-                      text="Cập nhật hình ảnh sau khi sửa"
-                      size={16}
-                      font={fontFamilies.bold}
-                    />
-
-                    {workFormUpdate.after_images.length > 0 ? (
-                      <>
-                        <DocumentUpload
-                          size={22}
-                          variant="Bold"
-                          color={appColors.primary}
-                          onPress={handleUploadAfterImages}
-                        />
-                      </>
-                    ) : (
-                      <></>
-                    )}
-
-                    <Camera
-                      size="22"
-                      color={appColors.primary}
-                      variant="Bold"
-                      onPress={() => setVisibleChoiceFileAfter(true)}
-                    />
-                  </RowComponent>
-                  <SpaceComponent height={15} />
-
-                  {workFormUpdate.after_images.length > 0 ? (
-                    <>
-                      <ScrollView
-                        horizontal={true}
-                        showsHorizontalScrollIndicator={false}>
-                        <RowComponent styles={{paddingVertical: 10}}>
-                          {Array.isArray(workFormUpdate.after_images) &&
-                            workFormUpdate.after_images.map(
-                              (image: any, index: any) => (
-                                <View
-                                  key={index}
-                                  style={{
-                                    position: 'relative',
-                                    marginRight: 20,
-                                  }}>
-                                  <AntDesign
-                                    name="close"
-                                    size={20}
-                                    color={appColors.white}
-                                    style={{
-                                      position: 'absolute',
-                                      right: -10,
-                                      top: -10,
-                                      zIndex: 1,
-                                      backgroundColor: appColors.red,
-                                      borderRadius: 999,
-                                    }}
-                                    // onPress={() => removeImage(item.id, index)}
-                                    onPress={() =>
-                                      handleDeletedImageFile('after', index)
-                                    }
-                                  />
-                                  <Image
-                                    source={{uri: image}}
-                                    style={{
-                                      width: 100,
-                                      height: 150,
-                                      borderRadius: 10,
-                                    }}
-                                  />
-                                </View>
-                              ),
-                            )}
-                        </RowComponent>
-                      </ScrollView>
-                      <SpaceComponent height={15} />
-                    </>
-                  ) : (
-                    <>
-                      <TextComponent text="Hiện chưa có ảnh nào để tải lên hệ thống" />
-                      <SpaceComponent height={15} />
-                    </>
-                  )}
-
-                  {/* workSessionById */}
-                  {workSessionById.after_images.length > 0 ? (
-                    <>
-                      <ScrollView
-                        horizontal={true}
-                        showsHorizontalScrollIndicator={false}>
-                        <RowComponent styles={{paddingVertical: 10}}>
-                          {Array.isArray(workSessionById.after_images) &&
-                            workSessionById.after_images.map(
-                              (image: any, index: any) => (
-                                <View
-                                  key={index}
-                                  style={{
-                                    position: 'relative',
-                                    marginRight: 20,
-                                  }}>
-                                  {/* <AntDesign
-                                  name="close"
-                                  size={20}
-                                  color={appColors.white}
-                                  style={{
-                                    position: 'absolute',
-                                    right: -10,
-                                    top: -10,
-                                    zIndex: 1,
-                                    backgroundColor: appColors.red,
-                                    borderRadius: 999,
-                                  }}
-                                  // onPress={() => removeImage(item.id, index)}
-                                  // onPress={() => handleDeletedImageFile('before', index)}
-                                /> */}
-                                  <Image
-                                    source={{uri: image}}
-                                    style={{
-                                      width: 100,
-                                      height: 150,
-                                      borderRadius: 10,
-                                    }}
-                                  />
-                                </View>
-                              ),
-                            )}
-                        </RowComponent>
-                      </ScrollView>
-                      <SpaceComponent height={15} />
-                    </>
-                  ) : (
-                    <></>
-                  )}
-
                   <TextComponent
-                    text="Cập nhật kết quả"
+                    text={`${DateTime.dateToDateString(
+                      existingMaintanceSchedule[0].scheduled_date,
+                    )}`}
                     size={16}
-                    font={fontFamilies.bold}
-                  />
-                  <SpaceComponent height={10} />
-
-                  <InputComponent
-                    onChange={(val: string) => handleChangeValue('result', val)}
-                    value={workFormUpdate.result}
-                    multiple
-                    numberOfLines={2}
-                    placeholder="Viết kết quả ở đây..."
-                    affix={<Edit2 size={22} color={appColors.text} />}
-                    styleInput={{alignItems: 'center'}}
-                    allowClear
                   />
                 </>
+              ) : (
+                <>
+                  <TouchableOpacity
+                    onPress={() =>
+                      navigation.navigate('AddNewScheduleScreen', {
+                        workSessionId: id,
+                        employeeId: staffById?._id,
+                        customerId: customerById?._id,
+                      })
+                    }>
+                    <AddSquare
+                      size={22}
+                      color={appColors.primary}
+                      variant="Bold"
+                    />
+                  </TouchableOpacity>
+                </>
               )}
-
+            </RowComponent>
             <SpaceComponent height={15} />
-            <ButtonComponent
-              text="Cập nhật kết quả công việc"
-              type="primary"
-              styles={{backgroundColor: appColors.warning}}
-              onPress={handleUpdateWork}
+            <TextComponent
+              text="Hình ảnh trước khi sửa"
+              size={16}
+              font={fontFamilies.bold}
             />
+            <SpaceComponent height={15} />
+            {workSessionById.before_images.length > 0 ? (
+              <>
+                <ScrollView
+                  horizontal={true}
+                  showsHorizontalScrollIndicator={false}>
+                  <RowComponent styles={{paddingVertical: 10}}>
+                    {Array.isArray(workSessionById.before_images) &&
+                      workSessionById.before_images.map(
+                        (image: any, index: any) => (
+                          <View
+                            key={index}
+                            style={{
+                              position: 'relative',
+                              marginRight: 20,
+                            }}>
+                            <Image
+                              source={{uri: image}}
+                              style={{
+                                width: 100,
+                                height: 150,
+                                borderRadius: 10,
+                              }}
+                            />
+                          </View>
+                        ),
+                      )}
+                  </RowComponent>
+                </ScrollView>
+              </>
+            ) : (
+              <TextComponent text="Bạn đã không cập nhật ảnh trước khi sửa lên" />
+            )}
+            <SpaceComponent height={15} />
+
+            <TextComponent
+              text="Hình ảnh sau khi sửa"
+              size={16}
+              font={fontFamilies.bold}
+            />
+            <SpaceComponent height={15} />
+
+            {workSessionById.after_images.length > 0 ? (
+              <>
+                <ScrollView
+                  horizontal={true}
+                  showsHorizontalScrollIndicator={false}>
+                  <RowComponent styles={{paddingVertical: 10}}>
+                    {Array.isArray(workSessionById.after_images) &&
+                      workSessionById.after_images.map(
+                        (image: any, index: any) => (
+                          <View
+                            key={index}
+                            style={{
+                              position: 'relative',
+                              marginRight: 20,
+                            }}>
+                            <Image
+                              source={{uri: image}}
+                              style={{
+                                width: 100,
+                                height: 150,
+                                borderRadius: 10,
+                              }}
+                            />
+                          </View>
+                        ),
+                      )}
+                  </RowComponent>
+                </ScrollView>
+              </>
+            ) : (
+              <TextComponent text="Bạn đã không cập nhật ảnh sau khi sửa lên" />
+            )}
+            <SpaceComponent height={15} />
+
+            <TextComponent
+              text="kết quả của công việc"
+              size={16}
+              font={fontFamilies.bold}
+            />
+            <SpaceComponent height={10} />
+            {workSessionById.result ? (
+              <TextComponent text={workSessionById.result} />
+            ) : (
+              <TextComponent text="Bạn đã báo cáo kết quả sau khi hoàn thành công việc" />
+            )}
+
             <SpaceComponent height={15} />
 
             {(workFormUpdate.status === 'completed' ||
@@ -1360,13 +1082,8 @@ const WorkDetailScreen = ({navigation, route}: any) => {
             />
             <SpaceComponent height={10} />
 
-            {/* <DropDownPickerStatusComponent
-              selected={workSessionById.status}
-              onSelect={val => handleChangeValue('status', val)}
-              items={statusSelect}
-            /> */}
-
             <DropDownPickerStatusComponent
+              title="Lựa chọn trạng thái"
               selected={workFormUpdate.status}
               items={statusSelect}
               onSelect={val => handleChangeValue('status', val)}
@@ -1442,20 +1159,6 @@ const WorkDetailScreen = ({navigation, route}: any) => {
                       size={16}
                       font={fontFamilies.bold}
                     />
-
-                    {workFormUpdate.before_images.length > 0 ? (
-                      <>
-                        <DocumentUpload
-                          size={22}
-                          variant="Bold"
-                          color={appColors.primary}
-                          onPress={handleUploadBeforeImages}
-                        />
-                      </>
-                    ) : (
-                      <></>
-                    )}
-
                     <Camera
                       size="22"
                       color={appColors.primary}
@@ -1569,68 +1272,12 @@ const WorkDetailScreen = ({navigation, route}: any) => {
                     <></>
                   )}
 
-                  {/* {workFormUpdate.before_image_firebase.length > 0 ? (
-                  <>
-                    <ScrollView
-                      horizontal={true}
-                      showsHorizontalScrollIndicator={false}>
-                      <RowComponent styles={{paddingVertical: 10}}>
-                        {Array.isArray(workFormUpdate.before_image_firebase) &&
-                          workFormUpdate.before_image_firebase.map(
-                            (image: any, index: any) => (
-                              <View
-                                key={index}
-                                style={{position: 'relative', marginRight: 20}}>
-                                <AntDesign
-                                  name="close"
-                                  size={20}
-                                  color={appColors.white}
-                                  style={{
-                                    position: 'absolute',
-                                    right: -10,
-                                    top: -10,
-                                    zIndex: 1,
-                                    backgroundColor: appColors.red,
-                                    borderRadius: 999,
-                                  }}
-                                  // onPress={() => removeImage(item.id, index)}
-                                  // onPress={() => handleDeletedImageFile('before', index)}
-                                />
-                                <Image
-                                  source={{uri: image}}
-                                  style={{width: 100, height: 150, borderRadius: 10}}
-                                />
-                              </View>
-                            ),
-                          )}
-                      </RowComponent>
-                    </ScrollView>
-                    <SpaceComponent height={15} />
-                  </>
-                ) : (
-                  <></>
-                )} */}
-
                   <RowComponent justify="space-between">
                     <TextComponent
                       text="Cập nhật hình ảnh sau khi sửa"
                       size={16}
                       font={fontFamilies.bold}
                     />
-
-                    {workFormUpdate.after_images.length > 0 ? (
-                      <>
-                        <DocumentUpload
-                          size={22}
-                          variant="Bold"
-                          color={appColors.primary}
-                          onPress={handleUploadAfterImages}
-                        />
-                      </>
-                    ) : (
-                      <></>
-                    )}
-
                     <Camera
                       size="22"
                       color={appColors.primary}
@@ -1710,21 +1357,6 @@ const WorkDetailScreen = ({navigation, route}: any) => {
                                     position: 'relative',
                                     marginRight: 20,
                                   }}>
-                                  {/* <AntDesign
-                                  name="close"
-                                  size={20}
-                                  color={appColors.white}
-                                  style={{
-                                    position: 'absolute',
-                                    right: -10,
-                                    top: -10,
-                                    zIndex: 1,
-                                    backgroundColor: appColors.red,
-                                    borderRadius: 999,
-                                  }}
-                                  // onPress={() => removeImage(item.id, index)}
-                                  // onPress={() => handleDeletedImageFile('before', index)}
-                                /> */}
                                   <Image
                                     source={{uri: image}}
                                     style={{

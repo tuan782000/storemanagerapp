@@ -10,108 +10,33 @@ import ButtonComponent from './ButtonComponent';
 import SpaceComponent from './SpaceComponent';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {SelectStatusModel} from '../models/SelectStatusModel';
-
-// interface Props {
-//   items: SelectModel[];
-//   selected: string[];
-//   onSelect: (val: string[]) => void;
-// }
+import {fontFamilies} from '../constants/fontFamilies';
 
 interface Props {
+  title?: string;
   items: SelectStatusModel[];
   selected: string; // selected là chuỗi
   onSelect: (val: string) => void; // onSelect nhận chuỗi
 }
 
 const DropDownPickerStatusComponent = (props: Props) => {
-  const {items, selected, onSelect} = props;
+  const {items, selected, onSelect, title} = props;
 
   const [isVisible, setIsVisible] = useState(false);
-  // const [dataSelected, setDataSelected] = useState<string[]>([]);
   const [dataSelected, setDataSelected] = useState<string>(selected || '');
 
   useEffect(() => {
     selected && setDataSelected(selected);
   }, []);
 
-  // const handleSelecteItem = (id: string) => {
-  //   setDataSelected([id]);
-  // };
-
   const handleSelecteItem = (id: string) => {
     setDataSelected(id); // Lưu trữ chỉ một giá trị chuỗi
   };
-
-  // const handleConfirmSelect = () => {
-  //   // truyền qua cho cha
-  //   onSelect(dataSelected);
-  //   setIsVisible(false);
-  //   setDataSelected([]);
-  // };
 
   const handleConfirmSelect = () => {
     onSelect(dataSelected); // Truyền chuỗi trạng thái
     setIsVisible(false);
   };
-
-  // const handleRemoveItemSelected = (index: number) => {
-  //   if (selected) {
-  //     selected.splice(index, 1);
-
-  //     onSelect(selected);
-  //   }
-  // };
-
-  // const renderSelectedItem = (id: string, index: number) => {
-  //   const item = items.find(element => element.value === id);
-  //   return (
-  //     item && (
-  //       <RowComponent
-  //         // onPress={() => handleRemoveItemSelected(index)}
-  //         key={id}
-  //         styles={{
-  //           padding: 5,
-  //           paddingHorizontal: 10,
-  //           borderWidth: 0.5,
-  //           borderColor: appColors.gray,
-  //           borderRadius: 10,
-  //           backgroundColor: appColors.primary,
-  //           alignItems: 'center',
-  //         }}>
-  //         <TextComponent
-  //           text={
-  //             // item.label === 'assigned'
-  //             //   ? 'Đang giao việc'
-  //             //   : item.label === 'accepted'
-  //             //   ? 'Đã chấp nhận'
-  //             //   : item.label === 'pending'
-  //             //   ? 'Đang xử lý'
-  //             //   : item.label === 'rejected'
-  //             //   ? 'Đã từ chối'
-  //             //   : item.label === 'completed'
-  //             //   ? 'Đã hoàn thành'
-  //             //   : ''
-  //             item.value === 'assigned'
-  //               ? 'Đang giao việc'
-  //               : item.value === 'accepted'
-  //               ? 'Đã chấp nhận'
-  //               : item.value === 'pending'
-  //               ? 'Đang xử lý'
-  //               : item.value === 'rejected'
-  //               ? 'Đã từ chối'
-  //               : item.value === 'completed'
-  //               ? 'Đã hoàn thành'
-  //               : ''
-  //           }
-  //           flex={0}
-  //           styles={{color: appColors.white}}
-  //         />
-  //         {/* <SpaceComponent width={10} />
-  //         <AntDesign name="close" size={14} color={appColors.white} /> */}
-  //       </RowComponent>
-  //     )
-  //   );
-  // };
 
   const renderSelectedItem = (id: string) => {
     const item = items.find(element => element.value === id);
@@ -194,6 +119,24 @@ const DropDownPickerStatusComponent = (props: Props) => {
               paddingBottom: Platform.OS === 'ios' ? 60 : 30,
             },
           ]}>
+          {title && (
+            <RowComponent
+              justify="space-between"
+              onPress={() => {
+                setIsVisible(false);
+              }}>
+              <TextComponent text={title} font={fontFamilies.bold} size={20} />
+              <View
+                style={{
+                  borderRadius: 999,
+                  backgroundColor: appColors.red,
+                  padding: 5,
+                }}>
+                <AntDesign name="close" size={22} color={appColors.white} />
+              </View>
+            </RowComponent>
+          )}
+          <SpaceComponent height={10} />
           <FlatList
             showsHorizontalScrollIndicator={false}
             style={{flex: 1}}
@@ -246,15 +189,6 @@ const DropDownPickerStatusComponent = (props: Props) => {
             text="Xác nhận"
             type="primary"
             onPress={handleConfirmSelect}
-          />
-          <SpaceComponent height={20} />
-          <ButtonComponent
-            text="Huỷ"
-            type="primary"
-            onPress={() => {
-              setIsVisible(false);
-            }}
-            styles={{backgroundColor: appColors.red}}
           />
         </View>
       </Modal>
