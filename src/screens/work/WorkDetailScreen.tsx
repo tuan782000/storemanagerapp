@@ -188,6 +188,12 @@ const WorkDetailScreen = ({navigation, route}: any) => {
     try {
       const workWithId = await HandleWorkSessionAPI.WorkSession(api);
       setworkSessionById(workWithId.data);
+
+      // Cập nhật status vào workFormUpdate
+      setWorkFormUpdate((prevState: any) => ({
+        ...prevState,
+        status: [{id: workWithId.data.status, value: workWithId.data.status}],
+      }));
     } catch (error: any) {
       console.log(error.message);
     } finally {
@@ -1010,7 +1016,8 @@ const WorkDetailScreen = ({navigation, route}: any) => {
         /> */}
 
         <DropDownPickerStatusComponent
-          selected={workFormUpdate.status}
+          // selected={workFormUpdate.status}
+          selected={workFormUpdate.status.map((status: any) => status.value)}
           items={statusSelect}
           onSelect={val => handleChangeValue('status', val)}
         />
