@@ -44,10 +44,6 @@ import storage from '@react-native-firebase/storage';
 // "assigned", "accepted", "pending", "rejected", "completed"
 const initialStatusWorks = [
   {
-    id: 'assigned',
-    value: 'assigned',
-  },
-  {
     id: 'accepted',
     value: 'accepted',
   },
@@ -65,41 +61,8 @@ const initialStatusWorks = [
   },
 ];
 
-// const initialStatus = [
-//   {
-//     id: 0,
-//     value: TaskStatus.Assigned,
-//   },
-//   {
-//     id: 1,
-//     value: TaskStatus.Accepted,
-//   },
-//   {
-//     id: 2,
-//     value: TaskStatus.Pending,
-//   },
-//   {
-//     id: 3,
-//     value: TaskStatus.Rejected,
-//   },
-//   {
-//     id: 4,
-//     value: TaskStatus.Completed,
-//   },
-//   // Assigned, // đã giao
-//   // Accepted, // đã chấp nhận
-//   // Pending, // đang xử lý
-//   // Rejected, // từ chối nhiệm vụ
-//   // Completed, // hoàn thành
-// ];
-
 const initialUpdateWorkSession = {
-  status: [
-    {
-      id: 'assigned',
-      value: 'assigned',
-    },
-  ], // Thay đổi giá trị theo yêu cầu của bạn
+  status: '',
   rejection_reason: '', // Có thể là null nếu không có lý do từ chối
   before_images: [], // Danh sách các URL hình ảnh trước khi làm
   after_images: [], // Danh sách các URL hình ảnh sau khi làm
@@ -134,7 +97,8 @@ const WorkDetailScreen = ({navigation, route}: any) => {
   const [visibleChoiceFileBefore, setVisibleChoiceFileBefore] = useState(false);
   const [visibleChoiceFileAfter, setVisibleChoiceFileAfter] = useState(false);
   const [comment, setComment] = useState('');
-  const [statusSelect, setStatusSelect] = useState<SelectModel[]>([]);
+  // const [statusSelect, setStatusSelect] = useState<SelectModel[]>([]);
+  const [statusSelect, setStatusSelect] = useState<SelectStatusModel[]>([]);
   const [isVisibleEditModal, setIsVisibleEditModal] = useState(false);
 
   useEffect(() => {
@@ -188,12 +152,6 @@ const WorkDetailScreen = ({navigation, route}: any) => {
     try {
       const workWithId = await HandleWorkSessionAPI.WorkSession(api);
       setworkSessionById(workWithId.data);
-
-      // Cập nhật status vào workFormUpdate
-      setWorkFormUpdate((prevState: any) => ({
-        ...prevState,
-        status: [{id: workWithId.data.status, value: workWithId.data.status}],
-      }));
     } catch (error: any) {
       console.log(error.message);
     } finally {
@@ -278,14 +236,21 @@ const WorkDetailScreen = ({navigation, route}: any) => {
   //   setStatusSelect(items);
   // };
 
+  // const handleGetAllStatus = async () => {
+  //   const items: SelectModel[] = [];
+  //   await initialStatusWorks.forEach(item => {
+  //     items.push({
+  //       label: item.id,
+  //       value: item.value,
+  //     });
+  //   });
+  //   setStatusSelect(items);
+  // };
+
   const handleGetAllStatus = async () => {
-    const items: SelectModel[] = [];
-    await initialStatusWorks.forEach(item => {
-      items.push({
-        label: item.id,
-        value: item.value,
-      });
-    });
+    const items: SelectStatusModel[] = initialStatusWorks.map(item => ({
+      value: item.value,
+    }));
     setStatusSelect(items);
   };
 
@@ -412,7 +377,7 @@ const WorkDetailScreen = ({navigation, route}: any) => {
   };
 
   const handleUpdateWork = async () => {
-    console.log(workFormUpdate.status[0]);
+    console.log(workFormUpdate.status);
     // console.log(workFormUpdate.rejection_reason);
     console.log(workFormUpdate.before_images);
     console.log(workFormUpdate.after_images);
@@ -424,7 +389,7 @@ const WorkDetailScreen = ({navigation, route}: any) => {
       await HandleWorkSessionAPI.WorkSession(
         api,
         {
-          status: workFormUpdate.status[0],
+          status: workFormUpdate.status,
           before_images: workFormUpdate.before_image_firebase,
           after_images: workFormUpdate.after_image_firebase,
           result: workFormUpdate.result,
@@ -439,7 +404,7 @@ const WorkDetailScreen = ({navigation, route}: any) => {
         visibilityTime: 1000,
       });
 
-      // navigation.goBack();
+      navigation.goBack();
     } catch (error: any) {
       console.error('Lỗi câoh nhật công việc: ', error);
       Toast.show({
@@ -1016,8 +981,7 @@ const WorkDetailScreen = ({navigation, route}: any) => {
         /> */}
 
         <DropDownPickerStatusComponent
-          // selected={workFormUpdate.status}
-          selected={workFormUpdate.status.map((status: any) => status.value)}
+          selected={workFormUpdate.status}
           items={statusSelect}
           onSelect={val => handleChangeValue('status', val)}
         />

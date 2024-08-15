@@ -9,32 +9,49 @@ import {ArrowDown2, TickCircle} from 'iconsax-react-native';
 import ButtonComponent from './ButtonComponent';
 import SpaceComponent from './SpaceComponent';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import {SelectStatusModel} from '../models/SelectStatusModel';
+
+// interface Props {
+//   items: SelectModel[];
+//   selected: string[];
+//   onSelect: (val: string[]) => void;
+// }
 
 interface Props {
-  items: SelectModel[];
-  selected: string[];
-  onSelect: (val: string[]) => void;
+  items: SelectStatusModel[];
+  selected: string; // selected là chuỗi
+  onSelect: (val: string) => void; // onSelect nhận chuỗi
 }
 
 const DropDownPickerStatusComponent = (props: Props) => {
   const {items, selected, onSelect} = props;
 
   const [isVisible, setIsVisible] = useState(false);
-  const [dataSelected, setDataSelected] = useState<string[]>([]);
+  // const [dataSelected, setDataSelected] = useState<string[]>([]);
+  const [dataSelected, setDataSelected] = useState<string>(selected || '');
 
   useEffect(() => {
     selected && setDataSelected(selected);
   }, []);
 
+  // const handleSelecteItem = (id: string) => {
+  //   setDataSelected([id]);
+  // };
+
   const handleSelecteItem = (id: string) => {
-    setDataSelected([id]);
+    setDataSelected(id); // Lưu trữ chỉ một giá trị chuỗi
   };
 
+  // const handleConfirmSelect = () => {
+  //   // truyền qua cho cha
+  //   onSelect(dataSelected);
+  //   setIsVisible(false);
+  //   setDataSelected([]);
+  // };
+
   const handleConfirmSelect = () => {
-    // truyền qua cho cha
-    onSelect(dataSelected);
+    onSelect(dataSelected); // Truyền chuỗi trạng thái
     setIsVisible(false);
-    setDataSelected([]);
   };
 
   // const handleRemoveItemSelected = (index: number) => {
@@ -45,12 +62,62 @@ const DropDownPickerStatusComponent = (props: Props) => {
   //   }
   // };
 
-  const renderSelectedItem = (id: string, index: number) => {
+  // const renderSelectedItem = (id: string, index: number) => {
+  //   const item = items.find(element => element.value === id);
+  //   return (
+  //     item && (
+  //       <RowComponent
+  //         // onPress={() => handleRemoveItemSelected(index)}
+  //         key={id}
+  //         styles={{
+  //           padding: 5,
+  //           paddingHorizontal: 10,
+  //           borderWidth: 0.5,
+  //           borderColor: appColors.gray,
+  //           borderRadius: 10,
+  //           backgroundColor: appColors.primary,
+  //           alignItems: 'center',
+  //         }}>
+  //         <TextComponent
+  //           text={
+  //             // item.label === 'assigned'
+  //             //   ? 'Đang giao việc'
+  //             //   : item.label === 'accepted'
+  //             //   ? 'Đã chấp nhận'
+  //             //   : item.label === 'pending'
+  //             //   ? 'Đang xử lý'
+  //             //   : item.label === 'rejected'
+  //             //   ? 'Đã từ chối'
+  //             //   : item.label === 'completed'
+  //             //   ? 'Đã hoàn thành'
+  //             //   : ''
+  //             item.value === 'assigned'
+  //               ? 'Đang giao việc'
+  //               : item.value === 'accepted'
+  //               ? 'Đã chấp nhận'
+  //               : item.value === 'pending'
+  //               ? 'Đang xử lý'
+  //               : item.value === 'rejected'
+  //               ? 'Đã từ chối'
+  //               : item.value === 'completed'
+  //               ? 'Đã hoàn thành'
+  //               : ''
+  //           }
+  //           flex={0}
+  //           styles={{color: appColors.white}}
+  //         />
+  //         {/* <SpaceComponent width={10} />
+  //         <AntDesign name="close" size={14} color={appColors.white} /> */}
+  //       </RowComponent>
+  //     )
+  //   );
+  // };
+
+  const renderSelectedItem = (id: string) => {
     const item = items.find(element => element.value === id);
     return (
       item && (
         <RowComponent
-          // onPress={() => handleRemoveItemSelected(index)}
           key={id}
           styles={{
             padding: 5,
@@ -63,27 +130,26 @@ const DropDownPickerStatusComponent = (props: Props) => {
           }}>
           <TextComponent
             text={
-              item.label === 'assigned'
+              item.value === 'assigned'
                 ? 'Đang giao việc'
-                : item.label === 'accepted'
+                : item.value === 'accepted'
                 ? 'Đã chấp nhận'
-                : item.label === 'pending'
+                : item.value === 'pending'
                 ? 'Đang xử lý'
-                : item.label === 'rejected'
+                : item.value === 'rejected'
                 ? 'Đã từ chối'
-                : item.label === 'completed'
+                : item.value === 'completed'
                 ? 'Đã hoàn thành'
                 : ''
             }
             flex={0}
             styles={{color: appColors.white}}
           />
-          {/* <SpaceComponent width={10} />
-          <AntDesign name="close" size={14} color={appColors.white} /> */}
         </RowComponent>
       )
     );
   };
+
   return (
     <View>
       <RowComponent
@@ -99,7 +165,8 @@ const DropDownPickerStatusComponent = (props: Props) => {
         <View style={{flex: 1, paddingRight: 12}}>
           {selected && selected.length > 0 ? (
             <RowComponent justify="flex-start" styles={{flexWrap: 'wrap'}}>
-              {selected.map((id, index) => renderSelectedItem(id, index))}
+              {/* {selected.map((id, index) => renderSelectedItem(id, index))} */}
+              {renderSelectedItem(selected)}
             </RowComponent>
           ) : (
             <TextComponent
@@ -139,17 +206,28 @@ const DropDownPickerStatusComponent = (props: Props) => {
                 styles={{paddingVertical: 16}}>
                 <TextComponent
                   text={
-                    item.label === 'assigned'
+                    item.value === 'assigned'
                       ? 'Đang giao việc'
-                      : item.label === 'accepted'
+                      : item.value === 'accepted'
                       ? 'Đã chấp nhận'
-                      : item.label === 'pending'
+                      : item.value === 'pending'
                       ? 'Đang xử lý'
-                      : item.label === 'rejected'
+                      : item.value === 'rejected'
                       ? 'Đã từ chối'
-                      : item.label === 'completed'
+                      : item.value === 'completed'
                       ? 'Đã hoàn thành'
                       : ''
+                    // item.label === 'assigned'
+                    //   ? 'Đang giao việc'
+                    //   : item.label === 'accepted'
+                    //   ? 'Đã chấp nhận'
+                    //   : item.label === 'pending'
+                    //   ? 'Đang xử lý'
+                    //   : item.label === 'rejected'
+                    //   ? 'Đã từ chối'
+                    //   : item.label === 'completed'
+                    //   ? 'Đã hoàn thành'
+                    //   : ''
                   }
                   size={16}
                   color={
