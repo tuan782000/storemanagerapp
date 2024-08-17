@@ -1,13 +1,10 @@
-import {
-  View,
-  Text,
-  Button,
-  Touchable,
-  TouchableOpacity,
-  Image,
-} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {Notification} from 'iconsax-react-native';
 import React, {useEffect, useState} from 'react';
-import {globalStyles} from '../../styles/globalStyle';
+import {Image, View} from 'react-native';
+import {BarChart} from 'react-native-gifted-charts';
+import Toast from 'react-native-toast-message';
+import {HandleUserAPI} from '../../apis/handleUserAPI';
 import {
   ContainerComponent,
   RowComponent,
@@ -15,125 +12,186 @@ import {
   SpaceComponent,
   TextComponent,
 } from '../../components';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
-import {UserModel} from '../../models/UserModel';
-import {Logout, Notification} from 'iconsax-react-native';
-import {BarChart, LineChart, PieChart} from 'react-native-gifted-charts';
-import LinearGradient from 'react-native-linear-gradient';
-import {fontFamilies} from '../../constants/fontFamilies';
 import {appColors} from '../../constants/colors';
-import {HandleUserAPI} from '../../apis/handleUserAPI';
-
-const barChartData: any = [
-  {
-    value: 2500,
-    frontColor: '#006DFF',
-    gradientColor: '#009FFF',
-    spacing: 6,
-    label: 'Jan',
-  },
-  {value: 2400, frontColor: '#3BE9DE', gradientColor: '#93FCF8'},
-
-  {
-    value: 3500,
-    frontColor: '#006DFF',
-    gradientColor: '#009FFF',
-    spacing: 6,
-    label: 'Feb',
-  },
-  {value: 3000, frontColor: '#3BE9DE', gradientColor: '#93FCF8'},
-
-  {
-    value: 4500,
-    frontColor: '#006DFF',
-    gradientColor: '#009FFF',
-    spacing: 6,
-    label: 'Mar',
-  },
-  {value: 4000, frontColor: '#3BE9DE', gradientColor: '#93FCF8'},
-
-  {
-    value: 5200,
-    frontColor: '#006DFF',
-    gradientColor: '#009FFF',
-    spacing: 6,
-    label: 'Apr',
-  },
-  {value: 4900, frontColor: '#3BE9DE', gradientColor: '#93FCF8'},
-
-  {
-    value: 3000,
-    frontColor: '#006DFF',
-    gradientColor: '#009FFF',
-    spacing: 6,
-    label: 'May',
-  },
-  {value: 2800, frontColor: '#3BE9DE', gradientColor: '#93FCF8'},
-];
-
-const lineChartData: any = [
-  {value: 50, label: 'Jan'},
-  {value: 80, label: 'Feb'},
-  {value: 90, label: 'Mar'},
-  {value: 70, label: 'Apr'},
-  {value: 85, label: 'May'},
-  {value: 60, label: 'Jun'},
-];
-
-const pieData: any = [
-  {value: 54, color: '#177AD5'},
-  {value: 40, color: '#79D2DE'},
-  {value: 20, color: '#ED6665'},
-];
+import {fontFamilies} from '../../constants/fontFamilies';
+import {LoadingModal} from '../../modals';
+import {UserModel} from '../../models/UserModel';
+import {globalStyles} from '../../styles/globalStyle';
 
 const HomeScreen = ({navigation}: any) => {
   const [userData, setUserData] = useState<UserModel | null>(null);
-  // const [userId, setUserId] = useState('');
+  const [userId, setUserId] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [data, setData] = useState<any>([]);
+  // const [yAxisLabelWidth, setYAxisLabelWidth] = useState(0);
+  const [maxValue, setMaxValue] = useState(0);
+  const [stepValue, setStepValue] = useState(0);
+  const [isDataReady, setIsDataReady] = useState(false);
+
+  const [dataEarningAmount, setDataEarningAmount] = useState<any>([]);
+  const [maxEarningAmount, setMaxEarningAmount] = useState(0);
+  const [stepEarningAmount, setStepEarningAmount] = useState(0);
+  const [isEarningAmountReady, setIsEarningAmountReady] = useState(false);
+
+  const [dataEarningPaymentAmount, setDataEarningPaymentAmount] = useState<any>(
+    [],
+  );
+  const [maxEarningPaymentAmount, setMaxEarningPaymentAmount] = useState(0);
+  const [stepEarningPaymentAmount, setStepEarningPaymentAmount] = useState(0);
+  const [isEarningPaymentAmountReady, setIsEarningPaymentAmountReady] =
+    useState(false);
 
   useEffect(() => {
     fetchUserData();
   }, []);
 
+  useEffect(() => {
+    if (userId) {
+      getMonthlyEarningAmounts(userId);
+      getMonthlyEarnings(userId);
+      getMonthlyEarningPaymentAmounts(userId);
+    }
+  }, [userId]);
+
   const fetchUserData = async () => {
+    setIsLoading(true);
+
     const user = await AsyncStorage.getItem('auth');
 
-    // const user = auth().currentUser;
-    // if (user) {
-    //   try {
-    //     const userDoc: any = await firestore()
-    //       .collection('users')
-    //       .doc(user.uid)
-    //       .get();
-    //     if (userDoc.exists) {
-    //       setUserData(userDoc.data());
-    //     }
-    //   } catch (error) {
-    //     console.error('Error fetching user data: ', error);
-    //   }
-    // }
     if (user) {
       const parsedUser = JSON.parse(user);
       const api = `/info?id=${parsedUser.id}`;
-      // setUserId(parsedUser.id);
+      setUserId(parsedUser.id);
       try {
         const res = await HandleUserAPI.Info(api);
+        Toast.show({
+          type: 'success',
+          text1: 'Thành công',
+          text2: 'Lấy thông tin người dùng thành công',
+          visibilityTime: 1000,
+        });
         setUserData(res.data);
       } catch (error) {
-        console.error('Lỗi khi lấy thông tin người dùng: ', error);
+        // console.error('Lỗi khi lấy thông tin người dùng: ', error);
+        Toast.show({
+          type: 'error',
+          text1: 'Thất bại',
+          text2: 'Lấy thông tin người dùng thất bại',
+          visibilityTime: 1000,
+        });
+      } finally {
+        setIsLoading(false);
       }
     }
   };
 
-  // const handleSignOut = async () => {
-  //   await auth().signOut();
+  // console.log(userId);
+  const getMonthlyEarningAmounts = async (id: string) => {
+    setIsLoading(true);
+    const api = `/getMonthlyEarningAmounts?id=${id}`;
+    try {
+      const res = await HandleUserAPI.Info(api);
+      setDataEarningAmount(res.data);
 
-  //   // navigation.navigate('LoginScreen');
-  // };
+      // Tính toán maxValue và stepValue
+      const max = Math.max(...res.data.map((item: any) => item.value));
+      const step = Math.ceil(max / 5);
 
-  // const user = auth().currentUser;
-  console.log(userData);
+      setMaxEarningAmount(max);
+      setStepEarningAmount(step);
+      setIsEarningAmountReady(true); // Đánh dấu rằng dữ liệu đã sẵn sàng
+    } catch (error) {
+      // console.error('Lỗi khi lấy thông tin người dùng: ', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Thất bại',
+        text2: 'Lấy thông tin người dùng thất bại',
+        visibilityTime: 1000,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const getMonthlyEarnings = async (id: string) => {
+    setIsLoading(true);
+    const api = `/getMonthlyEarnings?id=${id}`;
+
+    try {
+      const res = await HandleUserAPI.Info(api);
+      setData(res.data);
+
+      // Tính toán maxValue và stepValue
+      const max = Math.max(...res.data.map((item: any) => item.value));
+      const step = Math.ceil(max / 5);
+
+      setMaxValue(max);
+      setStepValue(step);
+      setIsDataReady(true); // Đánh dấu rằng dữ liệu đã sẵn sàng
+    } catch (error) {
+      // console.error('Lỗi khi lấy thông tin người dùng: ', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Thất bại',
+        text2: 'Lấy thông tin người dùng thất bại',
+        visibilityTime: 1000,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const getMonthlyEarningPaymentAmounts = async (id: string) => {
+    setIsLoading(true);
+    const api = `/getMonthlyEarningPaymentAmounts?id=${id}`;
+    try {
+      const res = await HandleUserAPI.Info(api);
+      setDataEarningPaymentAmount(res.data);
+
+      // Tính toán maxValue và stepValue
+      const max = Math.max(...res.data.map((item: any) => item.value));
+      const step = Math.ceil(max / 5);
+
+      setMaxEarningPaymentAmount(max);
+      setStepEarningPaymentAmount(step);
+      setIsEarningPaymentAmountReady(true); // Đánh dấu rằng dữ liệu đã sẵn sàng
+    } catch (error) {
+      // console.error('Lỗi khi lấy thông tin người dùng: ', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Thất bại',
+        text2: 'Lấy thông tin người dùng thất bại',
+        visibilityTime: 1000,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // // console.log(data);
+  // const maxValue = Math.max(...data.map((item: any) => item.value));
+  // const stepValue = Math.ceil(maxValue / 5);
+  // console.log(dataEarningAmount);
+  const calculateYAxisLabelWidth = () => {
+    const maxLength = Math.max(
+      ...data.map((item: any) => item.value.toString().length),
+    );
+    return maxLength * 10; // Điều chỉnh theo fontSize của nhãn trục y
+  };
+  const calculateYAxisLabelWidthAmount = () => {
+    const maxLength = Math.max(
+      ...dataEarningAmount.map((item: any) => item.value.toString().length),
+    );
+    return maxLength * 10; // Điều chỉnh theo fontSize của nhãn trục y
+  };
+  const calculateYAxisLabelWidthPaymentAmount = () => {
+    const maxLength = Math.max(
+      ...dataEarningPaymentAmount.map(
+        (item: any) => item.value.toString().length,
+      ),
+    );
+    return maxLength * 10; // Điều chỉnh theo fontSize của nhãn trục y
+  };
+
   return (
     <ContainerComponent isScroll>
       <SectionComponent styles={{marginTop: 10}}>
@@ -167,26 +225,12 @@ const HomeScreen = ({navigation}: any) => {
           ) : (
             <></>
           )}
-          {/* <TouchableOpacity onPress={handleSignOut}>
-          <Logout size={22} color="coral" />
-        </TouchableOpacity> */}
         </RowComponent>
       </SectionComponent>
       <View style={[globalStyles.container]}>
-        {/* <BarChart
-          data={barChartData}
-          barWidth={30}
-          barBorderRadius={5}
-          frontColor="blue"
-          initialSpacing={10}
-          spacing={20}
-          isAnimated
-          animationDuration={1000}
-          // animationType="SlideFromBottom"
-        /> */}
         <SectionComponent>
           <TextComponent
-            text="I. Thống kê doanh số thu - chi của 6 tháng gần nhất"
+            text="I. Thống kê doanh số đơn hàng"
             size={18}
             font={fontFamilies.bold}
           />
@@ -198,79 +242,130 @@ const HomeScreen = ({navigation}: any) => {
             borderRadius: 20,
             backgroundColor: '#232B5D',
           }}>
-          <Text style={{color: 'white', fontSize: 16, fontWeight: 'bold'}}>
-            Overview
-          </Text>
-          <View style={{padding: 20, alignItems: 'center'}}>
-            <BarChart
-              data={barChartData}
-              barWidth={16}
-              initialSpacing={10}
-              spacing={14}
-              barBorderRadius={4}
-              showGradient
-              yAxisThickness={0}
-              xAxisType={'dashed'}
-              xAxisColor={'lightgray'}
-              yAxisTextStyle={{color: 'lightgray'}}
-              stepValue={1000}
-              maxValue={6000}
-              noOfSections={6}
-              yAxisLabelTexts={['0', '1k', '2k', '3k', '4k', '5k', '6k']}
-              labelWidth={40}
-              xAxisLabelTextStyle={{color: 'lightgray', textAlign: 'center'}}
-              showLine
-              lineConfig={{
-                color: '#F29C6E',
-                thickness: 3,
-                curved: true,
-                hideDataPoints: true,
-                shiftY: 20,
-                initialSpacing: -30,
-              }}
-            />
+          <TextComponent
+            text="Thống kê"
+            color={appColors.white}
+            font={fontFamilies.bold}
+          />
+          <View style={{paddingVertical: 20, alignItems: 'center'}}>
+            {isEarningAmountReady && (
+              <BarChart
+                data={dataEarningAmount}
+                barWidth={22}
+                spacing={20}
+                barBorderRadius={4}
+                showGradient
+                yAxisLabelWidth={calculateYAxisLabelWidthAmount()}
+                hideRules
+                yAxisThickness={0}
+                xAxisColor="#FFFFFF"
+                yAxisTextStyle={{color: 'white'}}
+                xAxisLabelTextStyle={{
+                  color: 'white',
+                  fontFamily: fontFamilies.regular,
+                }}
+                isAnimated
+                labelWidth={30}
+                rotateLabel={true}
+                stepValue={stepEarningAmount}
+                maxValue={maxEarningAmount}
+              />
+            )}
           </View>
         </View>
-      </View>
-      {/* <View style={[globalStyles.container, globalStyles.center]}>
-        <LineChart
-          data={lineChartData}
-          thickness={2}
-          startFillColor="#ffa726"
-          endFillColor="#fb8c00"
-          startOpacity={0.4}
-          endOpacity={0.2}
-          color="#ff7043"
-          curved
-          xAxisColor="black"
-          yAxisColor="black"
-          hideDataPoints
-          isAnimated
-          animationDuration={1000}
-        />
-        <LinearGradient colors={['#ffa726', '#fb8c00']} style={{flex: 1}} />
-      </View> */}
 
-      <View style={[globalStyles.container, globalStyles.center]}>
         <SectionComponent>
           <TextComponent
-            text="II. Tổng biên độ thu - chi của 6 tháng gần nhất"
+            text="II. Thống kê doanh số kiếm được"
             size={18}
             font={fontFamilies.bold}
           />
         </SectionComponent>
-        <PieChart
-          data={pieData}
-          showText
-          textColor="black"
-          radius={150}
-          textSize={20}
-          focusOnPress
-          showValuesAsLabels
-          showTextBackground
-          textBackgroundRadius={26}
-        />
+        <View
+          style={{
+            margin: 10,
+            padding: 16,
+            borderRadius: 20,
+            backgroundColor: '#232B5D',
+          }}>
+          <TextComponent
+            text="Thống kê"
+            color={appColors.white}
+            font={fontFamilies.bold}
+          />
+          <View style={{paddingVertical: 20, alignItems: 'center'}}>
+            {isDataReady && (
+              <BarChart
+                data={data}
+                barWidth={22}
+                spacing={20}
+                barBorderRadius={4}
+                showGradient
+                yAxisLabelWidth={calculateYAxisLabelWidth()}
+                hideRules
+                yAxisThickness={0}
+                xAxisColor="#FFFFFF"
+                yAxisTextStyle={{color: 'white'}}
+                xAxisLabelTextStyle={{
+                  color: 'white',
+                  fontFamily: fontFamilies.regular,
+                }}
+                isAnimated
+                labelWidth={30}
+                rotateLabel={true}
+                stepValue={stepValue}
+                maxValue={maxValue}
+              />
+            )}
+          </View>
+        </View>
+        <SectionComponent>
+          <TextComponent
+            text="III. Thống kê doanh số phải chi cho nhân công"
+            size={18}
+            font={fontFamilies.bold}
+          />
+        </SectionComponent>
+        <View
+          style={{
+            margin: 10,
+            padding: 16,
+            borderRadius: 20,
+            backgroundColor: '#232B5D',
+          }}>
+          <TextComponent
+            text="Thống kê"
+            color={appColors.white}
+            font={fontFamilies.bold}
+          />
+          <View style={{paddingVertical: 20, alignItems: 'center'}}>
+            {isEarningPaymentAmountReady && (
+              <BarChart
+                data={dataEarningPaymentAmount}
+                barWidth={22}
+                spacing={20}
+                barBorderRadius={4}
+                showGradient
+                yAxisLabelWidth={calculateYAxisLabelWidthPaymentAmount()}
+                hideRules
+                yAxisThickness={0}
+                xAxisColor="#FFFFFF"
+                yAxisTextStyle={{color: 'white'}}
+                xAxisLabelTextStyle={{
+                  color: 'white',
+                  fontFamily: fontFamilies.regular,
+                }}
+                isAnimated
+                labelWidth={30}
+                rotateLabel={true}
+                stepValue={stepEarningPaymentAmount}
+                maxValue={maxEarningPaymentAmount}
+              />
+            )}
+          </View>
+        </View>
       </View>
+      <LoadingModal visible={isLoading} />
     </ContainerComponent>
   );
 };

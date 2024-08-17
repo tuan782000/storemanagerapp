@@ -31,12 +31,14 @@ import {getLastSevenCharacters} from '../../utils/getLastSevenCharacters';
 import Toast from 'react-native-toast-message';
 import {HandleUserAPI} from '../../apis/handleUserAPI';
 import ButtonComponent from '../../components/ButtonComponent';
+import {formatCurrencyVND} from '../../utils/moneyFormatCurrency';
 
 type EmployeeData = Pick<
   UserModel,
   `email` | `name` | `phone` | `profilePicture` | `created_at`
 > & {
   _id: string;
+  totalMoney: number;
 };
 
 const StaffScreen = ({navigation}: any) => {
@@ -78,7 +80,18 @@ const StaffScreen = ({navigation}: any) => {
       const response = await HandleUserAPI.Info('/getListEmployees');
       const listUsers: EmployeeData[] = response.data;
 
-      console.log(listUsers);
+      // console.log(listUsers);
+
+      for (const user of listUsers) {
+        try {
+          const totalMoneyResponse: any = await getTotalMoney(user._id);
+          // console.log(totalMoneyResponse);
+          user.totalMoney = totalMoneyResponse.data;
+        } catch (error) {
+          console.error('Error fetching total money for user: ', user._id);
+          // Optionally handle errors per user, if necessary
+        }
+      }
 
       setData(listUsers);
       setFilteredData(listUsers);
@@ -114,6 +127,20 @@ const StaffScreen = ({navigation}: any) => {
           id: item.id,
         })
   */
+
+  const getTotalMoney = async (id: string) => {
+    try {
+      const api = `/getMoneyUserEarn?id=${id}`;
+      return await HandleUserAPI.Info(api);
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Thất bại',
+        text2: 'Có lỗi đã xảy ra',
+        visibilityTime: 1000,
+      });
+    }
+  };
 
   const renderItem = ({item}: {item: EmployeeData}) => (
     <CardComponent
@@ -151,7 +178,12 @@ const StaffScreen = ({navigation}: any) => {
           <RowComponent>
             <Money2 size={20} color={appColors.text} />
             <SpaceComponent width={10} />
-            <TextComponent text="100.000.000 vnđ" size={16} />
+            {/* <TextComponent text="100.000.000 vnđ" size={16} /> */}
+
+            <TextComponent
+              text={`${formatCurrencyVND(item.totalMoney)}`}
+              size={16}
+            />
           </RowComponent>
           <SpaceComponent height={10} />
           <RowComponent>

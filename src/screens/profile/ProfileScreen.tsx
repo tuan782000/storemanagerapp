@@ -32,10 +32,12 @@ import {useDispatch} from 'react-redux';
 import {removeAuth} from '../../redux/reducers/authReducer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {HandleUserAPI} from '../../apis/handleUserAPI';
+import {formatCurrencyVND} from '../../utils/moneyFormatCurrency';
 
 const ProfileScreen = () => {
   const [userData, setUserData] = useState<UserModel | null>(null);
   const [userId, setUserId] = useState('');
+  const [totalMoney, setTotalMoney] = useState<number>(0);
   const [isVisibleEditModal, setIsVisibleEditModal] = useState(false);
   const [isVisibledResetPassword, setIsVisibledResetPassword] = useState(false);
 
@@ -47,6 +49,12 @@ const ProfileScreen = () => {
   useEffect(() => {
     fetchUserData();
   }, []);
+
+  useEffect(() => {
+    if (userId) {
+      getTotalMoney(userId);
+    }
+  }, [userId]);
 
   const fetchUserData = async () => {
     const user = await AsyncStorage.getItem('auth');
@@ -148,6 +156,25 @@ const ProfileScreen = () => {
     }
   };
 
+  const getTotalMoney = async (id: string) => {
+    setIsLoading(true);
+
+    try {
+      const api = `/getMoneyUserEarn?id=${id}`;
+      const total: any = await HandleUserAPI.Info(api);
+      setTotalMoney(total.data); // này trả về object tham chiếu data lấy ra kết quả mình cần
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Thất bại',
+        text2: 'Có lỗi đã xảy ra',
+        visibilityTime: 1000,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <ContainerComponent isScroll>
       <SectionComponent styles={{marginTop: 10}}>
@@ -211,7 +238,7 @@ const ProfileScreen = () => {
             <RowComponent>
               <WalletMoney size={20} color={appColors.text} />
               <SpaceComponent width={10} />
-              <TextComponent text="10.000.000 vnđ" />
+              <TextComponent text={`${formatCurrencyVND(totalMoney)}`} />
             </RowComponent>
             <SpaceComponent height={10} />
             <RowComponent>

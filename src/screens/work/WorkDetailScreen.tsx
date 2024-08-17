@@ -62,8 +62,6 @@ const initialUpdateWorkSession = {
   rejection_reason: '', // Có thể là null nếu không có lý do từ chối
   before_images: [], // Danh sách các URL hình ảnh trước khi làm
   after_images: [], // Danh sách các URL hình ảnh sau khi làm
-  before_image_firebase: [], // Danh sách các URL hình ảnh trước khi làm
-  after_image_firebase: [], // Danh sách các URL hình ảnh sau khi làm
   result: '', // Có thể là null nếu không có kết quả
 };
 

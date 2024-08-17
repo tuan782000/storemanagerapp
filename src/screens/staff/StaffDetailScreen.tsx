@@ -18,6 +18,8 @@ import {DateTime} from '../../utils/DateTime';
 import ButtonComponent from '../../components/ButtonComponent';
 import {DeleteUserConfirmModal, EditAccountModal} from '../../modals';
 import {HandleUserAPI} from '../../apis/handleUserAPI';
+import Toast from 'react-native-toast-message';
+import {formatCurrencyVNDWithText} from '../../utils/moneyFormatCurrency';
 
 type EmployeeData = Pick<
   UserModel,
@@ -33,9 +35,11 @@ const StaffDetailScreen = ({navigation, route}: any) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isVisibleDeleteStaff, setIsVisibleDeleteStaff] = useState(false);
   const [isVisibleUpdateStaff, setIsVisibleUpdateStaff] = useState(false);
+  const [totalMoney, setTotalMoney] = useState<number>(0);
 
   useEffect(() => {
     handleGetUserWithId(id);
+    getTotalMoney(id);
   }, [id]);
 
   const handleGetUserWithId = async (id: string) => {
@@ -81,6 +85,25 @@ const StaffDetailScreen = ({navigation, route}: any) => {
     }
   };
 
+  const getTotalMoney = async (id: string) => {
+    setIsLoading(true);
+
+    try {
+      const api = `/getMoneyUserEarn?id=${id}`;
+      const total: any = await HandleUserAPI.Info(api);
+      setTotalMoney(total.data); // này trả về object tham chiếu data lấy ra kết quả mình cần
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Thất bại',
+        text2: 'Có lỗi đã xảy ra',
+        visibilityTime: 1000,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <ContainerComponent back isScroll title="Thông tin chi tiết nhân viên">
       <SectionComponent>
@@ -106,6 +129,22 @@ const StaffDetailScreen = ({navigation, route}: any) => {
                 resizeMode="cover"
               />
               <SpaceComponent height={20} />
+            </View>
+            <View
+              style={{
+                alignItems: 'center',
+              }}>
+              <TextComponent
+                text={`${formatCurrencyVNDWithText(totalMoney)}`}
+                styles={{
+                  backgroundColor: appColors.success,
+                  paddingHorizontal: 20,
+                  paddingVertical: 10,
+                  borderRadius: 10,
+                }}
+                color={appColors.white}
+                font={fontFamilies.bold}
+              />
             </View>
             <SpaceComponent height={20} />
             {Object.entries(infoUser)
