@@ -1,4 +1,11 @@
-import {View, Text, Button, Image, Switch} from 'react-native';
+import {
+  View,
+  Text,
+  Button,
+  Image,
+  Switch,
+  KeyboardAvoidingView,
+} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import ButtonComponent from '../../components/ButtonComponent';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -147,7 +154,7 @@ const LoginScreen = ({navigation}: any) => {
   // };
 
   return (
-    <>
+    <KeyboardAvoidingView behavior="padding" style={{flex: 1}}>
       <ContainerComponent isScroll>
         <SectionComponent
           styles={[globalStyles.center, {marginTop: 75, marginBottom: 30}]}>
@@ -240,7 +247,7 @@ const LoginScreen = ({navigation}: any) => {
         />
       </ContainerComponent>
       <LoadingModal visible={isLoading} />
-    </>
+    </KeyboardAvoidingView>
   );
 };
 

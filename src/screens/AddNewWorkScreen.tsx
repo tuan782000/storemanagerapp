@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {TouchableOpacity} from 'react-native';
+import {KeyboardAvoidingView, TouchableOpacity} from 'react-native';
 import {
   ContainerComponent,
   DateTimePickerComponent,
@@ -176,7 +176,8 @@ const AddNewWorkScreen = ({navigation}: any) => {
 
       case 'amount':
         if (typeof value === 'number') {
-          newErrors.amount = value > 0 ? '' : 'Không được nhập số âm';
+          newErrors.amount =
+            value > 0 ? '' : 'Không được nhập số âm hoặc bằng 0';
         }
         break;
       case 'payment_amount':
@@ -313,196 +314,220 @@ const AddNewWorkScreen = ({navigation}: any) => {
   };
 
   return (
-    <ContainerComponent back isScroll title="Thêm công việc mới">
-      <SpaceComponent height={10} />
-      <DividerComponent />
-      <SpaceComponent height={10} />
-      <SectionComponent>
-        <RowComponent
-          styles={{
-            marginBottom: 8,
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-          }}>
-          <RowComponent>
-            <TextComponent
-              text="Chọn nhân viên"
-              size={16}
-              font={fontFamilies.bold}
-              flex={1}
-            />
-          </RowComponent>
-          <SpaceComponent height={10} />
-          {errors['employee_id'] ? (
-            <TextComponent text={errors['employee_id']} color={appColors.red} />
-          ) : null}
-          <DropDownPickerComponent
-            values={staffsSelect}
-            selected={workForm.employee_id}
-            onSelect={val => handleChangeValue('employee_id', val)}
-          />
-        </RowComponent>
-        <RowComponent
-          styles={{
-            marginBottom: 8,
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-          }}>
-          <RowComponent>
-            <TextComponent
-              text="Chọn khác hàng"
-              size={16}
-              font={fontFamilies.bold}
-              flex={1}
-            />
-            <TouchableOpacity
-              onPress={() => navigation.navigate('AddNewCustomerScreen')}>
-              <AddCircle size={22} color={appColors.primary} />
-            </TouchableOpacity>
-          </RowComponent>
-          <SpaceComponent height={10} />
-          {errors['customer_id'] ? (
-            <TextComponent text={errors['customer_id']} color={appColors.red} />
-          ) : null}
-          <DropDownPickerComponent
-            values={customersSelect}
-            selected={workForm.customer_id}
-            onSelect={val => handleChangeValue('customer_id', val)}
-          />
-        </RowComponent>
-        <RowComponent
-          styles={{
-            marginBottom: 8,
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-          }}>
-          <TextComponent
-            text="Mô tả công việc"
-            size={16}
-            font={fontFamilies.bold}
-          />
-          <SpaceComponent height={10} />
-          {errors['description'] ? (
-            <TextComponent text={errors['description']} color={appColors.red} />
-          ) : null}
-          <InputComponent
-            type="default"
-            value={workForm.description}
-            onChange={val => handleChangeValue('description', val)}
-            placeholder="Mô tả công việc"
-            multiple
-            numberOfLines={4}
-            affix={
-              <Edit2 size={20} color={appColors.gray} style={{marginTop: 22}} />
-            }
-            allowClear
-          />
-        </RowComponent>
-        <RowComponent
-          styles={{
-            marginBottom: 8,
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-          }}>
-          <RowComponent>
-            <TextComponent
-              text="Nhập giá tiền"
-              size={16}
-              font={fontFamilies.bold}
-              flex={1}
-            />
-          </RowComponent>
-          <SpaceComponent height={10} />
-          {errors['amount'] ? (
-            <TextComponent text={errors['amount']} color={appColors.red} />
-          ) : null}
-          <InputComponent
-            type="numeric"
-            value={workForm.amount}
-            onChange={val => handleChangeValue('amount', val)}
-            placeholder="Vui lòng nhập số tiền công việc"
-            affix={<Money2 size={20} color={appColors.gray} />}
-          />
-        </RowComponent>
-        <RowComponent
-          styles={{
-            marginBottom: 8,
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-          }}>
-          <RowComponent>
-            <TextComponent
-              text="Phần trăm chia cho thợ"
-              size={16}
-              font={fontFamilies.bold}
-              flex={1}
-            />
-          </RowComponent>
-          <SpaceComponent height={10} />
-          {errors['payment_amount'] ? (
-            <TextComponent
-              text={errors['payment_amount']}
-              color={appColors.red}
-            />
-          ) : null}
-          <InputComponent
-            type="numeric"
-            value={workForm.payment_amount}
-            onChange={val => handleChangeValue('payment_amount', val)}
-            placeholder="Vui lòng nhập số phần trăm"
-            affix={<Money2 size={20} color={appColors.gray} />}
-          />
-        </RowComponent>
-
-        <RowComponent justify="space-between">
+    <KeyboardAvoidingView behavior="padding" style={{flex: 1}}>
+      <ContainerComponent back isScroll title="Thêm công việc mới">
+        <SpaceComponent height={10} />
+        <DividerComponent />
+        <SpaceComponent height={10} />
+        <SectionComponent>
           <RowComponent
             styles={{
               marginBottom: 8,
               flexDirection: 'column',
               alignItems: 'flex-start',
-              flex: 1,
             }}>
-            <TextComponent
-              text="Ngày bắt đầu"
-              size={16}
-              font={fontFamilies.bold}
-            />
+            <RowComponent>
+              <TextComponent
+                text="Chọn nhân viên"
+                size={16}
+                font={fontFamilies.bold}
+                flex={1}
+              />
+            </RowComponent>
             <SpaceComponent height={10} />
-            <DateTimePickerComponent
-              type="date"
-              onSelect={val => handleChangeValue('start_time', val)}
-              selected={workForm.start_time}
+            {errors['employee_id'] ? (
+              <>
+                <TextComponent
+                  text={errors['employee_id']}
+                  color={appColors.red}
+                />
+                <SpaceComponent height={5} />
+              </>
+            ) : null}
+            <DropDownPickerComponent
+              values={staffsSelect}
+              selected={workForm.employee_id}
+              onSelect={val => handleChangeValue('employee_id', val)}
             />
           </RowComponent>
-          <SpaceComponent width={10} />
           <RowComponent
             styles={{
               marginBottom: 8,
               flexDirection: 'column',
               alignItems: 'flex-start',
-              flex: 1,
+            }}>
+            <RowComponent>
+              <TextComponent
+                text="Chọn khác hàng"
+                size={16}
+                font={fontFamilies.bold}
+                flex={1}
+              />
+              <TouchableOpacity
+                onPress={() => navigation.navigate('AddNewCustomerScreen')}>
+                <AddCircle size={22} color={appColors.primary} />
+              </TouchableOpacity>
+            </RowComponent>
+            <SpaceComponent height={10} />
+            {errors['customer_id'] ? (
+              <>
+                <TextComponent
+                  text={errors['customer_id']}
+                  color={appColors.red}
+                />
+                <SpaceComponent height={5} />
+              </>
+            ) : null}
+            <DropDownPickerComponent
+              values={customersSelect}
+              selected={workForm.customer_id}
+              onSelect={val => handleChangeValue('customer_id', val)}
+            />
+          </RowComponent>
+          <RowComponent
+            styles={{
+              marginBottom: 8,
+              flexDirection: 'column',
+              alignItems: 'flex-start',
             }}>
             <TextComponent
-              text="Dự kiến hoàn thành"
+              text="Mô tả công việc"
               size={16}
               font={fontFamilies.bold}
             />
             <SpaceComponent height={10} />
-            <DateTimePickerComponent
-              type="date"
-              onSelect={val => handleChangeValue('end_time', val)}
-              selected={workForm.end_time}
+            {errors['description'] ? (
+              <>
+                <TextComponent
+                  text={errors['description']}
+                  color={appColors.red}
+                />
+                <SpaceComponent height={5} />
+              </>
+            ) : null}
+            <InputComponent
+              type="default"
+              value={workForm.description}
+              onChange={val => handleChangeValue('description', val)}
+              placeholder="Mô tả công việc"
+              multiple
+              numberOfLines={4}
+              affix={<Edit2 size={20} color={appColors.gray} />}
+              allowClear
             />
           </RowComponent>
-        </RowComponent>
+          <RowComponent
+            styles={{
+              marginBottom: 8,
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+            }}>
+            <RowComponent>
+              <TextComponent
+                text="Nhập giá tiền"
+                size={16}
+                font={fontFamilies.bold}
+                flex={1}
+              />
+            </RowComponent>
+            <SpaceComponent height={10} />
+            {errors['amount'] ? (
+              <>
+                <TextComponent text={errors['amount']} color={appColors.red} />
+                <SpaceComponent height={5} />
+              </>
+            ) : null}
+            <InputComponent
+              type="numeric"
+              value={workForm.amount}
+              onChange={val => handleChangeValue('amount', val)}
+              placeholder="Vui lòng nhập số tiền công việc"
+              affix={<Money2 size={20} color={appColors.gray} />}
+            />
+          </RowComponent>
+          <RowComponent
+            styles={{
+              marginBottom: 8,
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+            }}>
+            <RowComponent>
+              <TextComponent
+                text="Phần trăm chia cho thợ"
+                size={16}
+                font={fontFamilies.bold}
+                flex={1}
+              />
+            </RowComponent>
+            <SpaceComponent height={10} />
+            {errors['payment_amount'] ? (
+              <>
+                <TextComponent
+                  text={errors['payment_amount']}
+                  color={appColors.red}
+                />
+                <SpaceComponent height={5} />
+              </>
+            ) : null}
+            <InputComponent
+              type="numeric"
+              value={workForm.payment_amount}
+              onChange={val => handleChangeValue('payment_amount', val)}
+              placeholder="Vui lòng nhập số phần trăm"
+              affix={<Money2 size={20} color={appColors.gray} />}
+            />
+          </RowComponent>
 
-        <ButtonComponent
-          text="Tạo công việc"
-          onPress={handleRegister}
-          type="primary"
-        />
-      </SectionComponent>
-    </ContainerComponent>
+          <RowComponent justify="space-between">
+            <RowComponent
+              styles={{
+                marginBottom: 8,
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                flex: 1,
+              }}>
+              <TextComponent
+                text="Ngày bắt đầu"
+                size={16}
+                font={fontFamilies.bold}
+              />
+              <SpaceComponent height={10} />
+              <DateTimePickerComponent
+                type="date"
+                onSelect={val => handleChangeValue('start_time', val)}
+                selected={workForm.start_time}
+              />
+            </RowComponent>
+            <SpaceComponent width={10} />
+            <RowComponent
+              styles={{
+                marginBottom: 8,
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                flex: 1,
+              }}>
+              <TextComponent
+                text="Dự kiến hoàn thành"
+                size={16}
+                font={fontFamilies.bold}
+              />
+              <SpaceComponent height={10} />
+              <DateTimePickerComponent
+                type="date"
+                onSelect={val => handleChangeValue('end_time', val)}
+                selected={workForm.end_time}
+              />
+            </RowComponent>
+          </RowComponent>
+
+          <ButtonComponent
+            text="Tạo công việc"
+            onPress={handleRegister}
+            type="primary"
+          />
+        </SectionComponent>
+      </ContainerComponent>
+    </KeyboardAvoidingView>
   );
 };
 

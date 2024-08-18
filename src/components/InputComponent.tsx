@@ -52,13 +52,20 @@ const InputComponent = (props: Props) => {
         {
           minHeight: numberOfLines && multiple ? numberOfLines * 56 : 56,
           alignItems: numberOfLines && multiple ? 'flex-start' : 'center',
+          paddingTop: multiple ? 12 : 0,
         },
         styleInput,
       ]}>
       {affix ?? affix}
       <TextInput
         editable={disabled}
-        style={[globalStyles.input, globalStyles.text]}
+        style={[
+          globalStyles.input,
+          globalStyles.text,
+          {
+            textAlignVertical: multiple ? 'top' : 'auto',
+          },
+        ]}
         value={value}
         placeholder={placeholder ?? ''}
         onChangeText={val => onChange(val)}
@@ -86,7 +93,7 @@ const InputComponent = (props: Props) => {
               name="close"
               size={22}
               color={appColors.text}
-              style={{paddingTop: multiple ? 22 : 0}}
+              style={{paddingTop: 0}}
             />
           )
         )}
