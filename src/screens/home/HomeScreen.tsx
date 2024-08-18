@@ -264,7 +264,7 @@ const HomeScreen = ({navigation}: any) => {
                   color: 'white',
                   fontFamily: fontFamilies.regular,
                 }}
-                isAnimated
+                // isAnimated
                 labelWidth={30}
                 rotateLabel={true}
                 stepValue={stepEarningAmount}
@@ -310,7 +310,7 @@ const HomeScreen = ({navigation}: any) => {
                   color: 'white',
                   fontFamily: fontFamilies.regular,
                 }}
-                isAnimated
+                // isAnimated
                 labelWidth={30}
                 rotateLabel={true}
                 stepValue={stepValue}
@@ -355,7 +355,7 @@ const HomeScreen = ({navigation}: any) => {
                   color: 'white',
                   fontFamily: fontFamilies.regular,
                 }}
-                isAnimated
+                // isAnimated
                 labelWidth={30}
                 rotateLabel={true}
                 stepValue={stepEarningPaymentAmount}

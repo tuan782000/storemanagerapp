@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {KeyboardAvoidingView, TouchableOpacity} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {KeyboardAvoidingView, TextInput, TouchableOpacity} from 'react-native';
 import {
   ContainerComponent,
   DateTimePickerComponent,
@@ -23,6 +23,7 @@ import {fontFamilies} from '../constants/fontFamilies';
 import {SelectModel} from '../models/SelectModel';
 import {TaskStatus} from '../models/WorkSessionModel';
 import {DateTime} from '../utils/DateTime';
+import {formatNumber} from '../utils/formatNumber';
 
 const initialTask = {
   employee_id: [],
@@ -52,6 +53,7 @@ const AddNewWorkScreen = ({navigation}: any) => {
   const [customersSelect, setCustomersSelect] = useState<SelectModel[]>([]);
 
   const [isLoading, setIsLoading] = useState(false);
+  const amountRef = useRef<TextInput>(null);
 
   useEffect(() => {
     // Lắng nghe sự kiện khi màn hình được focus
@@ -122,6 +124,15 @@ const AddNewWorkScreen = ({navigation}: any) => {
         visibilityTime: 10000,
       });
     }
+  };
+
+  const handleAmountChange = (text: string) => {
+    const numericValue: string = text.replace(/\./g, ''); // Remove old dots
+    handleChangeValue('amount', numericValue); // Save raw value
+    const formattedValue: string = formatNumber(numericValue);
+
+    // Update the display value in the TextInput
+    amountRef.current?.setNativeProps({text: formattedValue});
   };
 
   const handleChangeValue = (
@@ -438,9 +449,11 @@ const AddNewWorkScreen = ({navigation}: any) => {
               </>
             ) : null}
             <InputComponent
+              inputRef={amountRef}
               type="numeric"
               value={workForm.amount}
-              onChange={val => handleChangeValue('amount', val)}
+              // onChange={val => handleChangeValue('amount', val)}
+              onChange={handleAmountChange} // Sử dụng hàm handleAmountChange
               placeholder="Vui lòng nhập số tiền công việc"
               affix={<Money2 size={20} color={appColors.gray} />}
             />

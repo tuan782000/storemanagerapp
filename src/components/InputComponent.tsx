@@ -7,7 +7,7 @@ import {
   StyleProp,
   ViewStyle,
 } from 'react-native';
-import React, {ReactNode, useState} from 'react';
+import React, {ReactNode, RefObject, useState} from 'react';
 import {EyeSlash} from 'iconsax-react-native';
 import {appColors} from '../constants/colors';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -27,6 +27,7 @@ interface Props {
   styleInput?: StyleProp<ViewStyle>;
   multiple?: boolean;
   numberOfLines?: number;
+  inputRef?: RefObject<TextInput>;
 }
 
 const InputComponent = (props: Props) => {
@@ -43,6 +44,7 @@ const InputComponent = (props: Props) => {
     allowClear,
     multiple,
     numberOfLines,
+    inputRef,
   } = props;
   const [isShowPass, setIsShowPass] = useState(isPassword ?? false);
   return (
@@ -58,6 +60,7 @@ const InputComponent = (props: Props) => {
       ]}>
       {affix ?? affix}
       <TextInput
+        ref={inputRef}
         editable={disabled}
         style={[
           globalStyles.input,

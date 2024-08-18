@@ -131,6 +131,12 @@ const WorkDetailScreen = ({navigation, route}: any) => {
           console.log('Không có thông tin liên quan!');
         }
       } catch (error: any) {
+        // Toast.show({
+        //   type: 'error',
+        //   text1: 'Thất bại',
+        //   text2: error.message,
+        //   visibilityTime: 1000,
+        // });
         console.log(error.message);
       } finally {
         setIsLoading(false);
@@ -144,6 +150,12 @@ const WorkDetailScreen = ({navigation, route}: any) => {
     try {
       const workWithId = await HandleWorkSessionAPI.WorkSession(api);
       setworkSessionById(workWithId.data);
+      Toast.show({
+        type: 'success',
+        text1: 'Thành công',
+        text2: 'Lấy thông tin chi tiết nhiệm vụ',
+        visibilityTime: 1000,
+      });
     } catch (error: any) {
       console.log(error.message);
     } finally {
@@ -189,7 +201,7 @@ const WorkDetailScreen = ({navigation, route}: any) => {
       setIsLoading(false);
     }
   };
-
+  // Phía server sẽ trả về 404 lịch bảo trì
   const fetchCheckMaintanceSchedule = async (
     employee_id: string,
     customer_id: string,
@@ -209,7 +221,7 @@ const WorkDetailScreen = ({navigation, route}: any) => {
         );
       setExistingMaintanceSchedule(checkExistingSchedule.data);
     } catch (error: any) {
-      console.log(error.message);
+      console.log('Chưa có lịch bảo trì cho nhiệm vụ này');
     } finally {
       setIsLoading(false);
     }
@@ -305,8 +317,16 @@ const WorkDetailScreen = ({navigation, route}: any) => {
   };
 
   const handleUpdateWork = async () => {
+    if (!workFormUpdate.status) {
+      Toast.show({
+        type: 'error',
+        text1: 'Lỗi',
+        text2: 'Vui lòng chọn trạng thái trước khi cập nhật!',
+        visibilityTime: 1000,
+      });
+      return; // Ngừng quá trình submit
+    }
     setIsLoading(true);
-
     // console.log(workFormUpdate.status);
     // console.log(workFormUpdate.rejection_reason);
     // console.log(workFormUpdate.before_images);
@@ -1387,8 +1407,8 @@ const WorkDetailScreen = ({navigation, route}: any) => {
                     multiple
                     numberOfLines={2}
                     placeholder="Viết kết quả ở đây..."
-                    affix={<Edit2 size={22} color={appColors.text} />}
-                    styleInput={{alignItems: 'center'}}
+                    affix={<Edit2 size={16} color={appColors.text} />}
+                    // styleInput={{alignItems: 'center'}}
                     allowClear
                   />
                 </>
@@ -1436,8 +1456,7 @@ const WorkDetailScreen = ({navigation, route}: any) => {
                         multiple
                         numberOfLines={2}
                         placeholder="Viết nhận xét ở đây..."
-                        affix={<Edit2 size={22} color={appColors.text} />}
-                        styleInput={{alignItems: 'center'}}
+                        affix={<Edit2 size={16} color={appColors.text} />}
                         allowClear
                       />
                       <SpaceComponent height={15} />
