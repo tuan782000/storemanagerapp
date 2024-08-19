@@ -35,17 +35,22 @@ const TabsNavigators = () => {
   }, [userData]);
 
   const fetchUserData = async () => {
-    const user = await AsyncStorage.getItem('auth');
-    if (user) {
-      const parsedUser = JSON.parse(user);
-      const api = `/info?id=${parsedUser.id}`;
-      try {
-        const res = await HandleUserAPI.Info(api);
-        setUserData(res.data);
-      } catch (error) {
-        console.error('Lỗi khi lấy thông tin user: ', error);
-      }
+    try {
+      const res = await HandleUserAPI.Info(`/info`);
+    } catch (error) {
+      console.log(error);
     }
+    // const user = await AsyncStorage.getItem('auth');
+    // if (user) {
+    //   const parsedUser = JSON.parse(user);
+    //   const api = `/info?id=${parsedUser.id}`;
+    //   try {
+    //
+    //     setUserData(res.data);
+    //   } catch (error) {
+    //     console.error('Lỗi khi lấy thông tin user: ', error);
+    //   }
+    // }
   };
 
   // 1 bugs nhỏ khi login vào staff - quay lại login bằng admin thì vẵn ăn isAdmin là false

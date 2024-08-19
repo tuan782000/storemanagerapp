@@ -125,38 +125,10 @@ const LoginScreen = ({navigation}: any) => {
     }
   };
 
-  // const handleRegister = async () => {
-  //   // console.log(values);
-  //   setIsLoading(true);
-
-  //   try {
-  //     const res = await handleAuthAPI(
-  //       '/register',
-  //       {
-  //         email: values.email,
-  //         password: values.password,
-  //         role: values.role,
-  //         username: extractUsernameFromEmail(values.email),
-  //         name: values.name,
-  //         phone: values.phone,
-  //         profilePicture: values.profilePicture,
-  //       },
-  //       'post',
-  //     );
-  //     console.log(res);
-  //     // dispatch(addAuth(res.data));
-  //     // await AsyncStorage.setItem('auth', JSON.stringify(res.data));
-  //   } catch (error) {
-  //     console.log(error);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
   return (
     <KeyboardAvoidingView behavior="padding" style={{flex: 1}}>
       <ContainerComponent isScroll>
-        <SectionComponent
+        {/* <SectionComponent
           styles={[globalStyles.center, {marginTop: 75, marginBottom: 30}]}>
           <Image
             source={require('../../assets/images/icon-logo.png')}
@@ -169,7 +141,7 @@ const LoginScreen = ({navigation}: any) => {
             size={28}
             font={fontFamilies.bold}
           />
-        </SectionComponent>
+        </SectionComponent> */}
         <SectionComponent>
           <TextComponent text="Đăng nhập" size={20} title />
           <SpaceComponent height={20} />
@@ -231,13 +203,6 @@ const LoginScreen = ({navigation}: any) => {
             // onPress={handleRegister}
             icon={<ArrowRight2 size={20} color={appColors.white} />}
             iconPostion="right"
-          />
-        </SectionComponent>
-        <SpaceComponent height={16} />
-        <SectionComponent styles={[globalStyles.center]}>
-          <TextComponent
-            text={`Dĩ tín giao tình, khách nhớ thương, \n Hài lòng khách đến, bền chặt giao thương.`}
-            styles={{textAlign: 'center'}}
           />
         </SectionComponent>
 

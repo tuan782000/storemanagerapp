@@ -1,5 +1,5 @@
 import {View, Text} from 'react-native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import TabsNavigators from './TabsNavigators';
 import {
@@ -10,6 +10,7 @@ import {
   StaffDetailScreen,
   WorkDetailScreen,
 } from '../../screens';
+import {Notifications} from '../../utils/handleNotifications';
 
 const MainNavigator = () => {
   // Auth thì nằm riêng
@@ -17,6 +18,10 @@ const MainNavigator = () => {
   // những nào nằm Tabs (5) Home - schedule - Staff - Customers - Info
   // Vì tabs có HomeScreen nên đặt ở main
   const Stack = createNativeStackNavigator();
+
+  useEffect(() => {
+    Notifications.CheckPermision();
+  }, []);
 
   return (
     <Stack.Navigator
