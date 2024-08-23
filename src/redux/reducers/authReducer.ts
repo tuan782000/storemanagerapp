@@ -13,20 +13,18 @@ const initialState: AuthState = {
 };
 
 const authSlice = createSlice({
-  name: 'auth', // tên reduce
+  name: 'auth',
   initialState: {
     authData: initialState,
-  }, // các giá trị - trạng thái ban đầu
+  },
   reducers: {
-    // state trạng thái hiện tại - action mang theo các thông tin
     addAuth: (state, action) => {
-      state.authData = action.payload; // action mang các thông tin - các thông tin nằm trong payload, nhiệm vụ của state.authData là giúp cập nhật state bằng cách mang các thông tin đó di cập nhật
+      state.authData = action.payload;
     },
     removeAuth: (state, action) => {
       state.authData = initialState;
     },
   },
-  // chứa các hàm - hay còn gọi là các action
 });
 
 export const authReducer = authSlice.reducer;

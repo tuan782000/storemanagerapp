@@ -7,6 +7,7 @@ export enum TaskStatus {
 }
 
 type WorkSession = {
+  _id: string;
   customer_id: string[];
   employee_id: string[];
   start_time?: Date | null;
@@ -23,7 +24,7 @@ type WorkSession = {
   updated_at?: Date;
   isDeleted?: boolean;
   deletedAt?: Date;
-  maintenance_schedule?: string[];
+  maintenance_schedule: string;
   comments?: string[];
 };
 

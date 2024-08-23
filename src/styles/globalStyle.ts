@@ -46,7 +46,7 @@ export const globalStyles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 15,
     backgroundColor: appColors.white,
-    marginBottom: 20,
+    marginBottom: 16,
   },
   input: {
     padding: 0,
@@ -63,5 +63,16 @@ export const globalStyles = StyleSheet.create({
     // shadowOpacity: 0.25,
     // shadowRadius: 8,
     // elevation: 6,
+  },
+
+  avatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 100,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    padding: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

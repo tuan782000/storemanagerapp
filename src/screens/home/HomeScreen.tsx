@@ -17,6 +17,10 @@ import {fontFamilies} from '../../constants/fontFamilies';
 import {LoadingModal} from '../../modals';
 import {UserModel} from '../../models/UserModel';
 import {globalStyles} from '../../styles/globalStyle';
+import Container from '../../components/Container';
+import {Button, Section} from '@bsdaoquang/rncomponent';
+import {useDispatch} from 'react-redux';
+import {removeAuth} from '../../redux/reducers/authReducer';
 
 const HomeScreen = ({navigation}: any) => {
   const [userData, setUserData] = useState<UserModel | null>(null);
@@ -42,49 +46,50 @@ const HomeScreen = ({navigation}: any) => {
   const [isEarningPaymentAmountReady, setIsEarningPaymentAmountReady] =
     useState(false);
 
-  useEffect(() => {
-    fetchUserData();
-  }, []);
+  // useEffect(() => {
+  //   fetchUserData();
+  // }, []);
 
-  useEffect(() => {
-    if (userId) {
-      getMonthlyEarningAmounts(userId);
-      getMonthlyEarnings(userId);
-      getMonthlyEarningPaymentAmounts(userId);
-    }
-  }, [userId]);
+  // const dispatch = useDispatch();
+  // useEffect(() => {
+  //   if (userId) {
+  //     getMonthlyEarningAmounts(userId);
+  //     getMonthlyEarnings(userId);
+  //     getMonthlyEarningPaymentAmounts(userId);
+  //   }
+  // }, [userId]);
 
-  const fetchUserData = async () => {
-    setIsLoading(true);
+  // const fetchUserData = async () => {
+  //   setIsLoading(true);
 
-    const user = await AsyncStorage.getItem('auth');
+  //   const user = await AsyncStorage.getItem('auth');
 
-    if (user) {
-      const parsedUser = JSON.parse(user);
-      const api = `/info?id=${parsedUser.id}`;
-      setUserId(parsedUser.id);
-      try {
-        const res = await HandleUserAPI.Info(api);
-        Toast.show({
-          type: 'success',
-          text1: 'Thành công',
-          text2: 'Lấy thông tin người dùng thành công',
-          visibilityTime: 1000,
-        });
-        setUserData(res.data);
-      } catch (error) {
-        // console.error('Lỗi khi lấy thông tin người dùng: ', error);
-        Toast.show({
-          type: 'error',
-          text1: 'Thất bại',
-          text2: 'Lấy thông tin người dùng thất bại',
-          visibilityTime: 1000,
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    }
-  };
+  //   if (user) {
+  //     const parsedUser = JSON.parse(user);
+  //     const api = `/info?id=${parsedUser.id}`;
+  //     setUserId(parsedUser.id);
+  //     try {
+  //       const res = await HandleUserAPI.Info(api);
+  //       Toast.show({
+  //         type: 'success',
+  //         text1: 'Thành công',
+  //         text2: 'Lấy thông tin người dùng thành công',
+  //         visibilityTime: 1000,
+  //       });
+  //       setUserData(res.data);
+  //     } catch (error) {
+  //       // console.error('Lỗi khi lấy thông tin người dùng: ', error);
+  //       Toast.show({
+  //         type: 'error',
+  //         text1: 'Thất bại',
+  //         text2: 'Lấy thông tin người dùng thất bại',
+  //         visibilityTime: 1000,
+  //       });
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   }
+  // };
 
   // console.log(userId);
   const getMonthlyEarningAmounts = async (id: string) => {
@@ -193,8 +198,11 @@ const HomeScreen = ({navigation}: any) => {
   };
 
   return (
-    <ContainerComponent isScroll>
-      <SectionComponent styles={{marginTop: 10}}>
+    <Container>
+      <Section>
+        <TextComponent text="fafa" />
+      </Section>
+      {/* <SectionComponent styles={{marginTop: 10}}>
         <RowComponent justify="space-between">
           <View
             style={{
@@ -365,8 +373,8 @@ const HomeScreen = ({navigation}: any) => {
           </View>
         </View>
       </View>
-      <LoadingModal visible={isLoading} />
-    </ContainerComponent>
+      <LoadingModal visible={isLoading} /> */}
+    </Container>
   );
 };
 

@@ -10,6 +10,7 @@ import AddNewWorkScreen from './AddNewWorkScreen';
 import AddNewCustomerScreen from './AddNewCustomerScreen';
 import WorkDetailScreen from './work/WorkDetailScreen';
 import AddNewScheduleScreen from './AddNewScheduleScreen';
+import SearchScreen from './SearchScreen';
 export {
   HomeScreen,
   LoginScreen,
@@ -23,4 +24,5 @@ export {
   AddNewCustomerScreen,
   WorkDetailScreen,
   AddNewScheduleScreen,
+  SearchScreen,
 };

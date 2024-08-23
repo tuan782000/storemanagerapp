@@ -7,16 +7,13 @@ import {
   AddNewScheduleScreen,
   AddNewUserScreen,
   AddNewWorkScreen,
+  SearchScreen,
   StaffDetailScreen,
   WorkDetailScreen,
 } from '../../screens';
 import {Notifications} from '../../utils/handleNotifications';
 
 const MainNavigator = () => {
-  // Auth thì nằm riêng
-  // những cái nào bị che luôn bottomtab thì nằm trong Main
-  // những nào nằm Tabs (5) Home - schedule - Staff - Customers - Info
-  // Vì tabs có HomeScreen nên đặt ở main
   const Stack = createNativeStackNavigator();
 
   useEffect(() => {
@@ -33,6 +30,7 @@ const MainNavigator = () => {
       <Stack.Screen name="StaffDetailScreen" component={StaffDetailScreen} />
       <Stack.Screen name="AddNewWorkScreen" component={AddNewWorkScreen} />
       <Stack.Screen name="WorkDetailScreen" component={WorkDetailScreen} />
+      <Stack.Screen name="SearchScreen" component={SearchScreen} />
       <Stack.Screen
         name="AddNewScheduleScreen"
         component={AddNewScheduleScreen}

@@ -14,14 +14,8 @@ const Routers = () => {
 
   const auth = useSelector(authSelector);
   const dispatch = useDispatch();
-
-  // lấy và gán vào trong asyncStore của cái phone accessToken dựa vào useAsyncStorage
-  // const {getItem, setItem} = useAsyncStorage('keyAccessToken');
-
-  // lấy
   const {getItem} = useAsyncStorage('auth');
 
-  // chạy từ trên xuống - những j của useEffect sẽ luôn chạy lần đầu tiên - nên sẽ được để qua 1 bên Build xong UI rồi quay lại chạy
   useEffect(() => {
     const timeout = setTimeout(() => {
       setIsShowSplash(false);

@@ -3,7 +3,7 @@ import React from 'react';
 import {fontFamilies} from '../constants/fontFamilies';
 import {Platform} from 'react-native';
 
-const TextComponent = (props: TextProps | any) => {
+const TextComponent = (props: TextProps) => {
   return (
     <Text
       {...props}
