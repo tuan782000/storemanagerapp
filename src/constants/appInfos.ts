@@ -5,7 +5,7 @@ export const appInfos = {
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').height,
   },
-  BASE_URL: 'http://192.168.1.13:7820',
+  BASE_URL: 'http://192.168.1.13:3001',
   monthNames: [
     'January',
     'February',

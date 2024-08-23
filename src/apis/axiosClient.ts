@@ -17,8 +17,9 @@ const axiosClient = axios.create({
 });
 
 axiosClient.interceptors.request.use(async (config: any) => {
+  const accesstoken = await getAccesstoken();
   config.headers = {
-    Authorization: `Bearer ${await getAccesstoken()}`,
+    Authorization: accesstoken ? `Bearer ${accesstoken}` : '',
     Accept: 'application/json',
     ...config.headers,
   };
@@ -29,15 +30,17 @@ axiosClient.interceptors.request.use(async (config: any) => {
 });
 
 axiosClient.interceptors.response.use(
-  response => {
-    if (response.status >= 200 && response.status < 300 && response.data) {
-      return response.data;
+  res => {
+    if (res.data && res.status >= 200 && res.status < 300) {
+      return res.data;
+    } else {
+      return Promise.reject(res.data);
     }
   },
   error => {
-    console.log(error);
-    console.log(error.response.data.message);
-    throw new Error(error.message);
+    const {response} = error;
+    // console.log(response);
+    return Promise.reject(response.data);
   },
 );
 

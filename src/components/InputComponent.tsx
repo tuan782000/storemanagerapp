@@ -52,7 +52,7 @@ const InputComponent = (props: Props) => {
       style={[
         globalStyles.inputContainer,
         {
-          minHeight: numberOfLines && multiple ? numberOfLines * 56 : 56,
+          minHeight: numberOfLines && multiple ? numberOfLines * 48 : 48,
           alignItems: numberOfLines && multiple ? 'flex-start' : 'center',
           paddingTop: multiple ? 12 : 0,
         },
@@ -95,7 +95,7 @@ const InputComponent = (props: Props) => {
             <AntDesign
               name="close"
               size={22}
-              color={appColors.text}
+              color={appColors.gray4}
               style={{paddingTop: 0}}
             />
           )

@@ -1662,6 +1662,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@bsdaoquang/rncomponent@npm:^0.1.16":
+  version: 0.1.16
+  resolution: "@bsdaoquang/rncomponent@npm:0.1.16"
+  dependencies:
+    "@react-native-community/checkbox": "npm:^0.5.17"
+    react-native-vector-icons: "npm:^10.1.0"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 10/98658762ae61a74746691e4a47a6129b4d9096c326fc6b82844ef217e6c1d375db488bd614622107fc66bb9cbdf58dbdf5efa4e084bc93a58edb13dd537061e1
+  languageName: node
+  linkType: hard
+
 "@egjs/hammerjs@npm:^2.0.17":
   version: 2.0.17
   resolution: "@egjs/hammerjs@npm:2.0.17"
@@ -2804,6 +2817,20 @@ __metadata:
   peerDependencies:
     react-native: ^0.0.0-0 || >=0.60 <1.0
   checksum: 10/5a6b7ac8bd7a9e537a53a3f2301530c284fd885a45ce4a4e0014859bc0f7c89bee5c4b5a6b3740b8d83751561159b237474d18f32fad75ea7d56d4ddb2180d91
+  languageName: node
+  linkType: hard
+
+"@react-native-community/checkbox@npm:^0.5.17":
+  version: 0.5.17
+  resolution: "@react-native-community/checkbox@npm:0.5.17"
+  peerDependencies:
+    react: "*"
+    react-native: ">= 0.62"
+    react-native-windows: ">=0.62"
+  peerDependenciesMeta:
+    react-native-windows:
+      optional: true
+  checksum: 10/dcb2335c37f56fc707f0a513d84af74641894778c20e57bd3f98accb6f15498a7ec1754b576e58a3984680df54c7dd7c577777141393ea8ade7e7972871fce96
   languageName: node
   linkType: hard
 
@@ -10393,6 +10420,7 @@ __metadata:
     "@babel/core": "npm:^7.20.0"
     "@babel/preset-env": "npm:^7.20.0"
     "@babel/runtime": "npm:^7.20.0"
+    "@bsdaoquang/rncomponent": "npm:^0.1.16"
     "@react-native-async-storage/async-storage": "npm:^1.24.0"
     "@react-native-firebase/app": "npm:^20.3.0"
     "@react-native-firebase/auth": "npm:^20.3.0"

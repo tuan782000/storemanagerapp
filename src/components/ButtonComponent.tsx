@@ -12,6 +12,7 @@ import TextComponent from './TextComponent';
 import {globalStyles} from '../styles/globalStyle';
 import {appColors} from '../constants/colors';
 import {fontFamilies} from '../constants/fontFamilies';
+import {colors} from '@bsdaoquang/rncomponent';
 
 interface Props {
   text: string;
@@ -26,6 +27,7 @@ interface Props {
   textFont?: string;
   isLoading?: boolean;
   activeOpacity?: number;
+  disable?: boolean;
   textAndLinkStyle?: StyleProp<TextStyle>;
 }
 
@@ -46,17 +48,22 @@ const ButtonComponent = (props: Props) => {
     isLoading,
     activeOpacity,
     textAndLinkStyle,
+    disable,
   } = props;
   return type === 'primary' ? (
     <TouchableOpacity
       activeOpacity={activeOpacity}
-      disabled={isLoading}
+      disabled={isLoading || disable}
       onPress={onPress}
       style={[
         globalStyles.button,
         globalStyles.shadow,
         {
-          backgroundColor: color ?? appColors.primary,
+          backgroundColor: color
+            ? color
+            : disable
+            ? colors.gray400
+            : appColors.primary,
         },
         styles,
       ]}>

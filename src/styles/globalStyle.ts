@@ -31,8 +31,8 @@ export const globalStyles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: appColors.white,
     paddingHorizontal: 16,
-    paddingVertical: 16,
-    minHeight: 56,
+    paddingVertical: 12,
+    minHeight: 48,
     flexDirection: 'row',
   },
   inputContainer: {
@@ -41,7 +41,7 @@ export const globalStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: appColors.gray3,
     width: '100%',
-    minHeight: 56,
+    minHeight: 48,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 15,
@@ -55,13 +55,13 @@ export const globalStyles = StyleSheet.create({
     paddingHorizontal: 14,
   },
   shadow: {
-    shadowColor: 'rgba(0,0,0,0.5)',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    elevation: 6,
+    // shadowColor: 'rgba(0,0,0,0.5)',
+    // shadowOffset: {
+    //   width: 0,
+    //   height: 4,
+    // },
+    // shadowOpacity: 0.25,
+    // shadowRadius: 8,
+    // elevation: 6,
   },
 });

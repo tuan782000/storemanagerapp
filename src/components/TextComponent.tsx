@@ -1,41 +1,30 @@
-import {View, Text, StyleProp} from 'react-native';
+import {Text, TextProps} from '@bsdaoquang/rncomponent';
 import React from 'react';
-import {TextStyle} from 'react-native';
-import {appColors} from '../constants/colors';
 import {fontFamilies} from '../constants/fontFamilies';
-import {globalStyles} from '../styles/globalStyle';
-// thêm tilte để khác kiểu
+import {Platform} from 'react-native';
 
-interface Props {
-  text: string;
-  color?: string;
-  size?: number;
-  flex?: number;
-  font?: string;
-  styles?: StyleProp<TextStyle>;
-  title?: boolean;
-}
-const TextComponent = (props: Props) => {
-  const {text, color, flex, font, size, styles, title} = props;
+const TextComponent = (props: TextProps | any) => {
   return (
     <Text
-      style={[
-        globalStyles.text,
-        {
-          color: color ?? appColors.text,
-          flex: flex ?? 0,
-          fontSize: size ? size : title ? 24 : 14,
-          // fontSize: size,
-          fontFamily: font
-            ? font
-            : title
-            ? fontFamilies.medium
-            : fontFamilies.regular,
-        },
-        styles,
-      ]}>
-      {text}
-    </Text>
+      {...props}
+      text={props.text}
+      flex={props.flex}
+      numberOfLine={props.numberOfLine}
+      styles={{
+        lineHeight: props.size ? props.size + 4 : 20,
+        fontSize: props.size ? props.size : Platform.OS === 'ios' ? 16 : 14,
+        fontFamily: props.font ?? fontFamilies.regular,
+        fontWeight: props.font
+          ? props.font === fontFamilies.bold
+            ? '700'
+            : props.font === fontFamilies.medium
+            ? '500'
+            : '600'
+          : '400',
+        color: props.color ?? '#212121',
+        ...props.styles,
+      }}
+    />
   );
 };
 
